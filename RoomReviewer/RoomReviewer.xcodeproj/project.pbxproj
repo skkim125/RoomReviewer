@@ -6,30 +6,23 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		04FFC7CC2DF16A840081AF7C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04FFC7C32DF16A840081AF7C /* Assets.xcassets */; };
+		04FFC7CE2DF16A840081AF7C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */; };
+		04FFC7D02DF16A840081AF7C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FFC7C22DF16A840081AF7C /* AppDelegate.swift */; };
+		04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FFC7C92DF16A840081AF7C /* SceneDelegate.swift */; };
+		04FFC7D22DF16A840081AF7C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FFC7CA2DF16A840081AF7C /* ViewController.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		04FFC7AA2DF169D60081AF7C /* RoomReviewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoomReviewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		04FFC7C22DF16A840081AF7C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		04FFC7C32DF16A840081AF7C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		04FFC7C42DF16A840081AF7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		04FFC7C52DF16A840081AF7C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		04FFC7C92DF16A840081AF7C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		04FFC7CA2DF16A840081AF7C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		04FFC7BC2DF169D70081AF7C /* Exceptions for "RoomReviewer" folder in "RoomReviewer" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 04FFC7A92DF169D60081AF7C /* RoomReviewer */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		04FFC7AC2DF169D60081AF7C /* RoomReviewer */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				04FFC7BC2DF169D70081AF7C /* Exceptions for "RoomReviewer" folder in "RoomReviewer" target */,
-			);
-			path = RoomReviewer;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		04FFC7A72DF169D60081AF7C /* Frameworks */ = {
@@ -45,7 +38,7 @@
 		04FFC7A12DF169D60081AF7C = {
 			isa = PBXGroup;
 			children = (
-				04FFC7AC2DF169D60081AF7C /* RoomReviewer */,
+				04FFC7CB2DF16A840081AF7C /* RoomReviewer */,
 				04FFC7AB2DF169D60081AF7C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +49,19 @@
 				04FFC7AA2DF169D60081AF7C /* RoomReviewer.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		04FFC7CB2DF16A840081AF7C /* RoomReviewer */ = {
+			isa = PBXGroup;
+			children = (
+				04FFC7C22DF16A840081AF7C /* AppDelegate.swift */,
+				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
+				04FFC7C42DF16A840081AF7C /* Info.plist */,
+				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
+				04FFC7C92DF16A840081AF7C /* SceneDelegate.swift */,
+				04FFC7CA2DF16A840081AF7C /* ViewController.swift */,
+			);
+			path = RoomReviewer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -72,9 +78,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				04FFC7AC2DF169D60081AF7C /* RoomReviewer */,
 			);
 			name = RoomReviewer;
 			packageProductDependencies = (
@@ -122,6 +125,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04FFC7CC2DF16A840081AF7C /* Assets.xcassets in Resources */,
+				04FFC7CE2DF16A840081AF7C /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,10 +137,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04FFC7D02DF16A840081AF7C /* AppDelegate.swift in Sources */,
+				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,
+				04FFC7D22DF16A840081AF7C /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				04FFC7C52DF16A840081AF7C /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		04FFC7BE2DF169D70081AF7C /* Debug */ = {
@@ -149,9 +168,9 @@
 				INFOPLIST_FILE = RoomReviewer/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -159,9 +178,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -176,9 +199,9 @@
 				INFOPLIST_FILE = RoomReviewer/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -186,9 +209,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
