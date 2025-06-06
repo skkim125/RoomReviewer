@@ -2,8 +2,10 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 .DS_Store
+
 ## User settings
 xcuserdata/
+*.xcconfig
 
 ## Obj-C/Swift specific
 *.hmap
