@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		043BB0432DFC4D8800E5438D /* TV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0422DFC4D8800E5438D /* TV.swift */; };
+		043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0442DFC4DA700E5438D /* TMDBTarget.swift */; };
+		043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0462DFC4DDA00E5438D /* NetworkManager.swift */; };
 		04DCA88E2DF2D78500695361 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA88D2DF2D78500695361 /* SnapKit */; };
 		04DCA8912DF2D78A00695361 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA8902DF2D78A00695361 /* ReactorKit */; };
 		04DCA8942DF2D78F00695361 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA8932DF2D78F00695361 /* Then */; };
@@ -21,6 +24,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		043BB0422DFC4D8800E5438D /* TV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TV.swift; sourceTree = "<group>"; };
+		043BB0442DFC4DA700E5438D /* TMDBTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBTarget.swift; sourceTree = "<group>"; };
+		043BB0462DFC4DDA00E5438D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		04DCA89A2DF2D99200695361 /* API.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = API.xcconfig; sourceTree = "<group>"; };
 		04DCA89F2DF2DB7100695361 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		04DCA8A12DF2DBD100695361 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
@@ -52,7 +58,10 @@
 			isa = PBXGroup;
 			children = (
 				04DCA8A12DF2DBD100695361 /* Configuration.swift */,
+				043BB0422DFC4D8800E5438D /* TV.swift */,
+				043BB0442DFC4DA700E5438D /* TMDBTarget.swift */,
 				04DCA8A42DF2DBFC00695361 /* TargetType.swift */,
+				043BB0462DFC4DDA00E5438D /* NetworkManager.swift */,
 				04DCA89F2DF2DB7100695361 /* NetworkError.swift */,
 			);
 			path = Network;
@@ -170,9 +179,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */,
 				04DCA8A52DF2DBFC00695361 /* TargetType.swift in Sources */,
+				043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */,
 				04DCA8A22DF2DBD100695361 /* Configuration.swift in Sources */,
 				04FFC7D02DF16A840081AF7C /* AppDelegate.swift in Sources */,
+				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,
 				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,
 				04FFC7D22DF16A840081AF7C /* ViewController.swift in Sources */,
 				04DCA8A02DF2DB7100695361 /* NetworkError.swift in Sources */,
