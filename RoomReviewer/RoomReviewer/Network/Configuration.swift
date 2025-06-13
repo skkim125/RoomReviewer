@@ -15,6 +15,8 @@ enum API {
     static let key = Bundle.main.object(
         forInfoDictionaryKey: "API_KEY"
     ) as? String ?? ""
+    
+    static let authorization = "Authorization"
 }
 
 enum HTTPMethod: String {
