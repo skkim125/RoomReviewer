@@ -16,6 +16,10 @@ enum API {
         forInfoDictionaryKey: "API_KEY"
     ) as? String ?? ""
     
+    static let tmdbImageURL = Bundle.main.object(
+        forInfoDictionaryKey: "API_IMAGE_URL"
+    ) as? String ?? ""
+    
     static let authorization = "Authorization"
 }
 
