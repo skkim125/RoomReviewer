@@ -15,6 +15,7 @@
 		043BB0502DFD5EE000E5438D /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB04F2DFD5EE000E5438D /* RxBlocking */; };
 		043BB0522DFD5EE000E5438D /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB0512DFD5EE000E5438D /* RxCocoa */; };
 		043BB0542DFD5EE000E5438D /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB0532DFD5EE000E5438D /* RxSwift */; };
+		04B9CBC02DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */; };
 		04DCA88E2DF2D78500695361 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA88D2DF2D78500695361 /* SnapKit */; };
 		04DCA8912DF2D78A00695361 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA8902DF2D78A00695361 /* ReactorKit */; };
 		04DCA8942DF2D78F00695361 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA8932DF2D78F00695361 /* Then */; };
@@ -33,6 +34,7 @@
 		043BB0462DFC4DDA00E5438D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		043BB0482DFC4EA800E5438D /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		043BB04C2DFC4F2A00E5438D /* HomeReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactor.swift; sourceTree = "<group>"; };
+		04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCell.swift; sourceTree = "<group>"; };
 		04DCA89A2DF2D99200695361 /* API.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = API.xcconfig; sourceTree = "<group>"; };
 		04DCA89F2DF2DB7100695361 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		04DCA8A12DF2DBD100695361 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
 				04FFC7C92DF16A840081AF7C /* SceneDelegate.swift */,
 				043BB0482DFC4EA800E5438D /* HomeViewController.swift */,
+				04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */,
 				043BB04C2DFC4F2A00E5438D /* HomeReactor.swift */,
 			);
 			path = RoomReviewer;
@@ -200,6 +203,7 @@
 				043BB04D2DFC4F2A00E5438D /* HomeReactor.swift in Sources */,
 				043BB0492DFC4EA800E5438D /* HomeViewController.swift in Sources */,
 				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,
+				04B9CBC02DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift in Sources */,
 				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,
 				04DCA8A02DF2DB7100695361 /* NetworkError.swift in Sources */,
 			);

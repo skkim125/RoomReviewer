@@ -8,10 +8,17 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import SnapKit
+import Then
 
 final class HomeViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private let homeReactor: HomeReactor
+    
+    private let homeTVCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .collectionViewLayout).then {
+        $0.register(HomeTVCollectionViewCell.self, forCellWithReuseIdentifier: HomeTVCollectionViewCell.cellID)
+        $0.backgroundColor = .white
+    }
     
     init(reactor: HomeReactor) {
         self.homeReactor = reactor
@@ -33,7 +40,6 @@ final class HomeViewController: UIViewController {
     private func configureView() {
         configureHierarchy()
         configureLayout()
-        configureUI()
     }
     
     private func bind() {
@@ -57,11 +63,11 @@ final class HomeViewController: UIViewController {
             }
             .disposed(by: disposeBag)
             
-        reactor.state.map({ $0.tvs })
+        reactor.state.map { $0.tvs }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, value in
-                
+            .bind(to: homeTVCollectionView.rx.items(cellIdentifier: HomeTVCollectionViewCell.cellID, cellType: HomeTVCollectionViewCell.self)) { row, tv, cell in
+                cell.configureCellUI(data: tv)
             }
             .disposed(by: disposeBag)
     }
@@ -69,14 +75,24 @@ final class HomeViewController: UIViewController {
 
 extension HomeViewController {
     private func configureHierarchy() {
-        
+        view.addSubview(homeTVCollectionView)
     }
     
     private func configureLayout() {
-        
+        homeTVCollectionView.snp.makeConstraints {
+            $0.edges.equalTo(view.safeAreaLayoutGuide)
+        }
     }
-    
-    private func configureUI() {
+}
+
+extension UICollectionViewLayout {
+    static var collectionViewLayout: UICollectionViewFlowLayout {
+        let layout = UICollectionViewFlowLayout()
+        layout.sectionInset = .init(top: 20, left: 20, bottom: 20, right: 20)
+        layout.itemSize = CGSize(width: 170, height: 250)
+        layout.minimumLineSpacing = 20
+        layout.minimumInteritemSpacing = 20
         
+        return layout
     }
 }
