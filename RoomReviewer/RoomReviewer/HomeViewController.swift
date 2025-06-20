@@ -18,6 +18,7 @@ final class HomeViewController: UIViewController {
     private let homeTVCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .collectionViewLayout).then {
         $0.register(HomeTVCollectionViewCell.self, forCellWithReuseIdentifier: HomeTVCollectionViewCell.cellID)
         $0.backgroundColor = .white
+        $0.showsHorizontalScrollIndicator = false
     }
     
     init(reactor: HomeReactor) {
@@ -67,7 +68,9 @@ final class HomeViewController: UIViewController {
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: homeTVCollectionView.rx.items(cellIdentifier: HomeTVCollectionViewCell.cellID, cellType: HomeTVCollectionViewCell.self)) { row, tv, cell in
-                cell.configureCellUI(data: tv)
+                let reactor = HomeTVCollectionViewCellReactor(tv: tv)
+                cell.reactor = reactor
+                cell.bind(reactor: reactor)
             }
             .disposed(by: disposeBag)
     }
@@ -80,7 +83,8 @@ extension HomeViewController {
     
     private func configureLayout() {
         homeTVCollectionView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeAreaLayoutGuide)
+            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(280)
         }
     }
 }
@@ -92,6 +96,7 @@ extension UICollectionViewLayout {
         layout.itemSize = CGSize(width: 170, height: 250)
         layout.minimumLineSpacing = 20
         layout.minimumInteritemSpacing = 20
+        layout.scrollDirection = .horizontal
         
         return layout
     }

@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		041366632E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041366612E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift */; };
+		041366652E0138D40026514E /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 041366642E0138D40026514E /* ReactorKit */; };
+		041366672E0138D40026514E /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 041366662E0138D40026514E /* RxBlocking */; };
+		041366692E0138D40026514E /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 041366682E0138D40026514E /* RxSwift */; };
+		0413666B2E0139250026514E /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0413666A2E0139250026514E /* RxTest */; };
+		0413666D2E0139920026514E /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 0413666C2E0139920026514E /* RxCocoa */; };
 		043BB0432DFC4D8800E5438D /* TV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0422DFC4D8800E5438D /* TV.swift */; };
 		043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0442DFC4DA700E5438D /* TMDBTarget.swift */; };
 		043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0462DFC4DDA00E5438D /* NetworkManager.swift */; };
@@ -15,6 +21,8 @@
 		043BB0502DFD5EE000E5438D /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB04F2DFD5EE000E5438D /* RxBlocking */; };
 		043BB0522DFD5EE000E5438D /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB0512DFD5EE000E5438D /* RxCocoa */; };
 		043BB0542DFD5EE000E5438D /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB0532DFD5EE000E5438D /* RxSwift */; };
+		047829662DFFF1C4008CBE67 /* ImageLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047829652DFFF1C4008CBE67 /* ImageLoadManager.swift */; };
+		0478296C2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0478296B2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift */; };
 		04B9CBC02DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */; };
 		04DCA88E2DF2D78500695361 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA88D2DF2D78500695361 /* SnapKit */; };
 		04DCA8912DF2D78A00695361 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA8902DF2D78A00695361 /* ReactorKit */; };
@@ -28,12 +36,26 @@
 		04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FFC7C92DF16A840081AF7C /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		0413665C2E0136C60026514E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04FFC7A22DF169D60081AF7C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04FFC7A92DF169D60081AF7C;
+			remoteInfo = RoomReviewer;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		041366582E0136C60026514E /* HomeTVCollectionViewCellReactorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeTVCollectionViewCellReactorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		041366612E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCellReactorTests.swift; sourceTree = "<group>"; };
 		043BB0422DFC4D8800E5438D /* TV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TV.swift; sourceTree = "<group>"; };
 		043BB0442DFC4DA700E5438D /* TMDBTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBTarget.swift; sourceTree = "<group>"; };
 		043BB0462DFC4DDA00E5438D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		043BB0482DFC4EA800E5438D /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		043BB04C2DFC4F2A00E5438D /* HomeReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactor.swift; sourceTree = "<group>"; };
+		047829652DFFF1C4008CBE67 /* ImageLoadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoadManager.swift; sourceTree = "<group>"; };
+		0478296B2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCellReactor.swift; sourceTree = "<group>"; };
 		04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCell.swift; sourceTree = "<group>"; };
 		04DCA89A2DF2D99200695361 /* API.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = API.xcconfig; sourceTree = "<group>"; };
 		04DCA89F2DF2DB7100695361 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
@@ -48,6 +70,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		041366552E0136C60026514E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0413666B2E0139250026514E /* RxTest in Frameworks */,
+				041366692E0138D40026514E /* RxSwift in Frameworks */,
+				0413666D2E0139920026514E /* RxCocoa in Frameworks */,
+				041366652E0138D40026514E /* ReactorKit in Frameworks */,
+				041366672E0138D40026514E /* RxBlocking in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		04FFC7A72DF169D60081AF7C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -64,6 +98,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		041366472E0135E30026514E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		041366622E0136CB0026514E /* HomeTVCollectionViewCellReactorTests */ = {
+			isa = PBXGroup;
+			children = (
+				041366612E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift */,
+			);
+			path = HomeTVCollectionViewCellReactorTests;
+			sourceTree = "<group>";
+		};
 		04DCA8A32DF2DBD500695361 /* Network */ = {
 			isa = PBXGroup;
 			children = (
@@ -72,6 +121,7 @@
 				043BB0442DFC4DA700E5438D /* TMDBTarget.swift */,
 				04DCA8A42DF2DBFC00695361 /* TargetType.swift */,
 				043BB0462DFC4DDA00E5438D /* NetworkManager.swift */,
+				047829652DFFF1C4008CBE67 /* ImageLoadManager.swift */,
 				04DCA89F2DF2DB7100695361 /* NetworkError.swift */,
 			);
 			path = Network;
@@ -82,6 +132,8 @@
 			children = (
 				04DCA89A2DF2D99200695361 /* API.xcconfig */,
 				04FFC7CB2DF16A840081AF7C /* RoomReviewer */,
+				041366622E0136CB0026514E /* HomeTVCollectionViewCellReactorTests */,
+				041366472E0135E30026514E /* Frameworks */,
 				04FFC7AB2DF169D60081AF7C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				04FFC7AA2DF169D60081AF7C /* RoomReviewer.app */,
+				041366582E0136C60026514E /* HomeTVCollectionViewCellReactorTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -104,8 +157,9 @@
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
 				04FFC7C92DF16A840081AF7C /* SceneDelegate.swift */,
 				043BB0482DFC4EA800E5438D /* HomeViewController.swift */,
-				04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */,
 				043BB04C2DFC4F2A00E5438D /* HomeReactor.swift */,
+				04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */,
+				0478296B2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift */,
 			);
 			path = RoomReviewer;
 			sourceTree = "<group>";
@@ -113,6 +167,31 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		041366572E0136C60026514E /* HomeTVCollectionViewCellReactorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0413665E2E0136C60026514E /* Build configuration list for PBXNativeTarget "HomeTVCollectionViewCellReactorTests" */;
+			buildPhases = (
+				041366542E0136C60026514E /* Sources */,
+				041366552E0136C60026514E /* Frameworks */,
+				041366562E0136C60026514E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0413665D2E0136C60026514E /* PBXTargetDependency */,
+			);
+			name = HomeTVCollectionViewCellReactorTests;
+			packageProductDependencies = (
+				041366642E0138D40026514E /* ReactorKit */,
+				041366662E0138D40026514E /* RxBlocking */,
+				041366682E0138D40026514E /* RxSwift */,
+				0413666A2E0139250026514E /* RxTest */,
+				0413666C2E0139920026514E /* RxCocoa */,
+			);
+			productName = HomeTVCollectionViewCellReactorTests;
+			productReference = 041366582E0136C60026514E /* HomeTVCollectionViewCellReactorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		04FFC7A92DF169D60081AF7C /* RoomReviewer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 04FFC7BD2DF169D70081AF7C /* Build configuration list for PBXNativeTarget "RoomReviewer" */;
@@ -145,9 +224,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
+					041366572E0136C60026514E = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 04FFC7A92DF169D60081AF7C;
+					};
 					04FFC7A92DF169D60081AF7C = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -174,11 +257,19 @@
 			projectRoot = "";
 			targets = (
 				04FFC7A92DF169D60081AF7C /* RoomReviewer */,
+				041366572E0136C60026514E /* HomeTVCollectionViewCellReactorTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		041366562E0136C60026514E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		04FFC7A82DF169D60081AF7C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -191,12 +282,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		041366542E0136C60026514E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				041366632E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		04FFC7A62DF169D60081AF7C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */,
 				04DCA8A52DF2DBFC00695361 /* TargetType.swift in Sources */,
+				047829662DFFF1C4008CBE67 /* ImageLoadManager.swift in Sources */,
+				0478296C2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift in Sources */,
 				043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */,
 				04DCA8A22DF2DBD100695361 /* Configuration.swift in Sources */,
 				04FFC7D02DF16A840081AF7C /* AppDelegate.swift in Sources */,
@@ -211,6 +312,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		0413665D2E0136C60026514E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04FFC7A92DF169D60081AF7C /* RoomReviewer */;
+			targetProxy = 0413665C2E0136C60026514E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -223,6 +332,50 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		0413665F2E0136C60026514E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer.HomeTVCollectionViewCellReactorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RoomReviewer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RoomReviewer";
+			};
+			name = Debug;
+		};
+		041366602E0136C60026514E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer.HomeTVCollectionViewCellReactorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RoomReviewer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RoomReviewer";
+			};
+			name = Release;
+		};
 		04FFC7BE2DF169D70081AF7C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -410,6 +563,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0413665E2E0136C60026514E /* Build configuration list for PBXNativeTarget "HomeTVCollectionViewCellReactorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0413665F2E0136C60026514E /* Debug */,
+				041366602E0136C60026514E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		04FFC7A52DF169D60081AF7C /* Build configuration list for PBXProject "RoomReviewer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -466,6 +628,31 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		041366642E0138D40026514E /* ReactorKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04DCA88F2DF2D78A00695361 /* XCRemoteSwiftPackageReference "ReactorKit" */;
+			productName = ReactorKit;
+		};
+		041366662E0138D40026514E /* RxBlocking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 043BB04E2DFD5EE000E5438D /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxBlocking;
+		};
+		041366682E0138D40026514E /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 043BB04E2DFD5EE000E5438D /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		0413666A2E0139250026514E /* RxTest */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 043BB04E2DFD5EE000E5438D /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxTest;
+		};
+		0413666C2E0139920026514E /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 043BB04E2DFD5EE000E5438D /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
 		043BB04F2DFD5EE000E5438D /* RxBlocking */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 043BB04E2DFD5EE000E5438D /* XCRemoteSwiftPackageReference "RxSwift" */;
