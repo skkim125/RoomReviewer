@@ -12,46 +12,108 @@ import ReactorKit
 import SnapKit
 import Then
 
-final class HomeTVCollectionViewCell: UICollectionViewCell {
+final class HomeTVCollectionViewCell: UICollectionViewCell, View {
     static let cellID = "HomeTVCollectionViewCell"
+    var disposeBag = DisposeBag()
     
+    private let shadowView = UIView().then {
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOpacity = 0.25
+        $0.layer.shadowOffset = CGSize(width: 0, height: 2)
+        $0.layer.shadowRadius = 4
+        $0.layer.cornerRadius = 8
+        $0.backgroundColor = .clear
+    }
+    private let posterImageView = UIImageView().then {
+        $0.layer.cornerRadius = 8
+        $0.clipsToBounds = true
+        $0.contentMode = .scaleAspectFill
+    }
+    private let activityIndicator = UIActivityIndicatorView(style: .medium)
     private let tvNameLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14, weight: .bold)
         $0.textColor = .black
         $0.textAlignment = .center
-        $0.numberOfLines = 0
+        $0.numberOfLines = 2
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         configureHierarchy()
         configureLayout()
     }
     
-    func configureCellUI(data tv: TV) {
-        contentView.backgroundColor = .systemGray6
-        contentView.layer.cornerRadius = 8
-        contentView.clipsToBounds = true
-        tvNameLabel.text = tv.originalName
-    }
-    
-    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
 
 extension HomeTVCollectionViewCell {
+    func bind(reactor: HomeTVCollectionViewCellReactor) {
+        reactor.state.map({ $0.isLoading })
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(to: activityIndicator.rx.isAnimating)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.tvName }
+            .observe(on: MainScheduler.instance)
+            .bind(to: tvNameLabel.rx.text)
+            .disposed(by: disposeBag)
+
+        reactor.state.map { $0.image }
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind(to: posterImageView.rx.image)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.image }
+            .map { $0 != nil }
+            .observe(on: MainScheduler.instance)
+            .bind(to: tvNameLabel.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.image }
+            .distinctUntilChanged()
+            .filter { $0 == nil }
+            .map { _ in
+                HomeTVCollectionViewCellReactor.Action.loadImage
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag()
+        posterImageView.image = nil
+        tvNameLabel.text = nil
+    }
+    
     private func configureHierarchy() {
+        contentView.addSubview(shadowView)
+        shadowView.addSubview(posterImageView)
+        contentView.addSubview(activityIndicator)
         contentView.addSubview(tvNameLabel)
     }
     
     private func configureLayout() {
+        shadowView.snp.makeConstraints {
+            $0.top.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(shadowView.snp.width).multipliedBy(1.5)
+        }
+
+        posterImageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        activityIndicator.snp.makeConstraints {
+            $0.center.equalTo(posterImageView)
+        }
         
         tvNameLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalTo(contentView).inset(10)
-            $0.centerY.equalTo(contentView)
+            $0.horizontalEdges.equalToSuperview().inset(8)
+            $0.bottom.equalToSuperview().inset(8)
         }
     }
 }

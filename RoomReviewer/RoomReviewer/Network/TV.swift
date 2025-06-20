@@ -39,3 +39,13 @@ struct TV: Decodable, Equatable {
         case voteCount = "vote_count"
     }
 }
+
+extension TV {
+    static var mockTV: TV {
+        TV(adult: false, backdropPath: "/m0VuPoWQhbgMjVIwAdZmmHgHQrl.jpg", genreIDS: [35, 18], id: 261980, originCountry: ["KR"], originalLanguage: "ko", originalName: "미지의 서울", overview: "얼굴 빼고 모든 게 다른 쌍둥이 자매가 인생을 맞바꾸는 거짓말로 진짜 사랑과 인생을 찾아가는 로맨틱 성장 드라마", popularity: 24.141, posterPath: "/woGYRE5vChxqUqTBJJaOhO9Cqk6.jpg", firstAirDate: "2025-05-24", name: "미지의 서울", voteAverage: 7.444, voteCount: 9)
+    }
+    
+    static var mockTVwithNilPosterURL: TV {
+        TV(adult: false, backdropPath: "/m0VuPoWQhbgMjVIwAdZmmHgHQrl.jpg", genreIDS: [35, 18], id: 261980, originCountry: ["KR"], originalLanguage: "ko", originalName: "미지의 서울", overview: "얼굴 빼고 모든 게 다른 쌍둥이 자매가 인생을 맞바꾸는 거짓말로 진짜 사랑과 인생을 찾아가는 로맨틱 성장 드라마", popularity: 24.141, posterPath: nil, firstAirDate: "2025-05-24", name: "미지의 서울", voteAverage: 7.444, voteCount: 9)
+    }
+}

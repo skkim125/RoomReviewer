@@ -18,13 +18,13 @@ final class NetworkManager: NetworkService {
             do {
                 let request = try target.asURLRequest()
                 
-                URLSession.shared.dataTask(with: request) { data, response, error in
+                let task = URLSession.shared.dataTask(with: request) { data, response, error in
                     if let error = error {
                         return single(.success(.failure(error)))
                     }
                     
                     guard let response = response as? HTTPURLResponse,
-                          200 == response.statusCode else {
+                          response.statusCode == 200 else {
                         return single(.success(.failure(NetworkError.invalidResponse)))
                     }
                     
@@ -39,10 +39,44 @@ final class NetworkManager: NetworkService {
                         return single(.success(.failure(NetworkError.decodingError)))
                     }
                 }
-                .resume()
+                
+                task.resume()
+                
+                return Disposables.create() {
+                    task.cancel()
+                }
                 
             } catch {
                 single(.success(.failure(error)))
+            }
+            
+            return Disposables.create()
+        }
+    }
+}
+
+final class MockNetworkManager: NetworkService {
+    var mockResult: Result<Data, Error>?
+    
+    func callRequest<T: Decodable>(_ target: TargetType) -> Single<Result<T, Error>> {
+        return Single.create { single in
+            DispatchQueue.global(qos: .background).async {
+                guard let result = self.mockResult else {
+                    single(.success(.failure(NetworkError.invalidData)))
+                    return
+                }
+                
+                switch result {
+                case .success(let data):
+                    do {
+                        let decoded = try JSONDecoder().decode(T.self, from: data)
+                        single(.success(.success(decoded)))
+                    } catch {
+                        single(.success(.failure(error)))
+                    }
+                case .failure(let error):
+                    single(.success(.failure(error)))
+                }
             }
             
             return Disposables.create()
