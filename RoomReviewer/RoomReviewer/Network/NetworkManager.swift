@@ -56,29 +56,23 @@ final class NetworkManager: NetworkService {
 }
 
 final class MockNetworkManager: NetworkService {
-    var mockResult: Result<Data, Error>?
+    var mockResult: Result<Data, Error> = .failure(NetworkError.decodingError)
     
     func callRequest<T: Decodable>(_ target: TargetType) -> Single<Result<T, Error>> {
         return Single.create { single in
-            DispatchQueue.global(qos: .background).async {
-                guard let result = self.mockResult else {
-                    single(.success(.failure(NetworkError.invalidData)))
-                    return
-                }
-                
-                switch result {
-                case .success(let data):
-                    do {
-                        let decoded = try JSONDecoder().decode(T.self, from: data)
-                        single(.success(.success(decoded)))
-                    } catch {
-                        single(.success(.failure(error)))
-                    }
-                case .failure(let error):
+            switch self.mockResult {
+            case .success(let data):
+                do {
+                    let decoded = try JSONDecoder().decode(T.self, from: data)
+                    single(.success(.success(decoded)))
+                } catch {
+                    print(error)
                     single(.success(.failure(error)))
                 }
+            case .failure(let error):
+                print(error)
+                single(.success(.failure(error)))
             }
-            
             return Disposables.create()
         }
     }

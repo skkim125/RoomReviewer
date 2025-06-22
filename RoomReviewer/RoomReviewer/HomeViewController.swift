@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 import SnapKit
 import Then
 
@@ -64,14 +65,35 @@ final class HomeViewController: UIViewController {
             }
             .disposed(by: disposeBag)
             
-        reactor.state.map { $0.tvs }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(to: homeTVCollectionView.rx.items(cellIdentifier: HomeTVCollectionViewCell.cellID, cellType: HomeTVCollectionViewCell.self)) { row, tv, cell in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSectionModel> (configureCell: { _, collectionView, indexPath, item in
+            
+            switch item {
+            case .movie(item: let tv):
+                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeTVCollectionViewCell.cellID, for: indexPath) as? HomeTVCollectionViewCell else {
+                    return UICollectionViewCell()
+                }
                 let reactor = HomeTVCollectionViewCellReactor(tv: tv)
                 cell.reactor = reactor
                 cell.bind(reactor: reactor)
+                
+                return cell
+                
+            case .tv(item: let tv):
+                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeTVCollectionViewCell.cellID, for: indexPath) as? HomeTVCollectionViewCell else {
+                    return UICollectionViewCell()
+                }
+                let reactor = HomeTVCollectionViewCellReactor(tv: tv)
+                cell.reactor = reactor
+                cell.bind(reactor: reactor)
+                
+                return cell
             }
+        })
+        
+        reactor.state.map { $0.medias }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(to: homeTVCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
     }
 }

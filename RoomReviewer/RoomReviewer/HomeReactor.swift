@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import RxDataSources
 import ReactorKit
 
 final class HomeReactor: Reactor {
@@ -20,7 +21,7 @@ final class HomeReactor: Reactor {
     
     struct State {
         var isLoading: Bool = false
-        var tvs: [TV] = []
+        var medias: [HomeSectionModel] = []
         var errorType: Error?
     }
     
@@ -30,7 +31,7 @@ final class HomeReactor: Reactor {
     
     enum Mutation {
         case setLoading(Bool)
-        case fetchedData([TV])
+        case fetchedData([HomeSectionItem])
         case showError(Error)
     }
     
@@ -44,7 +45,8 @@ final class HomeReactor: Reactor {
                     .flatMap { (result: Result<TVList, Error>) -> Observable<Mutation> in
                         switch result {
                         case .success(let success):
-                            return .just(.fetchedData(success.results))
+                            let datas = success.results.map { HomeSectionItem.tv(item: $0) }
+                            return .just(.fetchedData(datas))
                         case .failure(let error):
                             return .just(.showError(error))
                         }
@@ -54,7 +56,6 @@ final class HomeReactor: Reactor {
         }
     }
     
-    
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         
@@ -62,7 +63,8 @@ final class HomeReactor: Reactor {
         case .showError(let error):
             newState.errorType = error
         case .fetchedData(let tvs):
-            newState.tvs = tvs
+            let result = HomeSectionModel.tv(item: tvs)
+            newState.medias = [result]
         case .setLoading(let loaded):
             newState.isLoading = loaded
         }
