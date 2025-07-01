@@ -42,6 +42,7 @@ final class HomeViewController: UIViewController {
     private func configureView() {
         configureHierarchy()
         configureLayout()
+        configureNavigationBar()
     }
     
     private func bind() {
@@ -52,6 +53,11 @@ final class HomeViewController: UIViewController {
     private func bindAction(reactor: HomeReactor) {
         rx.methodInvoked(#selector(viewWillAppear)).map { _ in }
             .map { HomeReactor.Action.fetchData }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.navigationItem.rightBarButtonItem?.rx.tap
+            .compactMap { HomeReactor.Action.writeButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -95,6 +101,14 @@ final class HomeViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(to: homeTVCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
+        
+        reactor.state.compactMap { $0.presentWriteReviewView }
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let vc = WriteReviewViewController()
+                owner.navigationController?.present(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -108,6 +122,10 @@ extension HomeViewController {
             $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(280)
         }
+    }
+    
+    private func configureNavigationBar() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .done, target: nil, action: nil)
     }
 }
 

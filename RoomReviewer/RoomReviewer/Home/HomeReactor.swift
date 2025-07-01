@@ -23,15 +23,18 @@ final class HomeReactor: Reactor {
         var isLoading: Bool = false
         var medias: [HomeSectionModel] = []
         var errorType: Error?
+        var presentWriteReviewView: Void?
     }
     
     enum Action {
         case fetchData
+        case writeButtonTapped
     }
     
     enum Mutation {
         case setLoading(Bool)
         case fetchedData([HomeSectionItem])
+        case presentWriteReviewView
         case showError(Error)
     }
     
@@ -53,6 +56,8 @@ final class HomeReactor: Reactor {
                     },
                 .just(.setLoading(false))
             ])
+        case .writeButtonTapped:
+            return .just(.presentWriteReviewView)
         }
     }
     
@@ -67,6 +72,8 @@ final class HomeReactor: Reactor {
             newState.medias = [result]
         case .setLoading(let loaded):
             newState.isLoading = loaded
+        case .presentWriteReviewView:
+            newState.presentWriteReviewView = ()
         }
         
         return newState
