@@ -67,7 +67,9 @@ final class HomeViewController: UIViewController {
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, value in
-                
+                if value {
+                    print("검색 중...")
+                }
             }
             .disposed(by: disposeBag)
             
@@ -105,8 +107,10 @@ final class HomeViewController: UIViewController {
         reactor.state.compactMap { $0.presentWriteReviewView }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = WriteReviewViewController()
-                owner.navigationController?.present(vc, animated: true)
+                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()))
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .fullScreen
+                owner.navigationController?.present(nav, animated: true)
             }
             .disposed(by: disposeBag)
     }
