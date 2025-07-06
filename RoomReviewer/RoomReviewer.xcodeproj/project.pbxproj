@@ -32,6 +32,7 @@
 		0449527C2E082A1500D75C4A /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527B2E082A1500D75C4A /* RxRelay */; };
 		0449527E2E082A1500D75C4A /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527D2E082A1500D75C4A /* RxSwift */; };
 		044952802E082A1500D75C4A /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527F2E082A1500D75C4A /* RxTest */; };
+		0461E4D52E1A900C00EDB5D6 /* WriteReviewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */; };
 		047829662DFFF1C4008CBE67 /* ImageLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047829652DFFF1C4008CBE67 /* ImageLoadManager.swift */; };
 		0478296C2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0478296B2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift */; };
 		04B9CBC02DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */; };
@@ -76,6 +77,7 @@
 		044952632E081A4A00D75C4A /* HomeSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSectionModel.swift; sourceTree = "<group>"; };
 		044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeReactorLoadDataUnitTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
+		0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteReviewReactor.swift; sourceTree = "<group>"; };
 		047829652DFFF1C4008CBE67 /* ImageLoadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoadManager.swift; sourceTree = "<group>"; };
 		0478296B2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCellReactor.swift; sourceTree = "<group>"; };
 		04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -173,6 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				042EFE632E14040500810E02 /* WriteReviewViewController.swift */,
+				0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */,
 			);
 			path = Review;
 			sourceTree = "<group>";
@@ -424,6 +427,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0461E4D52E1A900C00EDB5D6 /* WriteReviewReactor.swift in Sources */,
 				043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */,
 				04DCA8A52DF2DBFC00695361 /* TargetType.swift in Sources */,
 				047829662DFFF1C4008CBE67 /* ImageLoadManager.swift in Sources */,
