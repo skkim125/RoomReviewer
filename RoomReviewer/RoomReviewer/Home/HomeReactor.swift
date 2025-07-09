@@ -23,7 +23,7 @@ final class HomeReactor: Reactor {
         var isLoading: Bool = false
         var medias: [HomeSectionModel] = []
         var errorType: Error?
-        var presentWriteReviewView: Void?
+        @Pulse var presentWriteReviewView: Void?
     }
     
     enum Action {
@@ -45,7 +45,7 @@ final class HomeReactor: Reactor {
                 .just(.setLoading(true)),
                 networkService.callRequest(TMDBTargetType.tv)
                     .asObservable()
-                    .flatMap { (result: Result<TVList, Error>) -> Observable<Mutation> in
+                    .flatMap { (result: Result<MediaResult, Error>) -> Observable<Mutation> in
                         switch result {
                         case .success(let success):
                             let datas = success.results.map { HomeSectionItem.tv(item: $0) }

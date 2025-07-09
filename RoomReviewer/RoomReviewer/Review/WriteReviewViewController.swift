@@ -36,6 +36,7 @@ final class WriteReviewViewController: UIViewController {
         
         configureHierarchy()
         configureLayout()
+        configureNavigationBar()
         bind()
         view.backgroundColor = .white
     }
@@ -54,6 +55,11 @@ final class WriteReviewViewController: UIViewController {
         
         searchTextField.rx.controlEvent(.editingDidEndOnExit)
             .map { WriteReviewReactor.Action.searchButtonTapped }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.navigationItem.leftBarButtonItem?.rx.tap
+            .map { WriteReviewReactor.Action.dismissWriteReview }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -90,6 +96,14 @@ final class WriteReviewViewController: UIViewController {
                 print("검색 에러")
             }
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$dismissAction)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -104,5 +118,10 @@ extension WriteReviewViewController {
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             $0.height.equalTo(40)
         }
+    }
+    
+    private func configureNavigationBar() {
+        navigationItem.title = "시청한 미디어 검색"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: nil, action: nil)
     }
 }

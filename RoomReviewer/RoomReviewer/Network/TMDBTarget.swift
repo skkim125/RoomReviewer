@@ -10,6 +10,7 @@ import Foundation
 enum TMDBTargetType {
     case movie
     case tv
+    case searchMulti(String, Int)
 }
 
 extension TMDBTargetType: TargetType {
@@ -24,6 +25,8 @@ extension TMDBTargetType: TargetType {
             "discover/movie"
         case .tv:
             "discover/tv"
+        case .searchMulti:
+            "search/multi"
         }
     }
     
@@ -33,12 +36,15 @@ extension TMDBTargetType: TargetType {
             return .get
         case .tv:
             return .get
+        case .searchMulti:
+            return .get
         }
     }
     
     var header: [String : String]? {
         return [
-            API.authorization: API.key
+            API.authorization: API.key,
+            API.contentType: API.jsonContentType
         ]
     }
     
@@ -62,6 +68,12 @@ extension TMDBTargetType: TargetType {
                 URLQueryItem(name: "first_air_date.gte", value: "2025-05-01"),
                 URLQueryItem(name: "air_date.lte", value: "2025-06-04"),
             ]
+        case .searchMulti(let query, let page):
+            return [
+                URLQueryItem(name: "query", value: "\(query)"),
+                URLQueryItem(name: "language", value: "ko-KR"),
+                URLQueryItem(name: "page", value: "\(page)"),
+            ]
         }
     }
     
@@ -70,6 +82,8 @@ extension TMDBTargetType: TargetType {
         case .movie:
             nil
         case .tv:
+            nil
+        case .searchMulti:
             nil
         }
     }

@@ -21,6 +21,8 @@ enum API {
     ) as? String ?? ""
     
     static let authorization = "Authorization"
+    static let contentType = "accept"
+    static let jsonContentType = "application/json"
 }
 
 enum HTTPMethod: String {

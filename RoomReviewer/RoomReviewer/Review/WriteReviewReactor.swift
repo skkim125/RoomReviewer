@@ -22,20 +22,23 @@ final class WriteReviewReactor: Reactor {
     struct State {
         var query: String?
         var isLoading: Bool = false
-        @Pulse var medias: [TV]?
+        @Pulse var medias: [Media]?
         var errorType: Error?
+        @Pulse var dismissAction: Void?
     }
     
     enum Action {
         case updateQuery(String?)
         case searchButtonTapped
+        case dismissWriteReview
     }
     
     enum Mutation {
         case setLoading(Bool)
         case setQuery(String?)
-        case searchSuccessed([TV])
+        case searchSuccessed([Media])
         case showError(Error)
+        case dismissWriteReview
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -50,19 +53,22 @@ final class WriteReviewReactor: Reactor {
             
             return Observable.concat([
                 .just(.setLoading(true)),
-                networkService.callRequest(TMDBTargetType.tv)
+                networkService.callRequest(TMDBTargetType.searchMulti(searchText, 1))
                     .asObservable()
-                    .flatMap { (result: Result<TVList, Error>) -> Observable<Mutation> in
+                    .flatMap { (result: Result<MediaResult, Error>) -> Observable<Mutation> in
                         switch result {
                         case .success(let success):
                             let datas = success.results
                             return .just(.searchSuccessed(datas))
                         case .failure(let error):
+                            print(error.localizedDescription)
                             return .just(.showError(error))
                         }
                     },
                 .just(.setLoading(false))
             ])
+        case .dismissWriteReview:
+            return .just(.dismissWriteReview)
         }
     }
     
@@ -81,6 +87,8 @@ final class WriteReviewReactor: Reactor {
             
         case .setLoading(let loaded):
             newState.isLoading = loaded
+        case .dismissWriteReview:
+            newState.dismissAction = ()
         }
         
         return newState
