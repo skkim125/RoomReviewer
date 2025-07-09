@@ -43,6 +43,6 @@ extension HomeSectionModel: SectionModelType {
 }
 
 enum HomeSectionItem: Equatable {
-    case tv(item: TV)
-    case movie(item: TV)
+    case tv(item: Media)
+    case movie(item: Media)
 }

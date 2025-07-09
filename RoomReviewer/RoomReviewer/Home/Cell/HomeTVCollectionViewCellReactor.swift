@@ -29,8 +29,8 @@ final class HomeTVCollectionViewCellReactor: Reactor {
     var initialState: State
     private let imageLoader: ImageLoadService
 
-    init(tv: TV, imageLoader: ImageLoadService = ImageLoadManager()) {
-        self.initialState = State(tvName: tv.originalName, tvPosterURL: tv.posterPath)
+    init(media: Media, imageLoader: ImageLoadService = ImageLoadManager()) {
+        self.initialState = State(tvName: media.originalName, tvPosterURL: media.posterPath)
         self.imageLoader = imageLoader
     }
 

@@ -36,6 +36,8 @@ final class HomeViewController: UIViewController {
         configureView()
         bind()
         
+        homeReactor.action.onNext(.fetchData)
+        
         view.backgroundColor = .white
     }
     
@@ -51,11 +53,6 @@ final class HomeViewController: UIViewController {
     }
     
     private func bindAction(reactor: HomeReactor) {
-        rx.methodInvoked(#selector(viewWillAppear)).map { _ in }
-            .map { HomeReactor.Action.fetchData }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
         self.navigationItem.rightBarButtonItem?.rx.tap
             .compactMap { HomeReactor.Action.writeButtonTapped }
             .bind(to: reactor.action)
@@ -67,9 +64,7 @@ final class HomeViewController: UIViewController {
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, value in
-                if value {
-                    print("검색 중...")
-                }
+                
             }
             .disposed(by: disposeBag)
             
@@ -80,7 +75,7 @@ final class HomeViewController: UIViewController {
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeTVCollectionViewCell.cellID, for: indexPath) as? HomeTVCollectionViewCell else {
                     return UICollectionViewCell()
                 }
-                let reactor = HomeTVCollectionViewCellReactor(tv: tv)
+                let reactor = HomeTVCollectionViewCellReactor(media: tv)
                 cell.reactor = reactor
                 cell.bind(reactor: reactor)
                 
@@ -90,7 +85,7 @@ final class HomeViewController: UIViewController {
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeTVCollectionViewCell.cellID, for: indexPath) as? HomeTVCollectionViewCell else {
                     return UICollectionViewCell()
                 }
-                let reactor = HomeTVCollectionViewCellReactor(tv: tv)
+                let reactor = HomeTVCollectionViewCellReactor(media: tv)
                 cell.reactor = reactor
                 cell.bind(reactor: reactor)
                 
@@ -104,7 +99,8 @@ final class HomeViewController: UIViewController {
             .bind(to: homeTVCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-        reactor.state.compactMap { $0.presentWriteReviewView }
+        reactor.pulse(\.$presentWriteReviewView)
+            .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()))

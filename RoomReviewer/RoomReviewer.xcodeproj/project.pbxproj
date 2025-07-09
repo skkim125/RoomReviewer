@@ -33,6 +33,7 @@
 		0449527E2E082A1500D75C4A /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527D2E082A1500D75C4A /* RxSwift */; };
 		044952802E082A1500D75C4A /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527F2E082A1500D75C4A /* RxTest */; };
 		0461E4D52E1A900C00EDB5D6 /* WriteReviewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */; };
+		0461E4DC2E1D0FAB00EDB5D6 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4DB2E1D0FAB00EDB5D6 /* Media.swift */; };
 		047829662DFFF1C4008CBE67 /* ImageLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047829652DFFF1C4008CBE67 /* ImageLoadManager.swift */; };
 		0478296C2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0478296B2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift */; };
 		04B9CBC02DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */; };
@@ -78,6 +79,7 @@
 		044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeReactorLoadDataUnitTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
 		0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteReviewReactor.swift; sourceTree = "<group>"; };
+		0461E4DB2E1D0FAB00EDB5D6 /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		047829652DFFF1C4008CBE67 /* ImageLoadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoadManager.swift; sourceTree = "<group>"; };
 		0478296B2DFFFA3F008CBE67 /* HomeTVCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCellReactor.swift; sourceTree = "<group>"; };
 		04B9CBBF2DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 			isa = PBXGroup;
 			children = (
 				043BB0422DFC4D8800E5438D /* TV.swift */,
+				0461E4DB2E1D0FAB00EDB5D6 /* Media.swift */,
 				044952632E081A4A00D75C4A /* HomeSectionModel.swift */,
 			);
 			path = Data;
@@ -441,6 +444,7 @@
 				043BB0492DFC4EA800E5438D /* HomeViewController.swift in Sources */,
 				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,
 				04B9CBC02DFEAA8A00E84E78 /* HomeTVCollectionViewCell.swift in Sources */,
+				0461E4DC2E1D0FAB00EDB5D6 /* Media.swift in Sources */,
 				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,
 				04DCA8A02DF2DB7100695361 /* NetworkError.swift in Sources */,
 			);
