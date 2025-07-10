@@ -1,14 +1,14 @@
 //
-//  Media.swift
+//  SearchMedia.swift
 //  RoomReviewer
 //
-//  Created by 김상규 on 7/8/25.
+//  Created by 김상규 on 7/10/25.
 //
 
 import Foundation
 
-// MARK: - Media
-struct MediaResult: Decodable {
+// MARK: - Result
+struct SearchMediaResult: Decodable {
     let page: Int
     let results: [Media]
     let totalPages, totalResults: Int
@@ -20,7 +20,7 @@ struct MediaResult: Decodable {
     }
 }
 
-// MARK: - Result
+// MARK: - Media
 struct Media: Decodable, Equatable {
     let backdropPath: String?
     let id: Int
@@ -28,7 +28,6 @@ struct Media: Decodable, Equatable {
     let overview, posterPath: String?
     let mediaType: MediaType?
     let genreIDS: [Int]
-    let popularity: Double
     let releaseDate: String?
     let firstAirDate: String?
     let video: Bool?
@@ -43,7 +42,6 @@ struct Media: Decodable, Equatable {
         case posterPath = "poster_path"
         case mediaType = "media_type"
         case genreIDS = "genre_ids"
-        case popularity
         case releaseDate = "release_date"
         case video
         case name
@@ -69,7 +67,6 @@ extension Media {
             posterPath: "/woGYRE5vChxqUqTBJJaOhO9Cqk6.jpg",
             mediaType: .tv,
             genreIDS: [35, 18],
-            popularity: 24.141,
             releaseDate: nil,
             firstAirDate: "2025-05-24",
             video: nil,
@@ -89,7 +86,6 @@ extension Media {
             posterPath: nil,
             mediaType: .tv,
             genreIDS: [35, 18],
-            popularity: 24.141,
             releaseDate: nil,
             firstAirDate: "2025-05-24",
             video: nil,

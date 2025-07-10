@@ -55,7 +55,7 @@ final class WriteReviewReactor: Reactor {
                 .just(.setLoading(true)),
                 networkService.callRequest(TMDBTargetType.searchMulti(searchText, 1))
                     .asObservable()
-                    .flatMap { (result: Result<MediaResult, Error>) -> Observable<Mutation> in
+                    .flatMap { (result: Result<SearchMediaResult, Error>) -> Observable<Mutation> in
                         switch result {
                         case .success(let success):
                             let datas = success.results

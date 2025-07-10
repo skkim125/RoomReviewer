@@ -13,7 +13,7 @@ import ReactorKit
 @testable import RoomReviewer
 
 final class HomeTVCollectionViewCellReactorTests: XCTestCase {
-    var reactor: HomeTVCollectionViewCellReactor!
+    var reactor: HomeMediaCollectionViewCellReactor!
     var mockImageLoader: MockImageLoadService!
     var scheduler: TestScheduler!
     var disposeBag: DisposeBag!
@@ -36,7 +36,7 @@ final class HomeTVCollectionViewCellReactorTests: XCTestCase {
     func test_SuccessLoadImage() {
         let tv = TV.mockTV
         
-        reactor = HomeTVCollectionViewCellReactor(tv: tv, imageLoader: mockImageLoader)
+        reactor = HomeMediaCollectionViewCellReactor(tv: tv, imageLoader: mockImageLoader)
         
         guard let image = UIImage(systemName: "star.fill"), let testImage = image.pngData() else {
             XCTFail("이미지 변환 실패")
@@ -44,13 +44,13 @@ final class HomeTVCollectionViewCellReactorTests: XCTestCase {
         }
         mockImageLoader.loadImageResult = .success(testImage)
         
-        let observer = scheduler.createObserver(HomeTVCollectionViewCellReactor.State.self)
+        let observer = scheduler.createObserver(HomeMediaCollectionViewCellReactor.State.self)
         reactor.state
             .subscribe(observer)
             .disposed(by: disposeBag)
         
         scheduler.createColdObservable([
-            .next(20, HomeTVCollectionViewCellReactor.Action.loadImage)
+            .next(20, HomeMediaCollectionViewCellReactor.Action.loadImage)
         ])
         .bind(to: reactor.action)
         .disposed(by: disposeBag)
@@ -77,15 +77,15 @@ final class HomeTVCollectionViewCellReactorTests: XCTestCase {
     
     func test_LoadImageWithNilURL() {
         let tv = TV.mockTVwithNilPosterURL
-        reactor = HomeTVCollectionViewCellReactor(tv: tv, imageLoader: mockImageLoader)
+        reactor = HomeMediaCollectionViewCellReactor(tv: tv, imageLoader: mockImageLoader)
         
-        let observer = scheduler.createObserver(HomeTVCollectionViewCellReactor.State.self)
+        let observer = scheduler.createObserver(HomeMediaCollectionViewCellReactor.State.self)
         reactor.state
             .subscribe(observer)
             .disposed(by: disposeBag)
         
         scheduler.createColdObservable([
-            .next(10, HomeTVCollectionViewCellReactor.Action.loadImage)
+            .next(10, HomeMediaCollectionViewCellReactor.Action.loadImage)
         ])
         .bind(to: reactor.action)
         .disposed(by: disposeBag)

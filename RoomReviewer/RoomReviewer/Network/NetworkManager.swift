@@ -56,24 +56,47 @@ final class NetworkManager: NetworkService {
 }
 
 final class MockNetworkManager: NetworkService {
-    var mockResult: Result<Data, Error> = .failure(NetworkError.decodingError)
-    
+    var mockResult: Result<Data, Error>?
+    var mockMovieResult: Result<Data, Error>?
+    var mockTVResult: Result<Data, Error>?
+
     func callRequest<T: Decodable>(_ target: TargetType) -> Single<Result<T, Error>> {
+        let selectedResult: Result<Data, Error>?
+
+        switch target {
+        case TMDBTargetType.movie:
+            selectedResult = mockMovieResult ?? mockResult
+        case TMDBTargetType.tv:
+            selectedResult = mockTVResult ?? mockResult
+        default:
+            selectedResult = mockResult
+        }
+
         return Single.create { single in
-            switch self.mockResult {
+            guard let result = selectedResult else {
+                single(.success(.failure(MockError.noMockData)))
+                return Disposables.create()
+            }
+
+            switch result {
             case .success(let data):
                 do {
                     let decoded = try JSONDecoder().decode(T.self, from: data)
                     single(.success(.success(decoded)))
                 } catch {
-                    print(error)
                     single(.success(.failure(error)))
                 }
             case .failure(let error):
-                print(error)
                 single(.success(.failure(error)))
             }
+
             return Disposables.create()
         }
     }
+
+    enum MockError: Error {
+        case noMockData
+    }
 }
+
+
