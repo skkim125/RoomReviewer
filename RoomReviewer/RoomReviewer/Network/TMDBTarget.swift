@@ -52,10 +52,16 @@ extension TMDBTargetType: TargetType {
         switch self {
         case .movie:
             return [
-                URLQueryItem(name: "with_original_language", value: "ko"),
+                URLQueryItem(name: "language", value: "ko-KR"),
+                URLQueryItem(name: "region", value: "KR"),
+                URLQueryItem(name: "watch_region", value: "KR"),
+                URLQueryItem(name: "with_release_type", value: "3|4"),
+                URLQueryItem(name: "primary_release_date.gte", value: "2025-06-09"),
+                URLQueryItem(name: "primary_release_date.lte", value: "2025-07-09"),
+                URLQueryItem(name: "release_date.gte", value: "2025-06-09"),
+                URLQueryItem(name: "release_date.lte", value: "2025-07-09"),
                 URLQueryItem(name: "sort_by", value: "popularity.desc"),
-                URLQueryItem(name: "air_date.gte", value: "2025-05-01"),
-                URLQueryItem(name: "air_date.gte", value: "2025-06-04"),
+                URLQueryItem(name: "vore_count_gte", value: "10")
             ]
         case .tv:
             return [
@@ -66,7 +72,10 @@ extension TMDBTargetType: TargetType {
                 URLQueryItem(name: "with_original_language", value: "ko"),
                 URLQueryItem(name: "sort_by", value: "popularity.desc"),
                 URLQueryItem(name: "first_air_date.gte", value: "2025-05-01"),
-                URLQueryItem(name: "air_date.lte", value: "2025-06-04"),
+                URLQueryItem(name: "first_air_date.lte", value: "2025-07-10"),
+                URLQueryItem(name: "air_date.gte", value: "2025-05-01"),
+                URLQueryItem(name: "air_date.lte", value: "2025-07-10"),
+                URLQueryItem(name: "vore_count_gte", value: "10")
             ]
         case .searchMulti(let query, let page):
             return [

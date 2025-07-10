@@ -12,8 +12,8 @@ import ReactorKit
 import SnapKit
 import Then
 
-final class HomeTVCollectionViewCell: UICollectionViewCell, View {
-    static let cellID = "HomeTVCollectionViewCell"
+final class HomeMediaCollectionViewCell: UICollectionViewCell, View {
+    static let cellID = "HomeMediaCollectionViewCell"
     var disposeBag = DisposeBag()
     
     private let shadowView = UIView().then {
@@ -48,15 +48,15 @@ final class HomeTVCollectionViewCell: UICollectionViewCell, View {
     }
 }
 
-extension HomeTVCollectionViewCell {
-    func bind(reactor: HomeTVCollectionViewCellReactor) {
+extension HomeMediaCollectionViewCell {
+    func bind(reactor: HomeMediaCollectionViewCellReactor) {
         reactor.state.map({ $0.isLoading })
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: activityIndicator.rx.isAnimating)
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.tvName }
+        reactor.state.map { $0.mediaName }
             .observe(on: MainScheduler.instance)
             .bind(to: tvNameLabel.rx.text)
             .disposed(by: disposeBag)
@@ -77,7 +77,7 @@ extension HomeTVCollectionViewCell {
             .distinctUntilChanged()
             .filter { $0 == nil }
             .map { _ in
-                HomeTVCollectionViewCellReactor.Action.loadImage
+                HomeMediaCollectionViewCellReactor.Action.loadImage
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

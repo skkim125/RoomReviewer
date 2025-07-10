@@ -16,8 +16,9 @@ final class HomeViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private let homeReactor: HomeReactor
     
-    private let homeTVCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .collectionViewLayout).then {
-        $0.register(HomeTVCollectionViewCell.self, forCellWithReuseIdentifier: HomeTVCollectionViewCell.cellID)
+    private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .collectionViewLayout1).then {
+        $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
+        $0.register(HomeSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HomeSectionHeaderView.reusableID)
         $0.backgroundColor = .white
         $0.showsHorizontalScrollIndicator = false
     }
@@ -68,35 +69,49 @@ final class HomeViewController: UIViewController {
             }
             .disposed(by: disposeBag)
             
-        let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSectionModel> (configureCell: { _, collectionView, indexPath, item in
-            
-            switch item {
-            case .movie(item: let tv):
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeTVCollectionViewCell.cellID, for: indexPath) as? HomeTVCollectionViewCell else {
-                    return UICollectionViewCell()
+        let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSectionModel>(
+            configureCell: { _, collectionView, indexPath, item in
+                
+                switch item {
+                case .movie(item: let movie):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
+                        return UICollectionViewCell()
+                    }
+                    let reactor = HomeMediaCollectionViewCellReactor(movie: movie)
+                    cell.reactor = reactor
+                    cell.bind(reactor: reactor)
+                    
+                    return cell
+                    
+                case .tv(item: let tv):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
+                        return UICollectionViewCell()
+                    }
+                    let reactor = HomeMediaCollectionViewCellReactor(tv: tv)
+                    cell.reactor = reactor
+                    cell.bind(reactor: reactor)
+                    
+                    return cell
                 }
-                let reactor = HomeTVCollectionViewCellReactor(media: tv)
-                cell.reactor = reactor
-                cell.bind(reactor: reactor)
-                
-                return cell
-                
-            case .tv(item: let tv):
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeTVCollectionViewCell.cellID, for: indexPath) as? HomeTVCollectionViewCell else {
-                    return UICollectionViewCell()
+            },
+            configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+                guard kind == UICollectionView.elementKindSectionHeader else {
+                    return UICollectionReusableView()
                 }
-                let reactor = HomeTVCollectionViewCellReactor(media: tv)
-                cell.reactor = reactor
-                cell.bind(reactor: reactor)
                 
-                return cell
+                guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HomeSectionHeaderView.reusableID, for: indexPath) as? HomeSectionHeaderView else { return UICollectionReusableView() }
+                
+                let section = dataSource.sectionModels[indexPath.section]
+                headerView.configureUI(header: section.header)
+                
+                return headerView
             }
-        })
+        )
         
         reactor.state.map { $0.medias }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(to: homeTVCollectionView.rx.items(dataSource: dataSource))
+            .bind(to: hotMediaCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$presentWriteReviewView)
@@ -114,17 +129,22 @@ final class HomeViewController: UIViewController {
 
 extension HomeViewController {
     private func configureHierarchy() {
-        view.addSubview(homeTVCollectionView)
+        view.addSubview(hotMediaCollectionView)
     }
     
     private func configureLayout() {
-        homeTVCollectionView.snp.makeConstraints {
+        hotMediaCollectionView.snp.makeConstraints {
             $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(280)
+            $0.bottom.lessThanOrEqualTo(view.safeAreaLayoutGuide)
         }
     }
     
     private func configureNavigationBar() {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.text = "방구석 평론가"
+        navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: label)
+        
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .done, target: nil, action: nil)
     }
 }
@@ -138,6 +158,38 @@ extension UICollectionViewLayout {
         layout.minimumInteritemSpacing = 20
         layout.scrollDirection = .horizontal
         
+        layout.headerReferenceSize = CGSize(width: 0, height: 50)
+        
         return layout
+    }
+    
+    static var collectionViewLayout1: UICollectionViewLayout {
+        let layout = UICollectionViewCompositionalLayout { sectionIndex, layoutEnvironment in
+                
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .fractionalHeight(1.0)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(0.3),
+                    heightDimension: .fractionalHeight(0.25)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .continuous
+                section.interGroupSpacing = 15
+                section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 15, bottom: 20, trailing: 15)
+                
+                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(40))
+                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+                section.boundarySupplementaryItems = [header]
+                
+                return section
+            }
+            
+            return layout
     }
 }

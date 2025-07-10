@@ -33,7 +33,7 @@ final class HomeReactor: Reactor {
     
     enum Mutation {
         case setLoading(Bool)
-        case fetchedData([HomeSectionItem])
+        case fetchedData([HomeSectionModel])
         case presentWriteReviewView
         case showError(Error)
     }
@@ -43,17 +43,7 @@ final class HomeReactor: Reactor {
         case .fetchData:
             return Observable.concat([
                 .just(.setLoading(true)),
-                networkService.callRequest(TMDBTargetType.tv)
-                    .asObservable()
-                    .flatMap { (result: Result<MediaResult, Error>) -> Observable<Mutation> in
-                        switch result {
-                        case .success(let success):
-                            let datas = success.results.map { HomeSectionItem.tv(item: $0) }
-                            return .just(.fetchedData(datas))
-                        case .failure(let error):
-                            return .just(.showError(error))
-                        }
-                    },
+                fetchMedias(),
                 .just(.setLoading(false))
             ])
         case .writeButtonTapped:
@@ -67,9 +57,8 @@ final class HomeReactor: Reactor {
         switch mutation {
         case .showError(let error):
             newState.errorType = error
-        case .fetchedData(let tvs):
-            let result = HomeSectionModel.tv(item: tvs)
-            newState.medias = [result]
+        case .fetchedData(let sections):
+            newState.medias = sections
         case .setLoading(let loaded):
             newState.isLoading = loaded
         case .presentWriteReviewView:
@@ -77,5 +66,43 @@ final class HomeReactor: Reactor {
         }
         
         return newState
+    }
+}
+
+extension HomeReactor {
+    private func fetchMedias() -> Observable<Mutation> {
+        let tvRequest = networkService.callRequest(TMDBTargetType.tv)
+            .asObservable()
+            .map { (result: Result<TVList, Error>) -> [HomeSectionItem] in
+                switch result {
+                case .success(let success):
+                    return success.results.map { HomeSectionItem.tv(item: $0) }
+                case .failure:
+                    return []
+                }
+            }
+        
+        let movieRequest = networkService.callRequest(TMDBTargetType.movie)
+            .asObservable()
+            .map { (result: Result<MovieList, Error>) -> [HomeSectionItem] in
+                switch result {
+                case .success(let success):
+                    return success.results.map { HomeSectionItem.movie(item: $0) }
+                case .failure:
+                    return []
+                }
+            }
+        
+        return Observable.zip(movieRequest, tvRequest)
+            .map { (movies, tvs) -> Mutation in
+                var sections: [HomeSectionModel] = []
+                sections.append(HomeSectionModel.movie(item: movies))
+                sections.append(HomeSectionModel.tv(item: tvs))
+                
+                return .fetchedData(sections)
+            }
+            .catch { error in
+                return .just(.showError(error))
+            }
     }
 }

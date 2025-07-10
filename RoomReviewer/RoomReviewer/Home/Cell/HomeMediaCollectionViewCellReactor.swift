@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import ReactorKit
 
-final class HomeTVCollectionViewCellReactor: Reactor {
+final class HomeMediaCollectionViewCellReactor: Reactor {
     enum Action {
         case loadImage
     }
@@ -20,8 +20,8 @@ final class HomeTVCollectionViewCellReactor: Reactor {
     }
 
     struct State {
-        var tvName: String?
-        var tvPosterURL: String?
+        var mediaName: String?
+        var mediaPosterURL: String?
         var image: UIImage?
         var isLoading: Bool = false
     }
@@ -29,15 +29,20 @@ final class HomeTVCollectionViewCellReactor: Reactor {
     var initialState: State
     private let imageLoader: ImageLoadService
 
-    init(media: Media, imageLoader: ImageLoadService = ImageLoadManager()) {
-        self.initialState = State(tvName: media.originalName, tvPosterURL: media.posterPath)
+    init(tv: TV, imageLoader: ImageLoadService = ImageLoadManager()) {
+        self.initialState = State(mediaName: tv.name, mediaPosterURL: tv.posterPath)
+        self.imageLoader = imageLoader
+    }
+    
+    init(movie: Movie, imageLoader: ImageLoadService = ImageLoadManager()) {
+        self.initialState = State(mediaName: movie.title, mediaPosterURL: movie.posterPath)
         self.imageLoader = imageLoader
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .loadImage:
-            guard let url = currentState.tvPosterURL else {
+            guard let url = currentState.mediaPosterURL else {
                 return .just(.setImage(UIImage(systemName: "photo.fill")!))
             }
             return Observable.concat([

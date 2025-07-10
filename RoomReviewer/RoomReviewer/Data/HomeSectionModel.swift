@@ -15,9 +15,9 @@ enum HomeSectionModel: Equatable {
     var header: String {
         switch self {
         case .tv:
-            return "요즘 뜨는 TV 드라마"
+            return "요즘 핫한 K 드라마"
         case .movie:
-            return "요즘 뜨는 영화"
+            return "요즘 핫한 영화"
         }
     }
 }
@@ -43,6 +43,6 @@ extension HomeSectionModel: SectionModelType {
 }
 
 enum HomeSectionItem: Equatable {
-    case tv(item: Media)
-    case movie(item: Media)
+    case tv(item: TV)
+    case movie(item: Movie)
 }

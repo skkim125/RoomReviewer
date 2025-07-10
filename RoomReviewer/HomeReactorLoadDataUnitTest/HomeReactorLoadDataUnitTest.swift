@@ -34,8 +34,10 @@ final class HomeReactorLoadDataUnitTest: XCTestCase {
     }
 
     func test_SuccessLoadData() {
-        let jsonData = jsonResult.data(using: .utf8)!
-        mockNetworkManager.mockResult = .success(jsonData)
+        let movieResult = movieJsonResult.data(using: .utf8)!
+        let tvResult = tvJsonResult.data(using: .utf8)!
+        mockNetworkManager.mockMovieResult = .success(movieResult)
+        mockNetworkManager.mockTVResult = .success(tvResult)
         reactor = HomeReactor(networkService: mockNetworkManager)
 
         let observer = scheduler.createObserver(HomeReactor.State.self)
@@ -54,7 +56,7 @@ final class HomeReactorLoadDataUnitTest: XCTestCase {
         
         let events = observer.events
         let finalState = events.last?.value.element
-        XCTAssertEqual(finalState?.medias.count, 1)
+        XCTAssertEqual(finalState?.medias.count, 2)
         
         let tvItems = finalState?.medias.first?.items ?? []
         XCTAssertEqual(tvItems.count, 2)
@@ -62,55 +64,58 @@ final class HomeReactorLoadDataUnitTest: XCTestCase {
 }
 
 extension HomeReactorLoadDataUnitTest {
-    var jsonResult: String {
-          """
-              {
-                  "results": [
-                        {
-                          "adult": false,
-                          "backdrop_path": "/tJSAxxjCtbtZYMBQkfxvdgqXsz5.jpg",
-                          "genre_ids": [
-                              80,
-                              9648,
-                              18
-                          ],
-                          "id": 227191,
-                          "origin_country": [
-                              "KR"
-                          ],
-                          "original_language": "ko",
-                          "original_name": "나인 퍼즐",
-                          "overview": "삼촌 죽음의 유일한 목격자인 이나는 사건의 진실을 밝히기 위해 프로파일러가 된다. 강력팀 형사 한샘은 그런 이나를 용의자로 집요하게 의심하고, 10년 만에 도착한 의문의 퍼즐과 함께 살인이 다시 시작된다. 이나와 한샘은 퍼즐 연쇄살인을 막을 수 있을까?",
-                          "popularity": 51.3198,
-                          "poster_path": "/p5q5tS8PVdZiWaUNdeYPHrOMcaI.jpg",
-                          "first_air_date": "2025-05-21",
-                          "name": "나인 퍼즐",
-                          "vote_average": 7.2,
-                          "vote_count": 17
-                      },
-                      {
-                          "adult": false,
-                          "backdrop_path": "/m0VuPoWQhbgMjVIwAdZmmHgHQrl.jpg",
-                          "genre_ids": [
-                              35,
-                              18
-                          ],
-                          "id": 261980,
-                          "origin_country": [
-                              "KR"
-                          ],
-                          "original_language": "ko",
-                          "original_name": "미지의 서울",
-                          "overview": "얼굴 빼고 모든 게 다른 쌍둥이 자매가 인생을 맞바꾸는 거짓말로 진짜 사랑과 인생을 찾아가는 로맨틱 성장 드라마",
-                          "popularity": 24.141,
-                          "poster_path": "/woGYRE5vChxqUqTBJJaOhO9Cqk6.jpg",
-                          "first_air_date": "2025-05-24",
-                          "name": "미지의 서울",
-                          "vote_average": 7.444,
-                          "vote_count": 9
-                      }
-                  ]
-              }
-              """
+    var tvJsonResult: String {
+        """
+        {
+            "results": [
+                {
+                    "id": 227191,
+                    "name": "나인 퍼즐",
+                    "overview": "프로파일러가 된 이나의 미스터리.",
+                    "genre_ids": [80, 9648],
+                    "backdrop_path": "/tv1.jpg",
+                    "poster_path": "/tv1poster.jpg",
+                    "first_air_date": "2025-05-21"
+                },
+                {
+                    "id": 261980,
+                    "name": "미지의 서울",
+                    "overview": "쌍둥이 자매의 로맨스.",
+                    "genre_ids": [35, 18],
+                    "backdrop_path": "/tv2.jpg",
+                    "poster_path": "/tv2poster.jpg",
+                    "first_air_date": "2025-05-24"
+                }
+            ],
+            "total_pages": 1
+        }
+        """
+    }
+
+    var movieJsonResult: String {
+        """
+        {
+            "results": [
+                {
+                    "id": 111,
+                    "title": "서울의 밤",
+                    "overview": "서울의 밤을 배경으로 한 범죄 액션 영화.",
+                    "genre_ids": [28, 80],
+                    "poster_path": "/movie1poster.jpg",
+                    "release_date": "2025-05-10"
+                },
+                {
+                    "id": 112,
+                    "title": "로맨틱 코미디",
+                    "overview": "연애 초보들의 좌충우돌 이야기.",
+                    "genre_ids": [35, 10749],
+                    "poster_path": "/movie2poster.jpg",
+                    "release_date": "2025-04-01"
+                }
+            ],
+            "total_pages": 1
+        }
+        """
     }
 }
+
