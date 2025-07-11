@@ -17,10 +17,40 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
         
-        let vc = HomeViewController(reactor: HomeReactor(networkService: NetworkManager()))
-        let nav = UINavigationController(rootViewController: vc)
-        window?.rootViewController = nav
+        window?.rootViewController = setupVC()
         window?.makeKeyAndVisible()
+    }
+    
+    private func setupVC() -> UITabBarController {
+        let tabBarController = UITabBarController()
+        let homeVC = HomeViewController(reactor: HomeReactor(networkService: NetworkManager()))
+        let homeNav = UINavigationController(rootViewController: homeVC)
+        homeVC.tabBarItem.image = UIImage(systemName: "house")
+        homeVC.tabBarItem.title = "홈"
+        
+        let searchVC = UIViewController()
+        let searchNav = UINavigationController(rootViewController: searchVC)
+        searchNav.tabBarItem.image = UIImage(systemName: "magnifyingglass")
+        searchNav.tabBarItem.title = "검색"
+        
+        let tierVC = UIViewController()
+        let tierNav = UINavigationController(rootViewController: tierVC)
+        tierNav.tabBarItem.image = UIImage(systemName: "list.triangle")
+        tierNav.tabBarItem.title = "티어표"
+        
+        let settingVC = UIViewController()
+        let settingNav = UINavigationController(rootViewController: settingVC)
+        settingNav.tabBarItem.image = UIImage(systemName: "gear")
+        settingNav.tabBarItem.title = "설정"
+        
+        tabBarController.viewControllers = [
+            homeNav,
+            searchNav,
+            tierNav,
+            settingNav
+        ]
+
+        return tabBarController
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
