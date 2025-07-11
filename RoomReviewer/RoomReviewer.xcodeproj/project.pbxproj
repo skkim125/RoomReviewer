@@ -214,6 +214,15 @@
 			path = HomeReactorLoadDataUnitTest;
 			sourceTree = "<group>";
 		};
+		04C97AAF2E20D8C4001EB1D4 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				04FFC7C22DF16A840081AF7C /* AppDelegate.swift */,
+				04FFC7C92DF16A840081AF7C /* SceneDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
 		04DCA8A32DF2DBD500695361 /* Network */ = {
 			isa = PBXGroup;
 			children = (
@@ -252,13 +261,12 @@
 		04FFC7CB2DF16A840081AF7C /* RoomReviewer */ = {
 			isa = PBXGroup;
 			children = (
-				04FFC7C22DF16A840081AF7C /* AppDelegate.swift */,
+				04C97AAF2E20D8C4001EB1D4 /* App */,
 				0449525C2E08174000D75C4A /* Data */,
 				04DCA8A32DF2DBD500695361 /* Network */,
 				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
-				04FFC7C92DF16A840081AF7C /* SceneDelegate.swift */,
 				042EFE602E1403DD00810E02 /* Review */,
 				042EFE5E2E1403C800810E02 /* Home */,
 			);
