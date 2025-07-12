@@ -22,7 +22,7 @@ final class WriteReviewReactor: Reactor {
     struct State {
         var query: String?
         var isLoading: Bool = false
-        @Pulse var medias: [Media]?
+        @Pulse var medias: [Search]?
         var errorType: Error?
         @Pulse var dismissAction: Void?
     }
@@ -36,7 +36,7 @@ final class WriteReviewReactor: Reactor {
     enum Mutation {
         case setLoading(Bool)
         case setQuery(String?)
-        case searchSuccessed([Media])
+        case searchSuccessed([Search])
         case showError(Error)
         case dismissWriteReview
     }
@@ -55,7 +55,7 @@ final class WriteReviewReactor: Reactor {
                 .just(.setLoading(true)),
                 networkService.callRequest(TMDBTargetType.searchMulti(searchText, 1))
                     .asObservable()
-                    .flatMap { (result: Result<SearchMediaResult, Error>) -> Observable<Mutation> in
+                    .flatMap { (result: Result<SearchResult, Error>) -> Observable<Mutation> in
                         switch result {
                         case .success(let success):
                             let datas = success.results
@@ -87,6 +87,7 @@ final class WriteReviewReactor: Reactor {
             
         case .setLoading(let loaded):
             newState.isLoading = loaded
+            
         case .dismissWriteReview:
             newState.dismissAction = ()
         }

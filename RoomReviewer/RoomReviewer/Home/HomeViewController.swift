@@ -77,7 +77,7 @@ final class HomeViewController: UIViewController {
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
                         return UICollectionViewCell()
                     }
-                    let reactor = HomeMediaCollectionViewCellReactor(movie: movie)
+                    let reactor = HomeMediaCollectionViewCellReactor(media: movie)
                     cell.reactor = reactor
                     cell.bind(reactor: reactor)
                     
@@ -87,7 +87,7 @@ final class HomeViewController: UIViewController {
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
                         return UICollectionViewCell()
                     }
-                    let reactor = HomeMediaCollectionViewCellReactor(tv: tv)
+                    let reactor = HomeMediaCollectionViewCellReactor(media: tv)
                     cell.reactor = reactor
                     cell.bind(reactor: reactor)
                     

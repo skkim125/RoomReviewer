@@ -56,12 +56,12 @@ extension TMDBTargetType: TargetType {
                 URLQueryItem(name: "region", value: "KR"),
                 URLQueryItem(name: "watch_region", value: "KR"),
                 URLQueryItem(name: "with_release_type", value: "3|4"),
-                URLQueryItem(name: "primary_release_date.gte", value: "2025-06-09"),
-                URLQueryItem(name: "primary_release_date.lte", value: "2025-07-09"),
-                URLQueryItem(name: "release_date.gte", value: "2025-06-09"),
-                URLQueryItem(name: "release_date.lte", value: "2025-07-09"),
+                URLQueryItem(name: "primary_release_date.gte", value: "2025-06-01"),
+                URLQueryItem(name: "primary_release_date.lte", value: "2025-07-12"),
+                URLQueryItem(name: "release_date.gte", value: "2025-06-01"),
+                URLQueryItem(name: "release_date.lte", value: "2025-07-12"),
                 URLQueryItem(name: "sort_by", value: "popularity.desc"),
-                URLQueryItem(name: "vore_count_gte", value: "10")
+                URLQueryItem(name: "vote_count.gte", value: "50"),
             ]
         case .tv:
             return [
@@ -72,10 +72,11 @@ extension TMDBTargetType: TargetType {
                 URLQueryItem(name: "with_original_language", value: "ko"),
                 URLQueryItem(name: "sort_by", value: "popularity.desc"),
                 URLQueryItem(name: "first_air_date.gte", value: "2025-05-01"),
-                URLQueryItem(name: "first_air_date.lte", value: "2025-07-10"),
+                URLQueryItem(name: "first_air_date.lte", value: "2025-07-12"),
                 URLQueryItem(name: "air_date.gte", value: "2025-05-01"),
-                URLQueryItem(name: "air_date.lte", value: "2025-07-10"),
-                URLQueryItem(name: "vore_count_gte", value: "10")
+                URLQueryItem(name: "air_date.lte", value: "2025-07-12"),
+                URLQueryItem(name: "vote_count.gte", value: "5"),
+                URLQueryItem(name: "without_genres", value: "10764,99")
             ]
         case .searchMulti(let query, let page):
             return [

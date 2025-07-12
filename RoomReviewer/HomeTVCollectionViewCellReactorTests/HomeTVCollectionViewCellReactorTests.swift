@@ -34,9 +34,9 @@ final class HomeTVCollectionViewCellReactorTests: XCTestCase {
     }
     
     func test_SuccessLoadImage() {
-        let tv = TV.mockTV
+        let tv = Media.mockTV
         
-        reactor = HomeMediaCollectionViewCellReactor(tv: tv, imageLoader: mockImageLoader)
+        reactor = HomeMediaCollectionViewCellReactor(media: tv, imageLoader: mockImageLoader)
         
         guard let image = UIImage(systemName: "star.fill"), let testImage = image.pngData() else {
             XCTFail("이미지 변환 실패")
@@ -76,8 +76,8 @@ final class HomeTVCollectionViewCellReactorTests: XCTestCase {
     }
     
     func test_LoadImageWithNilURL() {
-        let tv = TV.mockTVwithNilPosterURL
-        reactor = HomeMediaCollectionViewCellReactor(tv: tv, imageLoader: mockImageLoader)
+        let tv = Media.mockTVwithNilPosterURL
+        reactor = HomeMediaCollectionViewCellReactor(media: tv, imageLoader: mockImageLoader)
         
         let observer = scheduler.createObserver(HomeMediaCollectionViewCellReactor.State.self)
         reactor.state
