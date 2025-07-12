@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - MovieList
 struct MovieList: Decodable, Equatable {
     let results: [Movie]
     let totalPages: Int
@@ -17,11 +18,13 @@ struct MovieList: Decodable, Equatable {
     }
 }
 
+// MARK: - Movie
 struct Movie: Decodable, Equatable {
     let id: Int
     let title: String
     let overview: String
     let posterPath: String?
+    let backdropPath: String?
     let genreIDS: [Int]
     let releaseDate: String
     
@@ -30,6 +33,7 @@ struct Movie: Decodable, Equatable {
         case title
         case overview
         case posterPath = "poster_path"
+        case backdropPath = "backdrop_path"
         case genreIDS = "genre_ids"
         case releaseDate = "release_date"
     }

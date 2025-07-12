@@ -7,10 +7,10 @@
 
 import Foundation
 
-// MARK: - Result
-struct SearchMediaResult: Decodable {
+// MARK: - SearchResult
+struct SearchResult: Decodable {
     let page: Int
-    let results: [Media]
+    let results: [Search]
     let totalPages, totalResults: Int
 
     enum CodingKeys: String, CodingKey {
@@ -20,8 +20,8 @@ struct SearchMediaResult: Decodable {
     }
 }
 
-// MARK: - Media
-struct Media: Decodable, Equatable {
+// MARK: - Search
+struct Search: Decodable, Equatable {
     let backdropPath: String?
     let id: Int
     let title, originalTitle: String?
@@ -51,14 +51,9 @@ struct Media: Decodable, Equatable {
     }
 }
 
-enum MediaType: String, Decodable {
-    case movie = "movie"
-    case tv = "tv"
-}
-
-extension Media {
-    static var mockMedia: Media {
-        Media(
+extension Search {
+    static var mockMedia: Search {
+        Search(
             backdropPath: "/m0VuPoWQhbgMjVIwAdZmmHgHQrl.jpg",
             id: 261980,
             title: nil,
@@ -76,8 +71,8 @@ extension Media {
         )
     }
 
-    static var mockMediaWithNilPoster: Media {
-        Media(
+    static var mockMediaWithNilPoster: Search {
+        Search(
             backdropPath: "/m0VuPoWQhbgMjVIwAdZmmHgHQrl.jpg",
             id: 261980,
             title: nil,

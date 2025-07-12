@@ -71,23 +71,28 @@ final class HomeReactor: Reactor {
 
 extension HomeReactor {
     private func fetchMedias() -> Observable<Mutation> {
-        let tvRequest = networkService.callRequest(TMDBTargetType.tv)
-            .asObservable()
-            .map { (result: Result<TVList, Error>) -> [HomeSectionItem] in
-                switch result {
-                case .success(let success):
-                    return success.results.map { HomeSectionItem.tv(item: $0) }
-                case .failure:
-                    return []
-                }
-            }
-        
         let movieRequest = networkService.callRequest(TMDBTargetType.movie)
             .asObservable()
             .map { (result: Result<MovieList, Error>) -> [HomeSectionItem] in
                 switch result {
                 case .success(let success):
-                    return success.results.map { HomeSectionItem.movie(item: $0) }
+                    let prefixed = success.results.prefix(10)
+                    
+                    return prefixed.map { HomeSectionItem.movie(item: Media(id: $0.id, mediaType: .movie, title: $0.title, overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS)) }
+                case .failure:
+                    return []
+                }
+            }
+        
+        
+        let tvRequest = networkService.callRequest(TMDBTargetType.tv)
+            .asObservable()
+            .map { (result: Result<TVList, Error>) -> [HomeSectionItem] in
+                switch result {
+                case .success(let success):
+                    let prefixed = success.results.prefix(10)
+                    
+                    return prefixed.map { HomeSectionItem.tv(item: Media(id: $0.id, mediaType: .tv, title: $0.name, overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS)) }
                 case .failure:
                     return []
                 }
