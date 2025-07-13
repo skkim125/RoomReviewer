@@ -16,7 +16,7 @@ final class HomeViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private let homeReactor: HomeReactor
     
-    private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .collectionViewLayout1).then {
+    private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
         $0.register(HomeSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HomeSectionHeaderView.reusableID)
         $0.backgroundColor = .white
@@ -150,20 +150,7 @@ extension HomeViewController {
 }
 
 extension UICollectionViewLayout {
-    static var collectionViewLayout: UICollectionViewFlowLayout {
-        let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = .init(top: 20, left: 20, bottom: 20, right: 20)
-        layout.itemSize = CGSize(width: 170, height: 250)
-        layout.minimumLineSpacing = 20
-        layout.minimumInteritemSpacing = 20
-        layout.scrollDirection = .horizontal
-        
-        layout.headerReferenceSize = CGSize(width: 0, height: 50)
-        
-        return layout
-    }
-    
-    static var collectionViewLayout1: UICollectionViewLayout {
+    static var homeCollectionViewLayout: UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, layoutEnvironment in
                 
                 let itemSize = NSCollectionLayoutSize(

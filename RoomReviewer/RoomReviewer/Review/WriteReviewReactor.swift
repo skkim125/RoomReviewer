@@ -22,7 +22,7 @@ final class WriteReviewReactor: Reactor {
     struct State {
         var query: String?
         var isLoading: Bool = false
-        @Pulse var medias: [Search]?
+        @Pulse var medias: [Media]?
         var errorType: Error?
         @Pulse var dismissAction: Void?
     }
@@ -36,7 +36,7 @@ final class WriteReviewReactor: Reactor {
     enum Mutation {
         case setLoading(Bool)
         case setQuery(String?)
-        case searchSuccessed([Search])
+        case searchSuccessed([Media])
         case showError(Error)
         case dismissWriteReview
     }
@@ -58,7 +58,9 @@ final class WriteReviewReactor: Reactor {
                     .flatMap { (result: Result<SearchResult, Error>) -> Observable<Mutation> in
                         switch result {
                         case .success(let success):
-                            let datas = success.results
+                            let datas = success.results.sorted(by: { $0.popularity > $1.popularity }).map {
+                                Media(id: $0.id, mediaType: $0.mediaType == .movie ? .movie : .tv, title: ($0.title ?? $0.name) ?? "", overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS)
+                            }
                             return .just(.searchSuccessed(datas))
                         case .failure(let error):
                             print(error.localizedDescription)
@@ -82,8 +84,8 @@ final class WriteReviewReactor: Reactor {
         case .showError(let error):
             newState.errorType = error
             
-        case .searchSuccessed(let tvs):
-            newState.medias = tvs
+        case .searchSuccessed(let medias):
+            newState.medias = medias
             
         case .setLoading(let loaded):
             newState.isLoading = loaded

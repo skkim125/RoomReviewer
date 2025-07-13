@@ -12,6 +12,11 @@ import SnapKit
 import Then
 
 final class WriteReviewViewController: UIViewController {
+    private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnCollectionViewLayout()).then {
+        $0.register(SearchMediaCollectionViewCell.self, forCellWithReuseIdentifier: SearchMediaCollectionViewCell.cellID)
+        $0.backgroundColor = .white
+        $0.showsVerticalScrollIndicator = false
+    }
     private let searchTextField = UITextField().then {
         $0.borderStyle = .roundedRect
         $0.font = .systemFont(ofSize: 14)
@@ -68,14 +73,12 @@ final class WriteReviewViewController: UIViewController {
         
         reactor.pulse(\.$medias)
             .compactMap { $0 }
+            .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, value in
-                print("검색 결과: \(value.count)개")
-                if value.isEmpty {
-                    print("검색 결과가 없습니다")
-                } else {
-                    print(value.first?.originalName ?? "")
-                }
+            .bind(to: searchMediaCollectionView.rx.items(cellIdentifier: SearchMediaCollectionViewCell.cellID, cellType: SearchMediaCollectionViewCell.self)) { index, item, cell in
+                let reactor = SearchMediaCollectionViewCellReactor(media: item)
+                cell.reactor = reactor
+                cell.bind(reactor: reactor)
             }
             .disposed(by: disposeBag)
 
@@ -84,9 +87,6 @@ final class WriteReviewViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, value in
                 owner.searchTextField.isEnabled = !value
-                if value {
-                    print("검색 중...")
-                }
             }
             .disposed(by: disposeBag)
         
@@ -110,6 +110,7 @@ final class WriteReviewViewController: UIViewController {
 extension WriteReviewViewController {
     private func configureHierarchy() {
         view.addSubview(searchTextField)
+        view.addSubview(searchMediaCollectionView)
     }
     
     private func configureLayout() {
@@ -118,10 +119,36 @@ extension WriteReviewViewController {
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             $0.height.equalTo(40)
         }
+        
+        searchMediaCollectionView.snp.makeConstraints {
+            $0.top.equalTo(searchTextField.snp.bottom).offset(10)
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(10)
+            $0.bottom.equalToSuperview()
+        }
     }
     
     private func configureNavigationBar() {
         navigationItem.title = "시청한 미디어 검색"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: nil, action: nil)
+    }
+}
+
+extension UICollectionViewLayout {
+    static func threeColumnCollectionViewLayout() -> UICollectionViewCompositionalLayout {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0/3.0),
+            heightDimension: .fractionalHeight(1.0)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(180))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        group.interItemSpacing = .fixed(10)
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 10
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        
+        return UICollectionViewCompositionalLayout(section: section)
     }
 }
