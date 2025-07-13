@@ -22,15 +22,17 @@ final class WriteReviewReactor: Reactor {
     struct State {
         var query: String?
         var isLoading: Bool = false
-        @Pulse var medias: [Media]?
+        @Pulse var searchResults: [Media]?
         var errorType: Error?
         @Pulse var dismissAction: Void?
+        @Pulse var selectedMedia: Media?
     }
     
     enum Action {
         case updateQuery(String?)
         case searchButtonTapped
         case dismissWriteReview
+        case selectedMedia(Media)
     }
     
     enum Mutation {
@@ -39,6 +41,7 @@ final class WriteReviewReactor: Reactor {
         case searchSuccessed([Media])
         case showError(Error)
         case dismissWriteReview
+        case pushDetailView(Media)
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -71,6 +74,8 @@ final class WriteReviewReactor: Reactor {
             ])
         case .dismissWriteReview:
             return .just(.dismissWriteReview)
+        case .selectedMedia(let media):
+            return .just(.pushDetailView(media))
         }
     }
     
@@ -85,13 +90,16 @@ final class WriteReviewReactor: Reactor {
             newState.errorType = error
             
         case .searchSuccessed(let medias):
-            newState.medias = medias
+            newState.searchResults = medias
             
         case .setLoading(let loaded):
             newState.isLoading = loaded
             
         case .dismissWriteReview:
             newState.dismissAction = ()
+            
+        case .pushDetailView(let media):
+            newState.selectedMedia = media
         }
         
         return newState
