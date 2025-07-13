@@ -33,6 +33,7 @@ struct Search: Decodable, Equatable {
     let video: Bool?
     let name, originalName: String?
     let originCountry: [String]?
+    let popularity: Double
 
     enum CodingKeys: String, CodingKey {
         case backdropPath = "backdrop_path"
@@ -48,6 +49,7 @@ struct Search: Decodable, Equatable {
         case originalName = "original_name"
         case firstAirDate = "first_air_date"
         case originCountry = "origin_country"
+        case popularity
     }
 }
 
@@ -67,7 +69,8 @@ extension Search {
             video: nil,
             name: "미지의 서울",
             originalName: "미지의 서울",
-            originCountry: ["KR"]
+            originCountry: ["KR"],
+            popularity: 7.9
         )
     }
 
@@ -86,7 +89,8 @@ extension Search {
             video: nil,
             name: "미지의 서울",
             originalName: "미지의 서울",
-            originCountry: ["KR"]
+            originCountry: ["KR"],
+            popularity: 7.9
         )
     }
 }
