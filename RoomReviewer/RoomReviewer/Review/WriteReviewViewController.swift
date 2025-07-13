@@ -67,11 +67,16 @@ final class WriteReviewViewController: UIViewController {
             .map { WriteReviewReactor.Action.dismissWriteReview }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        searchMediaCollectionView.rx.modelSelected(Media.self)
+            .map { WriteReviewReactor.Action.selectedMedia($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func bindState(reactor: WriteReviewReactor) {
         
-        reactor.pulse(\.$medias)
+        reactor.pulse(\.$searchResults)
             .compactMap { $0 }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
@@ -81,6 +86,7 @@ final class WriteReviewViewController: UIViewController {
                 cell.bind(reactor: reactor)
             }
             .disposed(by: disposeBag)
+        
 
         reactor.state.map { $0.isLoading }
             .distinctUntilChanged()
@@ -102,6 +108,15 @@ final class WriteReviewViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.navigationController?.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$selectedMedia)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, media in
+                let vc = MediaDetailViewController()
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
     }

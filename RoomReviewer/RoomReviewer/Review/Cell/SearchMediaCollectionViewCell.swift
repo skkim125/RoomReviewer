@@ -30,12 +30,6 @@ final class SearchMediaCollectionViewCell: UICollectionViewCell, View {
         $0.contentMode = .scaleAspectFill
     }
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
-    private let tvNameLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 14, weight: .bold)
-        $0.textColor = .black
-        $0.textAlignment = .center
-        $0.numberOfLines = 2
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -55,22 +49,11 @@ extension SearchMediaCollectionViewCell {
             .observe(on: MainScheduler.instance)
             .bind(to: activityIndicator.rx.isAnimating)
             .disposed(by: disposeBag)
-        
-        reactor.state.map { $0.mediaName }
-            .observe(on: MainScheduler.instance)
-            .bind(to: tvNameLabel.rx.text)
-            .disposed(by: disposeBag)
 
         reactor.state.map { $0.image }
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(to: posterImageView.rx.image)
-            .disposed(by: disposeBag)
-        
-        reactor.state.map { $0.image }
-            .map { $0 != nil }
-            .observe(on: MainScheduler.instance)
-            .bind(to: tvNameLabel.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.image }
@@ -87,14 +70,12 @@ extension SearchMediaCollectionViewCell {
         super.prepareForReuse()
         disposeBag = DisposeBag()
         posterImageView.image = nil
-        tvNameLabel.text = nil
     }
     
     private func configureHierarchy() {
         contentView.addSubview(shadowView)
         shadowView.addSubview(posterImageView)
         contentView.addSubview(activityIndicator)
-        contentView.addSubview(tvNameLabel)
     }
     
     private func configureLayout() {
@@ -109,11 +90,6 @@ extension SearchMediaCollectionViewCell {
         
         activityIndicator.snp.makeConstraints {
             $0.center.equalTo(posterImageView)
-        }
-        
-        tvNameLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(8)
-            $0.bottom.equalToSuperview().inset(8)
         }
     }
 }
