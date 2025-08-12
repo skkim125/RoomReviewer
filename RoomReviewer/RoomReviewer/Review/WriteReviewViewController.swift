@@ -96,7 +96,8 @@ final class WriteReviewViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        reactor.state.compactMap { $0.errorType }
+        reactor.pulse(\.$errorType)
+            .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, value in
                 print("검색 에러")
@@ -115,7 +116,7 @@ final class WriteReviewViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let vc = MediaDetailViewController()
+                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager()))
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -143,7 +144,7 @@ extension WriteReviewViewController {
     }
     
     private func configureNavigationBar() {
-        navigationItem.title = "시청한 미디어 검색"
+        navigationItem.title = "미디어 검색"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: nil, action: nil)
     }
 }

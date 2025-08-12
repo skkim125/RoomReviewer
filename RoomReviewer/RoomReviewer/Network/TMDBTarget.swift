@@ -11,6 +11,8 @@ enum TMDBTargetType {
     case movie
     case tv
     case searchMulti(String, Int)
+    case movieCredits(Int)
+    case tvCredits(Int)
 }
 
 extension TMDBTargetType: TargetType {
@@ -27,6 +29,10 @@ extension TMDBTargetType: TargetType {
             "discover/tv"
         case .searchMulti:
             "search/multi"
+        case .movieCredits(let id):
+            "movie/\(id)/credits"
+        case .tvCredits(let id):
+            "tv/\(id)/credits"
         }
     }
     
@@ -37,6 +43,10 @@ extension TMDBTargetType: TargetType {
         case .tv:
             return .get
         case .searchMulti:
+            return .get
+        case .movieCredits:
+            return .get
+        case .tvCredits:
             return .get
         }
     }
@@ -84,17 +94,29 @@ extension TMDBTargetType: TargetType {
                 URLQueryItem(name: "language", value: "ko-KR"),
                 URLQueryItem(name: "page", value: "\(page)"),
             ]
+        case .movieCredits(_):
+            return [
+                URLQueryItem(name: "language", value: "ko-KR")
+            ]
+        case .tvCredits:
+            return [
+                URLQueryItem(name: "language", value: "ko-KR")
+            ]
         }
     }
     
     var body: Data? {
         switch self {
         case .movie:
-            nil
+            return nil
         case .tv:
-            nil
+            return nil
         case .searchMulti:
-            nil
+            return nil
+        case .movieCredits:
+            return nil
+        case .tvCredits:
+            return nil
         }
     }
 }

@@ -26,8 +26,8 @@ struct Search: Decodable, Equatable {
     let id: Int
     let title, originalTitle: String?
     let overview, posterPath: String?
-    let mediaType: MediaType?
-    let genreIDS: [Int]
+    let mediaType: MediaType
+    let genreIDS: [Int]?
     let releaseDate: String?
     let firstAirDate: String?
     let video: Bool?
