@@ -23,6 +23,10 @@ final class MediaDetailViewController: UIViewController {
         $0.clipsToBounds = true
     }
     
+    private let dividerView = UIView().then {
+        $0.backgroundColor = .label.withAlphaComponent(0.1)
+    }
+    
     private let shadowView = UIView().then {
         $0.layer.shadowColor = UIColor.black.cgColor
         $0.layer.shadowOpacity = 0.8
@@ -80,15 +84,12 @@ final class MediaDetailViewController: UIViewController {
     }
     
     private func bindState(reactor: MediaDetailReactor) {
-        reactor.state.compactMap { $0.isLoading }
+        
+        reactor.state.map { $0.backDropImage }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, isLoading in
-                if isLoading {
-                    print("로드중")
-                } else {
-                    print("로드 완료")
-                }
+            .bind(with: self) { owner, image in
+                owner.dividerView.isHidden = image == nil
             }
             .disposed(by: disposeBag)
         
@@ -124,6 +125,7 @@ extension MediaDetailViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubview(backDropImageView)
+        contentView.addSubview(dividerView)
         contentView.addSubview(shadowView)
         shadowView.addSubview(posterImageView)
         contentView.addSubview(titleLabel)
@@ -145,6 +147,12 @@ extension MediaDetailViewController {
         backDropImageView.snp.makeConstraints {
             $0.top.horizontalEdges.equalTo(contentView)
             $0.height.equalTo(200)
+        }
+        
+        dividerView.snp.makeConstraints {
+            $0.top.equalTo(backDropImageView.snp.bottom)
+            $0.horizontalEdges.equalTo(contentView)
+            $0.height.equalTo(1)
         }
         
         shadowView.snp.makeConstraints {

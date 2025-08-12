@@ -58,6 +58,19 @@ final class HomeViewController: UIViewController {
             .compactMap { HomeReactor.Action.writeButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        self.hotMediaCollectionView.rx.modelSelected(HomeSectionModel.Item.self)
+            .compactMap { item -> Media? in
+                switch item {
+                case .movie(let movie):
+                    return movie
+                case .tv(let tv):
+                    return tv
+                }
+            }
+            .map { HomeReactor.Action.mediaSelected($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func bindState(reactor: HomeReactor) {
@@ -112,6 +125,16 @@ final class HomeViewController: UIViewController {
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: hotMediaCollectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$selectedMedia)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, media in
+                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager())
+                let vc = MediaDetailViewController(reactor: detailReactor)
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$presentWriteReviewView)
