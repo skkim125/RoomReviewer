@@ -20,6 +20,7 @@ struct Media: Equatable {
 enum MediaType: String, Codable {
     case movie = "movie"
     case tv = "tv"
+    case person = "person"
 }
 
 extension Media {
