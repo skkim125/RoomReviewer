@@ -25,10 +25,12 @@ final class WriteReviewViewController: UIViewController {
     }
     
     private let writeReviewReactor: WriteReviewReactor
+    private let imageLoader: ImageLoadService
     private var disposeBag = DisposeBag()
     
-    init(writeReviewReactor: WriteReviewReactor) {
+    init(writeReviewReactor: WriteReviewReactor, imageLoader: ImageLoadService) {
         self.writeReviewReactor = writeReviewReactor
+        self.imageLoader = imageLoader
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -116,7 +118,7 @@ final class WriteReviewViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager()))
+                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageLoader: owner.imageLoader))
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)

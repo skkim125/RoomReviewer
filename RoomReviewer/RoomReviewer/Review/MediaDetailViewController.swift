@@ -23,10 +23,6 @@ final class MediaDetailViewController: UIViewController {
         $0.clipsToBounds = true
     }
     
-    private let dividerView = UIView().then {
-        $0.backgroundColor = .label.withAlphaComponent(0.1)
-    }
-    
     private let shadowView = UIView().then {
         $0.layer.shadowColor = UIColor.black.cgColor
         $0.layer.shadowOpacity = 0.8
@@ -85,14 +81,6 @@ final class MediaDetailViewController: UIViewController {
     
     private func bindState(reactor: MediaDetailReactor) {
         
-        reactor.state.map { $0.backDropImage }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, image in
-                owner.dividerView.isHidden = image == nil
-            }
-            .disposed(by: disposeBag)
-        
         reactor.state.compactMap { $0.mediaDetail }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, detail in
@@ -101,14 +89,34 @@ final class MediaDetailViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        reactor.state.compactMap { $0.backDropImage }
+        reactor.state.map { $0.backDropImage }
+            .map { data -> UIImage? in
+                guard let data = data else { return nil }
+                return UIImage(data: data)
+            }
             .observe(on: MainScheduler.instance)
-            .bind(to: backDropImageView.rx.image)
+            .bind(with: self) { owner, image in
+                if let image = image {
+                    owner.backDropImageView.image = image
+                } else {
+                    owner.backDropImageView.backgroundColor = .systemGray6
+                }
+            }
             .disposed(by: disposeBag)
         
-        reactor.state.compactMap { $0.posterImage }
+        reactor.state.map { $0.posterImage }
+            .map { data -> UIImage? in
+                guard let data = data else { return nil }
+                return UIImage(data: data)
+            }
             .observe(on: MainScheduler.instance)
-            .bind(to: posterImageView.rx.image)
+            .bind(with: self) { owner, image in
+                if let image = image {
+                    owner.posterImageView.image = image
+                } else {
+                    owner.posterImageView.backgroundColor = .systemGray6
+                }
+            }
             .disposed(by: disposeBag)
         
         reactor.state.compactMap { $0.errorType }
@@ -125,7 +133,6 @@ extension MediaDetailViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubview(backDropImageView)
-        contentView.addSubview(dividerView)
         contentView.addSubview(shadowView)
         shadowView.addSubview(posterImageView)
         contentView.addSubview(titleLabel)
@@ -147,12 +154,6 @@ extension MediaDetailViewController {
         backDropImageView.snp.makeConstraints {
             $0.top.horizontalEdges.equalTo(contentView)
             $0.height.equalTo(200)
-        }
-        
-        dividerView.snp.makeConstraints {
-            $0.top.equalTo(backDropImageView.snp.bottom)
-            $0.horizontalEdges.equalTo(contentView)
-            $0.height.equalTo(1)
         }
         
         shadowView.snp.makeConstraints {

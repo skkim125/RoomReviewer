@@ -16,20 +16,20 @@ final class HomeMediaCollectionViewCellReactor: Reactor {
 
     enum Mutation {
         case setLoading(Bool)
-        case setImage(UIImage)
+        case setImage(Data?)
     }
 
     struct State {
         var mediaName: String?
         var mediaPosterURL: String?
-        var image: UIImage?
+        var image: Data?
         var isLoading: Bool = false
     }
 
     var initialState: State
     private let imageLoader: ImageLoadService
 
-    init(media: Media, imageLoader: ImageLoadService = ImageLoadManager()) {
+    init(media: Media, imageLoader: ImageLoadService) {
         self.initialState = State(mediaName: media.title, mediaPosterURL: media.posterPath)
         self.imageLoader = imageLoader
     }
@@ -38,7 +38,7 @@ final class HomeMediaCollectionViewCellReactor: Reactor {
         switch action {
         case .loadImage:
             guard let url = currentState.mediaPosterURL else {
-                return .just(.setImage(UIImage(systemName: "photo.fill")!))
+                return .just(.setImage(nil))
             }
             return Observable.concat([
                 .just(.setLoading(true)),
@@ -47,9 +47,9 @@ final class HomeMediaCollectionViewCellReactor: Reactor {
                     .compactMap { result in
                         switch result {
                         case .success(let data):
-                            return UIImage(data: data)
+                            return data
                         case .failure:
-                            return UIImage(systemName: "photo.fill")
+                            return nil
                         }
                     }
                     .observe(on: MainScheduler.instance)

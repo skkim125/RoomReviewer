@@ -5,23 +5,25 @@
 //  Created by 김상규 on 7/13/25.
 //
 
-import UIKit
+import Foundation
 import RxSwift
 import ReactorKit
 
 final class MediaDetailReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
+    private let imageLoader: ImageLoadService
     
-    init(media: Media, networkService: NetworkService) {
+    init(media: Media, networkService: NetworkService, imageLoader: ImageLoadService) {
         initialState = State(media: media)
         self.networkService = networkService
+        self.imageLoader = imageLoader
     }
     
     struct State {
         var media: Media
-        var backDropImage: UIImage?
-        var posterImage: UIImage?
+        var backDropImage: Data?
+        var posterImage: Data?
         var mediaDetail: MediaDetail?
         var isLoading: Bool?
         var errorType: Error?
@@ -36,8 +38,8 @@ final class MediaDetailReactor: Reactor {
     enum Mutation {
         case setLoading(Bool)
         case setMediaDetail(MediaDetail)
-        case setBackdropImage(UIImage?)
-        case setPosterImage(UIImage?)
+        case setBackdropImage(Data?)
+        case setPosterImage(Data?)
         case showError(Error)
     }
     
@@ -135,13 +137,13 @@ extension MediaDetailReactor {
             }
     }
     
-    private func loadImage(imagePath: String) -> Observable<UIImage?> {
-        return ImageLoadManager().loadImage(imagePath)
+    private func loadImage(imagePath: String) -> Observable<Data?> {
+        return imageLoader.loadImage(imagePath)
             .asObservable()
             .map { result in
                 switch result {
                 case .success(let image):
-                    return UIImage(data: image)
+                    return image
                 case .failure(let error):
                     print("이미지 로드 실패: \(error)")
                     return nil
