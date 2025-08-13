@@ -62,9 +62,14 @@ extension HomeMediaCollectionViewCell {
             .disposed(by: disposeBag)
 
         reactor.state.map { $0.image }
-            .compactMap { $0 }
+            .map { data -> UIImage? in
+                guard let data = data else { return nil }
+                return UIImage(data: data)
+            }
             .observe(on: MainScheduler.instance)
-            .bind(to: posterImageView.rx.image)
+            .bind(with: self) { owner, image in
+                owner.posterImageView.image = image
+            }
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.image }

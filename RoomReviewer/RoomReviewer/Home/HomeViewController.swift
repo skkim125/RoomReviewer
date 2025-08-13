@@ -15,6 +15,7 @@ import Then
 final class HomeViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private let homeReactor: HomeReactor
+    private let imageLoader: ImageLoadService
     
     private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
@@ -23,8 +24,9 @@ final class HomeViewController: UIViewController {
         $0.showsHorizontalScrollIndicator = false
     }
     
-    init(reactor: HomeReactor) {
+    init(reactor: HomeReactor, imageLoader: ImageLoadService) {
         self.homeReactor = reactor
+        self.imageLoader = imageLoader
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -83,14 +85,14 @@ final class HomeViewController: UIViewController {
             .disposed(by: disposeBag)
             
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSectionModel>(
-            configureCell: { _, collectionView, indexPath, item in
-                
+            configureCell: { [weak self] _, collectionView, indexPath, item in
+                guard let self = self else { return UICollectionViewCell() }
                 switch item {
                 case .movie(item: let movie):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
                         return UICollectionViewCell()
                     }
-                    let reactor = HomeMediaCollectionViewCellReactor(media: movie)
+                    let reactor = HomeMediaCollectionViewCellReactor(media: movie, imageLoader: imageLoader)
                     cell.reactor = reactor
                     cell.bind(reactor: reactor)
                     
@@ -100,7 +102,7 @@ final class HomeViewController: UIViewController {
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
                         return UICollectionViewCell()
                     }
-                    let reactor = HomeMediaCollectionViewCellReactor(media: tv)
+                    let reactor = HomeMediaCollectionViewCellReactor(media: tv, imageLoader: imageLoader)
                     cell.reactor = reactor
                     cell.bind(reactor: reactor)
                     
@@ -131,7 +133,7 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager())
+                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageLoader: owner.imageLoader)
                 let vc = MediaDetailViewController(reactor: detailReactor)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
@@ -141,7 +143,7 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()))
+                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()), imageLoader: owner.imageLoader)
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 owner.navigationController?.present(nav, animated: true)
