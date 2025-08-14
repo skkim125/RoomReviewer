@@ -22,8 +22,8 @@ final class MediaDetailReactor: Reactor {
     
     struct State {
         var media: Media
-        var backDropImage: Data?
-        var posterImage: Data?
+        var backDropImageData: Data?
+        var posterImageData: Data?
         var mediaDetail: MediaDetail?
         var isLoading: Bool?
         var errorType: Error?
@@ -60,7 +60,9 @@ final class MediaDetailReactor: Reactor {
             
             return Observable.concat([
                 .just(.setLoading(true)),
-                Observable.merge(tasks),
+                Observable.merge(tasks)
+                    .asObservable()
+                    .observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
             
@@ -85,10 +87,10 @@ final class MediaDetailReactor: Reactor {
             newState.mediaDetail = detail
             
         case .setBackdropImage(let image):
-            newState.backDropImage = image
+            newState.backDropImageData = image
             
         case .setPosterImage(let image):
-            newState.posterImage = image
+            newState.posterImageData = image
             
         case .showError(let error):
             newState.errorType = error

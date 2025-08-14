@@ -52,7 +52,8 @@ final class SearchMediaCollectionViewCellReactor: Reactor {
                         case .failure:
                             return .setImageData(nil)
                         }
-                    },
+                    }
+                    .observe(on: MainScheduler.instance),
                 .just(.setLoading(false)),
                 ])
         }

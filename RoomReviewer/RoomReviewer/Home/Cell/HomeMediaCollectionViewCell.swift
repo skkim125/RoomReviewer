@@ -61,24 +61,37 @@ extension HomeMediaCollectionViewCell {
             .bind(to: tvNameLabel.rx.text)
             .disposed(by: disposeBag)
 
-        reactor.state.map { $0.image }
-            .map { data -> UIImage? in
-                guard let data = data else { return nil }
-                return UIImage(data: data)
+        reactor.state.compactMap { $0.imageData }
+            .map { [weak self] data -> (Data, CGSize) in
+                guard let self = self else { return (data, .zero) }
+                var target = self.posterImageView.bounds.size
+                if target == .zero {
+                    let width = self.contentView.bounds.width
+                    target = CGSize(width: width, height: width * 1.5)
+                }
+                return (data, target)
+            }
+            .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+            .map { data, target in
+                ImageDownSampler.shared.downsampledImage(data: data, size: target)
             }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, image in
-                owner.posterImageView.image = image
+                if let image = image {
+                    owner.posterImageView.image = image
+                } else {
+                    owner.posterImageView.backgroundColor = .systemGray6
+                }
             }
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.image }
+        reactor.state.map { $0.imageData }
             .map { $0 != nil }
             .observe(on: MainScheduler.instance)
             .bind(to: tvNameLabel.rx.isHidden)
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.image }
+        reactor.state.map { $0.imageData }
             .distinctUntilChanged()
             .filter { $0 == nil }
             .map { _ in
