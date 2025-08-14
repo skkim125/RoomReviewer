@@ -64,7 +64,7 @@ extension SearchMediaCollectionViewCell {
             }
             .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             .map { data, target in
-                self.downsampledImage(data: data, size: target, scale: UIScreen.main.scale)
+                self.downsampledImage(data: data, size: target)
             }
             .observe(on: MainScheduler.instance)
             .bind(to: posterImageView.rx.image)
@@ -108,12 +108,12 @@ extension SearchMediaCollectionViewCell {
         }
     }
     
-    func downsampledImage(data: Data, size: CGSize, scale: CGFloat = UIScreen.main.scale) -> UIImage? {
-        let maxDimensionInPixels = max(size.width, size.height) * scale
+    func downsampledImage(data: Data, size: CGSize) -> UIImage? {
+        let maxDimensionInPixels = max(size.width, size.height) * UIScreen.main.scale
 
         let options: [CFString: Any] = [
+            kCGImageSourceShouldCache: false,
             kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceShouldCacheImmediately: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
             kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
         ]
