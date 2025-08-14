@@ -48,10 +48,8 @@ final class SearchMediaCollectionViewCellReactor: Reactor {
                     .map { result in
                         switch result {
                         case .success(let data):
-                            // 다운샘플링 없이 Data를 그대로 전달합니다.
                             return .setImageData(data)
                         case .failure:
-                            // 실패 시 nil을 전달합니다.
                             return .setImageData(nil)
                         }
                     },
