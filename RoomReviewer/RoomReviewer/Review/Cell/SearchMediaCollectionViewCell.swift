@@ -11,6 +11,7 @@ import RxCocoa
 import ReactorKit
 import SnapKit
 import Then
+import ImageIO
 
 final class SearchMediaCollectionViewCell: UICollectionViewCell, View {
     static let cellID = "SearchMediaCollectionViewCell"
@@ -50,13 +51,27 @@ extension SearchMediaCollectionViewCell {
             .bind(to: activityIndicator.rx.isAnimating)
             .disposed(by: disposeBag)
 
-        reactor.state.map { $0.image }
-            .compactMap { $0 }
+        reactor.state.compactMap { $0.imageData }
+            .observe(on: MainScheduler.instance)
+            .map { [weak self] data -> (Data, CGSize) in
+                guard let self = self else { return (data, .zero) }
+                var target = self.posterImageView.bounds.size
+                if target == .zero {
+                    let width = self.contentView.bounds.width
+                    target = CGSize(width: width, height: width * 1.5)
+                }
+                return (data, target)
+            }
+            .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+            .map { data, target in
+                self.downsampledImage(data: data, size: target, scale: UIScreen.main.scale)
+            }
             .observe(on: MainScheduler.instance)
             .bind(to: posterImageView.rx.image)
             .disposed(by: disposeBag)
+
         
-        reactor.state.map { $0.image }
+        reactor.state.map { $0.imageData }
             .distinctUntilChanged()
             .filter { $0 == nil }
             .map { _ in
@@ -90,6 +105,25 @@ extension SearchMediaCollectionViewCell {
         
         activityIndicator.snp.makeConstraints {
             $0.center.equalTo(posterImageView)
+        }
+    }
+    
+    func downsampledImage(data: Data, size: CGSize, scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+        let maxDimensionInPixels = max(size.width, size.height) * scale
+
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
+        ]
+
+        return data.withUnsafeBytes { raw -> UIImage? in
+            guard let base = raw.baseAddress, raw.count > 0 else { return nil }
+            let cfData = CFDataCreate(kCFAllocatorDefault, base.assumingMemoryBound(to: UInt8.self), raw.count)!
+            guard let src = CGImageSourceCreateWithData(cfData, nil),
+                  let cgImg = CGImageSourceCreateThumbnailAtIndex(src, 0, options as CFDictionary) else { return nil }
+            return UIImage(cgImage: cgImg)
         }
     }
 }
