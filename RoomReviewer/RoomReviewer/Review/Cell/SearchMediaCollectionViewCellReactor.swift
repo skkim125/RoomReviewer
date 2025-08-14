@@ -17,13 +17,13 @@ final class SearchMediaCollectionViewCellReactor: Reactor {
 
     enum Mutation {
         case setLoading(Bool)
-        case setImage(UIImage)
+        case setImageData(Data?)
     }
 
     struct State {
         var mediaName: String?
         var mediaPosterURL: String?
-        var image: UIImage?
+        var imageData: Data?
         var isLoading: Bool = false
     }
 
@@ -39,22 +39,22 @@ final class SearchMediaCollectionViewCellReactor: Reactor {
         switch action {
         case .loadImage:
             guard let url = currentState.mediaPosterURL else {
-                return .just(.setImage(UIImage(systemName: "photo.fill")!))
+                return .just(.setImageData(nil))
             }
             return Observable.concat([
                 .just(.setLoading(true)),
                 imageLoader.loadImage(url)
                     .asObservable()
-                    .compactMap { result in
+                    .map { result in
                         switch result {
                         case .success(let data):
-                            return UIImage(data: data)
+                            // 다운샘플링 없이 Data를 그대로 전달합니다.
+                            return .setImageData(data)
                         case .failure:
-                            return UIImage(systemName: "photo.fill")
+                            // 실패 시 nil을 전달합니다.
+                            return .setImageData(nil)
                         }
-                    }
-                    .observe(on: MainScheduler.instance)
-                    .map { Mutation.setImage($0) },
+                    },
                 .just(.setLoading(false)),
                 ])
         }
@@ -63,8 +63,8 @@ final class SearchMediaCollectionViewCellReactor: Reactor {
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setImage(let image):
-            newState.image = image
+        case .setImageData(let data):
+            newState.imageData = data
         case .setLoading(let isLoading):
             newState.isLoading = isLoading
         }
