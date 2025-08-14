@@ -52,7 +52,6 @@ extension SearchMediaCollectionViewCell {
             .disposed(by: disposeBag)
 
         reactor.state.compactMap { $0.imageData }
-            .observe(on: MainScheduler.instance)
             .map { [weak self] data -> (Data, CGSize) in
                 guard let self = self else { return (data, .zero) }
                 var target = self.posterImageView.bounds.size
@@ -64,10 +63,16 @@ extension SearchMediaCollectionViewCell {
             }
             .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             .map { data, target in
-                self.downsampledImage(data: data, size: target)
+                ImageDownSampler.shared.downsampledImage(data: data, size: target)
             }
             .observe(on: MainScheduler.instance)
-            .bind(to: posterImageView.rx.image)
+            .bind(with: self) { owner, image in
+                if let image = image {
+                    owner.posterImageView.image = image
+                } else {
+                    owner.posterImageView.backgroundColor = .systemGray6
+                }
+            }
             .disposed(by: disposeBag)
 
         
@@ -105,25 +110,6 @@ extension SearchMediaCollectionViewCell {
         
         activityIndicator.snp.makeConstraints {
             $0.center.equalTo(posterImageView)
-        }
-    }
-    
-    func downsampledImage(data: Data, size: CGSize) -> UIImage? {
-        let maxDimensionInPixels = max(size.width, size.height) * UIScreen.main.scale
-
-        let options: [CFString: Any] = [
-            kCGImageSourceShouldCache: false,
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
-        ]
-
-        return data.withUnsafeBytes { raw -> UIImage? in
-            guard let base = raw.baseAddress, raw.count > 0 else { return nil }
-            let cfData = CFDataCreate(kCFAllocatorDefault, base.assumingMemoryBound(to: UInt8.self), raw.count)!
-            guard let src = CGImageSourceCreateWithData(cfData, nil),
-                  let cgImg = CGImageSourceCreateThumbnailAtIndex(src, 0, options as CFDictionary) else { return nil }
-            return UIImage(cgImage: cgImg)
         }
     }
 }

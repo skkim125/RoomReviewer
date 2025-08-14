@@ -22,7 +22,7 @@ final class HomeMediaCollectionViewCellReactor: Reactor {
     struct State {
         var mediaName: String?
         var mediaPosterURL: String?
-        var image: Data?
+        var imageData: Data?
         var isLoading: Bool = false
     }
 
@@ -63,7 +63,7 @@ final class HomeMediaCollectionViewCellReactor: Reactor {
         var newState = state
         switch mutation {
         case .setImage(let image):
-            newState.image = image
+            newState.imageData = image
         case .setLoading(let isLoading):
             newState.isLoading = isLoading
         }
