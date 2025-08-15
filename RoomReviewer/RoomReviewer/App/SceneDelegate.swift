@@ -23,7 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func setupVC() -> UITabBarController {
         let tabBarController = UITabBarController()
-        let homeVC = HomeViewController(reactor: HomeReactor(networkService: NetworkManager()), imageLoader: ImageLoadManager())
+        let homeVC = HomeViewController(reactor: HomeReactor(networkService: NetworkManager()), imageLoader: ImageLoadManager(), imageDownsampler: ImageDownsampler())
         let homeNav = UINavigationController(rootViewController: homeVC)
         homeVC.tabBarItem.image = UIImage(systemName: "house")
         homeVC.tabBarItem.title = "홈"

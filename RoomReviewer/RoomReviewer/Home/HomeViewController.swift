@@ -16,6 +16,7 @@ final class HomeViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private let homeReactor: HomeReactor
     private let imageLoader: ImageLoadService
+    private let imageDownsampler: ImageDownsampling
     
     private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
@@ -24,9 +25,10 @@ final class HomeViewController: UIViewController {
         $0.showsHorizontalScrollIndicator = false
     }
     
-    init(reactor: HomeReactor, imageLoader: ImageLoadService) {
+    init(reactor: HomeReactor, imageLoader: ImageLoadService, imageDownsampler: ImageDownsampling) {
         self.homeReactor = reactor
         self.imageLoader = imageLoader
+        self.imageDownsampler = imageDownsampler
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -87,27 +89,21 @@ final class HomeViewController: UIViewController {
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSectionModel>(
             configureCell: { [weak self] _, collectionView, indexPath, item in
                 guard let self = self else { return UICollectionViewCell() }
+                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
+                    return UICollectionViewCell()
+                }
+                
+                let reactor: HomeMediaCollectionViewCellReactor
                 switch item {
                 case .movie(item: let movie):
-                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
-                        return UICollectionViewCell()
-                    }
-                    let reactor = HomeMediaCollectionViewCellReactor(media: movie, imageLoader: imageLoader)
-                    cell.reactor = reactor
-                    cell.bind(reactor: reactor)
-                    
-                    return cell
+                    reactor = HomeMediaCollectionViewCellReactor(media: movie, imageLoader: imageLoader)
                     
                 case .tv(item: let tv):
-                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
-                        return UICollectionViewCell()
-                    }
-                    let reactor = HomeMediaCollectionViewCellReactor(media: tv, imageLoader: imageLoader)
-                    cell.reactor = reactor
-                    cell.bind(reactor: reactor)
-                    
-                    return cell
+                    reactor = HomeMediaCollectionViewCellReactor(media: tv, imageLoader: imageLoader)
                 }
+                
+                cell.configureCell(reactor: reactor, imageDownsampler: self.imageDownsampler)
+                return cell
             },
             configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
                 guard kind == UICollectionView.elementKindSectionHeader else {
@@ -134,7 +130,7 @@ final class HomeViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
                 let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageLoader: owner.imageLoader)
-                let vc = MediaDetailViewController(reactor: detailReactor)
+                let vc = MediaDetailViewController(reactor: detailReactor, imageDownsampler: owner.imageDownsampler)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -143,7 +139,7 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()), imageLoader: owner.imageLoader)
+                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()), imageLoader: owner.imageLoader, imageDownsampler: owner.imageDownsampler)
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 owner.navigationController?.present(nav, animated: true)

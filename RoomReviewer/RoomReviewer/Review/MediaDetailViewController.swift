@@ -53,10 +53,12 @@ final class MediaDetailViewController: UIViewController {
 //    }
     
     private let reactor: MediaDetailReactor
+    private let imageDownsampler: ImageDownsampling
     private let disposeBag = DisposeBag()
     
-    init(reactor: MediaDetailReactor) {
+    init(reactor: MediaDetailReactor, imageDownsampler: ImageDownsampling) {
         self.reactor = reactor
+        self.imageDownsampler = imageDownsampler
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -101,7 +103,7 @@ final class MediaDetailViewController: UIViewController {
             }
             .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             .map { data, target in
-                ImageDownSampler.shared.downsampledImage(data: data, size: target)
+                self.imageDownsampler.downsampledImage(data: data, size: target)
             }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, image in
@@ -125,7 +127,7 @@ final class MediaDetailViewController: UIViewController {
             }
             .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             .map { data, target in
-                ImageDownSampler.shared.downsampledImage(data: data, size: target)
+                self.imageDownsampler.downsampledImage(data: data, size: target)
             }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, image in
