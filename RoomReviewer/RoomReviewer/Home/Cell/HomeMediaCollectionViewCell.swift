@@ -14,6 +14,7 @@ import Then
 
 final class HomeMediaCollectionViewCell: UICollectionViewCell, View {
     static let cellID = "HomeMediaCollectionViewCell"
+    private var imageDownsampler: ImageDownsampling?
     var disposeBag = DisposeBag()
     
     private let shadowView = UIView().then {
@@ -41,6 +42,11 @@ final class HomeMediaCollectionViewCell: UICollectionViewCell, View {
         super.init(frame: frame)
         configureHierarchy()
         configureLayout()
+    }
+    
+    func configureCell(reactor: HomeMediaCollectionViewCellReactor, imageDownsampler: ImageDownsampling) {
+        self.reactor = reactor
+        self.imageDownsampler = imageDownsampler
     }
     
     required init?(coder: NSCoder) {
@@ -73,7 +79,7 @@ extension HomeMediaCollectionViewCell {
             }
             .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             .map { data, target in
-                ImageDownSampler.shared.downsampledImage(data: data, size: target)
+                self.imageDownsampler?.downsampledImage(data: data, size: target)
             }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, image in
@@ -103,7 +109,7 @@ extension HomeMediaCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        disposeBag = DisposeBag()
+        reactor = nil
         posterImageView.image = nil
         tvNameLabel.text = nil
     }

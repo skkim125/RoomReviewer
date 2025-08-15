@@ -8,10 +8,11 @@
 import UIKit
 import ImageIO
 
-final class ImageDownSampler {
-    static let shared = ImageDownSampler()
-    private init() { }
-    
+protocol ImageDownsampling {
+    func downsampledImage(data: Data, size: CGSize) -> UIImage?
+}
+
+final class ImageDownsampler: ImageDownsampling {
     func downsampledImage(data: Data, size: CGSize) -> UIImage? {
         let maxDimensionInPixels = max(size.width, size.height) * UIScreen.main.scale
         let options: [CFString: Any] = [

@@ -15,6 +15,7 @@ import ImageIO
 
 final class SearchMediaCollectionViewCell: UICollectionViewCell, View {
     static let cellID = "SearchMediaCollectionViewCell"
+    private var imageDownsampler: ImageDownsampling?
     var disposeBag = DisposeBag()
     
     private let shadowView = UIView().then {
@@ -41,6 +42,11 @@ final class SearchMediaCollectionViewCell: UICollectionViewCell, View {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func configureCell(reactor: SearchMediaCollectionViewCellReactor, imageDownsampler: ImageDownsampling) {
+        self.reactor = reactor
+        self.imageDownsampler = imageDownsampler
+    }
 }
 
 extension SearchMediaCollectionViewCell {
@@ -63,7 +69,7 @@ extension SearchMediaCollectionViewCell {
             }
             .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             .map { data, target in
-                ImageDownSampler.shared.downsampledImage(data: data, size: target)
+                self.imageDownsampler?.downsampledImage(data: data, size: target)
             }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, image in
@@ -88,7 +94,7 @@ extension SearchMediaCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        disposeBag = DisposeBag()
+        reactor = nil
         posterImageView.image = nil
     }
     
