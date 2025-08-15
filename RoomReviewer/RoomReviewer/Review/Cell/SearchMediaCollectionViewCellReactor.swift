@@ -17,20 +17,20 @@ final class SearchMediaCollectionViewCellReactor: Reactor {
 
     enum Mutation {
         case setLoading(Bool)
-        case setImageData(Data?)
+        case setImageData(UIImage?)
     }
 
     struct State {
         var mediaName: String?
         var mediaPosterURL: String?
-        var imageData: Data?
+        var imageData: UIImage?
         var isLoading: Bool = false
     }
 
     var initialState: State
-    private let imageLoader: ImageLoadService
+    private let imageLoader: ImageProviding
 
-    init(media: Media, imageLoader: ImageLoadService = ImageLoadManager()) {
+    init(media: Media, imageLoader: ImageProviding) {
         self.initialState = State(mediaName: media.title, mediaPosterURL: media.posterPath)
         self.imageLoader = imageLoader
     }
@@ -41,21 +41,15 @@ final class SearchMediaCollectionViewCellReactor: Reactor {
             guard let url = currentState.mediaPosterURL else {
                 return .just(.setImageData(nil))
             }
+            let imageStream = imageLoader.fetchImage(from: url)
+                .observe(on: MainScheduler.instance)
+                .map { Mutation.setImageData($0) }
+            
             return Observable.concat([
                 .just(.setLoading(true)),
-                imageLoader.loadImage(url)
-                    .asObservable()
-                    .map { result in
-                        switch result {
-                        case .success(let data):
-                            return .setImageData(data)
-                        case .failure:
-                            return .setImageData(nil)
-                        }
-                    }
-                    .observe(on: MainScheduler.instance),
+                imageStream,
                 .just(.setLoading(false)),
-                ])
+            ])
         }
     }
 

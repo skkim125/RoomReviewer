@@ -5,25 +5,25 @@
 //  Created by 김상규 on 7/13/25.
 //
 
-import Foundation
+import UIKit
 import RxSwift
 import ReactorKit
 
 final class MediaDetailReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
-    private let imageLoader: ImageLoadService
+    private let imageProvider: ImageProviding
     
-    init(media: Media, networkService: NetworkService, imageLoader: ImageLoadService) {
+    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding) {
         initialState = State(media: media)
         self.networkService = networkService
-        self.imageLoader = imageLoader
+        self.imageProvider = imageProvider
     }
     
     struct State {
         var media: Media
-        var backDropImageData: Data?
-        var posterImageData: Data?
+        var backDropImageData: UIImage?
+        var posterImageData: UIImage?
         var mediaDetail: MediaDetail?
         var isLoading: Bool?
         var errorType: Error?
@@ -38,8 +38,8 @@ final class MediaDetailReactor: Reactor {
     enum Mutation {
         case setLoading(Bool)
         case setMediaDetail(MediaDetail)
-        case setBackdropImage(Data?)
-        case setPosterImage(Data?)
+        case setBackdropImage(UIImage?)
+        case setPosterImage(UIImage?)
         case showError(Error)
     }
     
@@ -61,7 +61,6 @@ final class MediaDetailReactor: Reactor {
             return Observable.concat([
                 .just(.setLoading(true)),
                 Observable.merge(tasks)
-                    .asObservable()
                     .observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
@@ -126,30 +125,16 @@ extension MediaDetailReactor {
     }
     
     private func loadBackdropImage(_ imagePath: String) -> Observable<Mutation> {
-        return loadImage(imagePath: imagePath)
+        return imageProvider.fetchImage(from: imagePath)
             .map { image in
                 return .setBackdropImage(image)
             }
     }
     
     private func loadPosterImage(_ imagePath: String) -> Observable<Mutation> {
-        return loadImage(imagePath: imagePath)
+        return imageProvider.fetchImage(from: imagePath)
             .map { image in
                 return .setPosterImage(image)
-            }
-    }
-    
-    private func loadImage(imagePath: String) -> Observable<Data?> {
-        return imageLoader.loadImage(imagePath)
-            .asObservable()
-            .map { result in
-                switch result {
-                case .success(let image):
-                    return image
-                case .failure(let error):
-                    print("이미지 로드 실패: \(error)")
-                    return nil
-                }
             }
     }
 }

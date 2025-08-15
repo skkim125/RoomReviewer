@@ -15,8 +15,7 @@ import Then
 final class HomeViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private let homeReactor: HomeReactor
-    private let imageLoader: ImageLoadService
-    private let imageDownsampler: ImageDownsampling
+    private let imageProvider: ImageProviding
     
     private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
@@ -25,10 +24,9 @@ final class HomeViewController: UIViewController {
         $0.showsHorizontalScrollIndicator = false
     }
     
-    init(reactor: HomeReactor, imageLoader: ImageLoadService, imageDownsampler: ImageDownsampling) {
+    init(reactor: HomeReactor, imageProvider: ImageProviding) {
         self.homeReactor = reactor
-        self.imageLoader = imageLoader
-        self.imageDownsampler = imageDownsampler
+        self.imageProvider = imageProvider
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -96,13 +94,13 @@ final class HomeViewController: UIViewController {
                 let reactor: HomeMediaCollectionViewCellReactor
                 switch item {
                 case .movie(item: let movie):
-                    reactor = HomeMediaCollectionViewCellReactor(media: movie, imageLoader: imageLoader)
+                    reactor = HomeMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider)
                     
                 case .tv(item: let tv):
-                    reactor = HomeMediaCollectionViewCellReactor(media: tv, imageLoader: imageLoader)
+                    reactor = HomeMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider)
                 }
                 
-                cell.configureCell(reactor: reactor, imageDownsampler: self.imageDownsampler)
+                cell.configureCell(reactor: reactor, imageProvider: self.imageProvider)
                 return cell
             },
             configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
@@ -129,8 +127,8 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageLoader: owner.imageLoader)
-                let vc = MediaDetailViewController(reactor: detailReactor, imageDownsampler: owner.imageDownsampler)
+                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider)
+                let vc = MediaDetailViewController(reactor: detailReactor)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -139,7 +137,7 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()), imageLoader: owner.imageLoader, imageDownsampler: owner.imageDownsampler)
+                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()), imageProvider: owner.imageProvider)
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 owner.navigationController?.present(nav, animated: true)

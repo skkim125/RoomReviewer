@@ -53,12 +53,10 @@ final class MediaDetailViewController: UIViewController {
 //    }
     
     private let reactor: MediaDetailReactor
-    private let imageDownsampler: ImageDownsampling
     private let disposeBag = DisposeBag()
     
-    init(reactor: MediaDetailReactor, imageDownsampler: ImageDownsampling) {
+    init(reactor: MediaDetailReactor) {
         self.reactor = reactor
-        self.imageDownsampler = imageDownsampler
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -91,21 +89,7 @@ final class MediaDetailViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        reactor.state.compactMap { $0.backDropImageData }
-            .map { [weak self] data -> (Data, CGSize) in
-                guard let self = self else { return (data, .zero) }
-                var target = self.backDropImageView.bounds.size
-                if target == .zero {
-                    let width = self.view.bounds.width
-                    target = CGSize(width: width, height: 200)
-                }
-                return (data, target)
-            }
-            .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
-            .map { data, target in
-                self.imageDownsampler.downsampledImage(data: data, size: target)
-            }
-            .observe(on: MainScheduler.instance)
+        reactor.state.map { $0.backDropImageData }
             .bind(with: self) { owner, image in
                 if let image = image {
                     owner.backDropImageView.image = image
@@ -115,21 +99,7 @@ final class MediaDetailViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        reactor.state.compactMap { $0.posterImageData }
-            .map { [weak self] data -> (Data, CGSize) in
-                guard let self = self else { return (data, .zero) }
-                var target = self.posterImageView.bounds.size
-                if target == .zero {
-                    let width = self.view.bounds.width/3
-                    target = CGSize(width: width, height: 180)
-                }
-                return (data, target)
-            }
-            .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
-            .map { data, target in
-                self.imageDownsampler.downsampledImage(data: data, size: target)
-            }
-            .observe(on: MainScheduler.instance)
+        reactor.state.map { $0.posterImageData }
             .bind(with: self) { owner, image in
                 if let image = image {
                     owner.posterImageView.image = image

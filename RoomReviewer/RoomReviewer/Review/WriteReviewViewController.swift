@@ -25,14 +25,12 @@ final class WriteReviewViewController: UIViewController {
     }
     
     private let writeReviewReactor: WriteReviewReactor
-    private let imageLoader: ImageLoadService
-    private let imageDownsampler: ImageDownsampling
+    private let imageProvider: ImageProviding
     private var disposeBag = DisposeBag()
     
-    init(writeReviewReactor: WriteReviewReactor, imageLoader: ImageLoadService, imageDownsampler: ImageDownsampling) {
+    init(writeReviewReactor: WriteReviewReactor, imageProvider: ImageProviding) {
         self.writeReviewReactor = writeReviewReactor
-        self.imageLoader = imageLoader
-        self.imageDownsampler = imageDownsampler
+        self.imageProvider = imageProvider
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -86,8 +84,8 @@ final class WriteReviewViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(to: searchMediaCollectionView.rx.items(cellIdentifier: SearchMediaCollectionViewCell.cellID, cellType: SearchMediaCollectionViewCell.self)) { [weak self] index, item, cell in
                 guard let self = self else { return }
-                let reactor = SearchMediaCollectionViewCellReactor(media: item)
-                cell.configureCell(reactor: reactor, imageDownsampler: self.imageDownsampler)
+                let reactor = SearchMediaCollectionViewCellReactor(media: item, imageLoader: self.imageProvider)
+                cell.configureCell(reactor: reactor, imageProvider: self.imageProvider)
             }
             .disposed(by: disposeBag)
         
@@ -120,7 +118,7 @@ final class WriteReviewViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageLoader: owner.imageLoader), imageDownsampler: owner.imageDownsampler)
+                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider))
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
