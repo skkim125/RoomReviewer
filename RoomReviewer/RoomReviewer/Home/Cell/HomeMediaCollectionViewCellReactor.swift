@@ -16,22 +16,22 @@ final class HomeMediaCollectionViewCellReactor: Reactor {
 
     enum Mutation {
         case setLoading(Bool)
-        case setImage(Data?)
+        case setImage(UIImage?)
     }
 
     struct State {
         var mediaName: String?
         var mediaPosterURL: String?
-        var imageData: Data?
+        var imageData: UIImage?
         var isLoading: Bool = false
     }
 
     var initialState: State
-    private let imageLoader: ImageLoadService
+    private let imageProvider: ImageProviding
 
-    init(media: Media, imageLoader: ImageLoadService) {
+    init(media: Media, imageProvider: ImageProviding) {
         self.initialState = State(mediaName: media.title, mediaPosterURL: media.posterPath)
-        self.imageLoader = imageLoader
+        self.imageProvider = imageProvider
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -40,20 +40,14 @@ final class HomeMediaCollectionViewCellReactor: Reactor {
             guard let url = currentState.mediaPosterURL else {
                 return .just(.setImage(nil))
             }
+            
+            let imageStream = imageProvider.fetchImage(from: url)
+                .observe(on: MainScheduler.instance)
+                .map { Mutation.setImage($0) }
+            
             return Observable.concat([
                 .just(.setLoading(true)),
-                imageLoader.loadImage(url)
-                    .asObservable()
-                    .compactMap { result in
-                        switch result {
-                        case .success(let data):
-                            return data
-                        case .failure:
-                            return nil
-                        }
-                    }
-                    .observe(on: MainScheduler.instance)
-                    .map { Mutation.setImage($0) },
+                imageStream,
                 .just(.setLoading(false)),
                 ])
         }
