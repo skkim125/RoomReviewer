@@ -96,6 +96,44 @@ final class CoreDataManagerUnitTests: XCTestCase {
 
         wait(for: [expectation], timeout: 2.0)
     }
+    
+    func test_deleteMedia_Success() {
+        let expectation = XCTestExpectation(description: "미디어 삭제 성공")
+        
+        let testId = "test_id_123"
+        let testTitle = "Test Movie"
+        
+        sut.createMedia(id: testId, title: testTitle, type: "movie", releaseDate: nil, watchedDate: nil)
+            .flatMap { [weak self] createdObjectID -> Single<Void?> in
+                XCTAssertNotNil(createdObjectID)
+                
+                guard let self = self else {
+                    XCTFail("실패")
+                    return .just(nil)
+                }
+                
+                return self.sut.deleteMedia(id: testId)
+            }
+            .flatMap { [weak self] result -> Single<[MediaEntity]> in
+                guard let self = self else {
+                    XCTFail("실패")
+                    return .just([])
+                }
+                
+                return self.sut.fetchAllMedia()
+            }
+            .observe(on: MainScheduler.instance)
+            .subscribe { list in
+                XCTAssertEqual(list.count, 0)
+                expectation.fulfill()
+                
+            } onFailure: { error in
+                XCTFail("deleteMedia가 실패했습니다: \(error.localizedDescription)")
+            }
+            .disposed(by: disposeBag)
+
+        wait(for: [expectation], timeout: 2.0)
+    }
 }
 
 final class MockCoreDataStack: DataStack {
