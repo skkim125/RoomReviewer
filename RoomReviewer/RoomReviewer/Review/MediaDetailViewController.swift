@@ -37,8 +37,25 @@ final class MediaDetailViewController: UIViewController {
         $0.contentMode = .scaleAspectFill
     }
     
-    private let titleLabel = UILabel().then {
-        $0.font = .boldSystemFont(ofSize: 18)
+    private let infoStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 6
+        $0.alignment = .leading
+    }
+    
+    private let titleAndYearLabel = UILabel().then {
+        $0.font = .boldSystemFont(ofSize: 20)
+        $0.numberOfLines = 0
+    }
+    
+    private let mediaTypeLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 14, weight: .semibold)
+        $0.textColor = .gray
+    }
+    
+    private let genreLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .darkGray
         $0.numberOfLines = 0
     }
     
@@ -48,9 +65,9 @@ final class MediaDetailViewController: UIViewController {
         $0.textColor = .darkGray
     }
     
-//    private let creditsLabel = UILabel().then {
-//        $0.backgroundColor = .systemGray6
-//    }
+    private let creditsLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 12)
+    }
     
     private let reactor: MediaDetailReactor
     private let disposeBag = DisposeBag()
@@ -84,8 +101,24 @@ final class MediaDetailViewController: UIViewController {
         reactor.state.compactMap { $0.mediaDetail }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, detail in
-                owner.titleLabel.text = detail.mediaInfo.title
-                owner.overviewLabel.text = detail.mediaInfo.overview
+                let mediaInfo = detail.mediaInfo
+                
+                switch mediaInfo.mediaType {
+                case .movie:
+                    owner.mediaTypeLabel.text = "영화"
+                case .tv:
+                    owner.mediaTypeLabel.text = "TV 시리즈"
+                default:
+                    owner.mediaTypeLabel.text = ""
+                }
+                
+                let yearString = mediaInfo.releaseDate.map { String($0.prefix(4)) }
+                owner.titleAndYearLabel.attributedText = owner.setTitleStyle(title: mediaInfo.title, year: yearString)
+                owner.overviewLabel.text = mediaInfo.overview
+                
+                // owner.genreLabel.text = mediaInfo.genres.map { $0.name }.joined(separator: " / ")
+                
+                owner.genreLabel.text = "애니메이션 / 가족 / 판타지"
             }
             .disposed(by: disposeBag)
         
@@ -125,9 +158,15 @@ extension MediaDetailViewController {
         contentView.addSubview(backDropImageView)
         contentView.addSubview(shadowView)
         shadowView.addSubview(posterImageView)
-        contentView.addSubview(titleLabel)
+        
+        contentView.addSubview(infoStackView)
+        
+        infoStackView.addArrangedSubview(titleAndYearLabel)
+        infoStackView.addArrangedSubview(mediaTypeLabel)
+        infoStackView.addArrangedSubview(genreLabel)
+        
         contentView.addSubview(overviewLabel)
-//        contentView.addSubview(creditsLabel)
+        contentView.addSubview(creditsLabel)
     }
     
     private func configureLayout() {
@@ -157,22 +196,47 @@ extension MediaDetailViewController {
             $0.edges.equalTo(shadowView)
         }
         
-        titleLabel.snp.makeConstraints {
-            $0.centerY.equalTo(posterImageView.snp.centerY)
-            $0.leading.equalTo(posterImageView.snp.trailing).offset(15)
+        infoStackView.snp.makeConstraints {
+            $0.top.equalTo(backDropImageView.snp.bottom).offset(15)
+            $0.leading.equalTo(shadowView.snp.trailing).offset(15)
             $0.trailing.equalTo(contentView).inset(20)
         }
         
         overviewLabel.snp.makeConstraints {
-            $0.top.equalTo(posterImageView.snp.bottom).offset(20)
+            $0.top.equalTo(shadowView.snp.bottom).offset(20)
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
-//        creditsLabel.snp.makeConstraints {
-//            $0.top.equalTo(overviewLabel.snp.bottom).offset(10)
-//            $0.horizontalEdges.equalTo(contentView).inset(20)
-//            $0.height.equalTo(800)
-//            $0.bottom.equalTo(contentView).inset(10)
-//        }
+        creditsLabel.snp.makeConstraints {
+            $0.top.equalTo(overviewLabel.snp.bottom).offset(10)
+            $0.horizontalEdges.equalTo(contentView).inset(20)
+            $0.height.equalTo(800)
+            $0.bottom.equalTo(contentView).inset(10)
+        }
+    }
+}
+
+extension MediaDetailViewController {
+    func setTitleStyle(title: String, year: String?) -> NSAttributedString {
+        let fullText: String
+        if let year = year {
+            fullText = "\(title) \(year)"
+        } else {
+            fullText = title
+        }
+        
+        let attributed = NSMutableAttributedString(string: fullText)
+        
+        if let year = year,
+           let range = fullText.range(of: "\(year)") {
+            let nsRange = NSRange(range, in: fullText)
+            
+            attributed.addAttributes([
+                .font: UIFont.systemFont(ofSize: 12),
+                .foregroundColor: UIColor.gray
+            ], range: nsRange)
+        }
+        
+        return attributed
     }
 }
