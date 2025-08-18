@@ -11,6 +11,8 @@ import RxSwift
 
 protocol DBManager {
     func createMedia(id: String, title: String, type: String, releaseDate: Date?, watchedDate: Date?) -> Single<NSManagedObjectID>
+    
+    func fetchAllMedia() -> Single<[MediaEntity]>
 }
 
 final class CoreDataManager: DBManager {
@@ -57,9 +59,29 @@ final class CoreDataManager: DBManager {
     }
     
     // 보고싶은 모든 미디어 불러오기
-//    func fetchAllMedia() -> [MediaEntity] {
-//
-//    }
+    func fetchAllMedia() -> Single<[MediaEntity]> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.failure(NetworkError.commonError))
+                return Disposables.create()
+            }
+            
+            let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+            let sortDescriptor = NSSortDescriptor(key: "addedDate", ascending: false)
+            request.sortDescriptors = [sortDescriptor]
+            
+            do {
+                let results = try stack.viewContext.fetch(request)
+                observer(.success(results))
+                
+            } catch {
+                print("Failed to fetch media: \(error)")
+                observer(.failure(error))
+            }
+            
+            return Disposables.create()
+        }
+    }
     
     // 보고싶은 Media 삭제
 //    func deleteMedia(_ media: MediaEntity) {

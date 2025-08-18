@@ -38,27 +38,63 @@ final class CoreDataManagerUnitTests: XCTestCase {
         
         sut.createMedia(id: testId, title: testTitle, type: "movie", releaseDate: nil, watchedDate: nil)
             .observe(on: MainScheduler.instance)
-            .subscribe(
-                onSuccess: { objectID in
-                    XCTAssertNotNil(objectID)
-                    do {
-                        let savedObject = try self.mockDataStack.viewContext.existingObject(with: objectID) as? MediaEntity
-                        XCTAssertEqual(savedObject?.id, testId)
-                        XCTAssertEqual(savedObject?.title, testTitle)
-                    } catch {
-                        XCTFail("ID로 객체를 가져오는 데 실패했습니다: \(error)")
-                    }
-                    
-                    expectation.fulfill()
-                },
-                onFailure: { error in
-                    XCTFail("createMedia가 실패했습니다: \(error.localizedDescription)")
+            .subscribe { objectID in
+                XCTAssertNotNil(objectID)
+                do {
+                    let savedObject = try self.mockDataStack.viewContext.existingObject(with: objectID) as? MediaEntity
+                    XCTAssertEqual(savedObject?.id, testId)
+                    XCTAssertEqual(savedObject?.title, testTitle)
+                } catch {
+                    XCTFail("ID로 객체를 가져오는 데 실패했습니다: \(error)")
                 }
-            )
+                
+                expectation.fulfill()
+            } onFailure: { error in
+                XCTFail("createMedia가 실패했습니다: \(error.localizedDescription)")
+            }
             .disposed(by: disposeBag)
     
         wait(for: [expectation], timeout: 1.0)
 
+    }
+    
+    func test_fetchAllMedia_Success() {
+        let expectation = XCTestExpectation(description: "미디어 생성 & 모든 미디어 불러오기 성공")
+        
+        let testId = "test_id_123"
+        let testTitle = "Test Movie"
+        
+        sut.createMedia(id: testId, title: testTitle, type: "movie", releaseDate: nil, watchedDate: nil)
+            .flatMap { [weak self] createdObjectID -> Single<[MediaEntity]> in
+                XCTAssertNotNil(createdObjectID)
+                
+                guard let self = self else {
+                    XCTFail("실패")
+                    return .just([])
+                }
+                
+                return self.sut.fetchAllMedia()
+            }
+            .observe(on: MainScheduler.instance)
+            .subscribe { list in
+                XCTAssertEqual(list.count, 1)
+                
+                guard let firstMedia = list.first else {
+                    XCTFail("미디어 리스트가 비어있습니다.")
+                    return
+                }
+                
+                XCTAssertEqual(firstMedia.id, testId)
+                XCTAssertEqual(firstMedia.title, testTitle)
+                
+                expectation.fulfill()
+                
+            } onFailure: { error in
+                XCTFail("createMedia 또는 fetchAllMedia가 실패했습니다: \(error.localizedDescription)")
+            }
+            .disposed(by: disposeBag)
+
+        wait(for: [expectation], timeout: 2.0)
     }
 }
 
