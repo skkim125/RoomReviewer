@@ -85,7 +85,7 @@ extension HomeReactor {
                 case .success(let success):
                     let prefixed = success.results.prefix(10)
                     
-                    return prefixed.map { HomeSectionItem.movie(item: Media(id: $0.id, mediaType: .movie, title: $0.title, overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS)) }
+                    return prefixed.map { HomeSectionItem.movie(item: Media(id: $0.id, mediaType: .movie, title: $0.title, overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS, releaseDate: $0.releaseDate)) }
                 case .failure:
                     return []
                 }
@@ -99,7 +99,7 @@ extension HomeReactor {
                 case .success(let success):
                     let prefixed = success.results.prefix(10)
                     
-                    return prefixed.map { HomeSectionItem.tv(item: Media(id: $0.id, mediaType: .tv, title: $0.name, overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS)) }
+                    return prefixed.map { HomeSectionItem.tv(item: Media(id: $0.id, mediaType: .tv, title: $0.name, overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS, releaseDate: $0.firstAirDate)) }
                 case .failure:
                     return []
                 }

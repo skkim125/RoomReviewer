@@ -103,6 +103,7 @@ extension MediaDetailReactor {
     private func fetchMediaCredits() -> Observable<Mutation> {
         let targetType: TMDBTargetType
         let media = currentState.media
+        
         switch media.mediaType {
         case .movie:
             targetType = TMDBTargetType.movieCredits(media.id)
