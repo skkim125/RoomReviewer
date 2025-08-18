@@ -13,6 +13,7 @@ protocol DBManager {
     func createMedia(id: String, title: String, type: String, releaseDate: Date?, watchedDate: Date?) -> Single<NSManagedObjectID>
     
     func fetchAllMedia() -> Single<[MediaEntity]>
+    func deleteMedia(id: String) -> Single<Void?>
 }
 
 final class CoreDataManager: DBManager {
@@ -84,9 +85,31 @@ final class CoreDataManager: DBManager {
     }
     
     // 보고싶은 Media 삭제
-//    func deleteMedia(_ media: MediaEntity) {
-//
-//    }
+    func deleteMedia(id: String) -> Single<Void?> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.success(nil))
+                return Disposables.create()
+            }
+            
+            do {
+                if let deleteObject = try stack.viewContext.fetch(MediaEntity.fetchRequest()).first(where: { $0.id == id }) {
+                    let object = deleteObject
+                    stack.viewContext.delete(deleteObject)
+                    print("\(object.title ?? "이름없음") 삭제 완료")
+                    observer(.success(()))
+                } else {
+                    observer(.failure(NetworkError.commonError))
+                }
+                
+            } catch {
+                print("Failed to fetch media: \(error)")
+                observer(.failure(error))
+            }
+            
+            return Disposables.create()
+        }
+    }
 
     // Review 생성
 //    func createReview(_ media: MediaEntity, rate: Double, viewingDate: Date, text: String?) -> ReviewEntity {
