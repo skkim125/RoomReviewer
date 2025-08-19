@@ -116,9 +116,7 @@ final class MediaDetailViewController: UIViewController {
                 owner.titleAndYearLabel.attributedText = owner.setTitleStyle(title: mediaInfo.title, year: yearString)
                 owner.overviewLabel.text = mediaInfo.overview
                 
-                // owner.genreLabel.text = mediaInfo.genres.map { $0.name }.joined(separator: " / ")
-                
-                owner.genreLabel.text = "애니메이션 / 가족 / 판타지"
+                owner.genreLabel.text = API.convertGenreString(mediaInfo.mediaType, array: mediaInfo.genreIDS).joined(separator: " / ")
             }
             .disposed(by: disposeBag)
         
