@@ -15,6 +15,7 @@ protocol DBManager {
     func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: String) -> Single<Void?>
     func checkSavedMedia(id: String) -> Single<Bool>
+    func updateWatchedDate(id: String, watchedDate: Date) -> Single<Void?>
 }
 
 final class CoreDataManager: DBManager {
@@ -129,6 +130,38 @@ final class CoreDataManager: DBManager {
                     observer(.failure(error))
                 }
             }
+            return Disposables.create()
+        }
+    }
+    
+    func updateWatchedDate(id: String, watchedDate: Date) -> Single<Void?> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.failure(NetworkError.commonError))
+                return Disposables.create()
+            }
+            
+            let backgroundContext = self.stack.newBackgroundContext()
+            
+            backgroundContext.perform {
+                let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %@", id)
+                
+                do {
+                    if let mediaToUpdate = try backgroundContext.fetch(request).first {
+                        mediaToUpdate.watchedDate = watchedDate
+                        try backgroundContext.save()
+                        print("\(mediaToUpdate.title ?? "") 시청 날짜 업데이트 완료")
+                        observer(.success(()))
+                    } else {
+                        observer(.failure(NetworkError.commonError))
+                    }
+                } catch {
+                    print("업데이트 실패: \(error.localizedDescription)")
+                    observer(.failure(error))
+                }
+            }
+            
             return Disposables.create()
         }
     }

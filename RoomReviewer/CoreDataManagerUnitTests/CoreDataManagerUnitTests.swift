@@ -134,6 +134,48 @@ final class CoreDataManagerUnitTests: XCTestCase {
 
         wait(for: [expectation], timeout: 2.0)
     }
+    
+    func test_updateWatchedDate_Success() {
+        let expectation = XCTestExpectation(description: "미디어 시청 날짜 업데이트 성공")
+        
+        let testId = "test_id_123"
+        let testTitle = "Test Movie"
+        let watchedDate = Date()
+        
+        sut.createMedia(id: testId, title: testTitle, type: "movie", releaseDate: nil, watchedDate: nil)
+            .flatMap { [weak self] createdObjectID -> Single<Void?> in
+                XCTAssertNotNil(createdObjectID)
+                
+                guard let self = self else {
+                    XCTFail("실패")
+                    return .just(nil)
+                }
+                
+                return self.sut.updateWatchedDate(id: testId, watchedDate: watchedDate)
+            }
+            .flatMap { [weak self] _ -> Single<[MediaEntity]> in
+                guard let self = self else {
+                    XCTFail("실패")
+                    return .just([])
+                }
+                
+                return self.sut.fetchAllMedia()
+            }
+            .observe(on: MainScheduler.instance)
+            .subscribe { list in
+                XCTAssertEqual(list.count, 1)
+                let data = list[0]
+                XCTAssertNotNil(data.addedDate)
+                XCTAssert(data.watchedDate == watchedDate)
+                expectation.fulfill()
+                
+            } onFailure: { error in
+                XCTFail("updateWatchedDate가 실패했습니다: \(error.localizedDescription)")
+            }
+            .disposed(by: disposeBag)
+
+        wait(for: [expectation], timeout: 2.0)
+    }
 }
 
 final class MockCoreDataStack: DataStack {

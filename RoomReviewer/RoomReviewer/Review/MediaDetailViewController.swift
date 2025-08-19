@@ -71,16 +71,16 @@ final class MediaDetailViewController: UIViewController {
     private let reviewButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         
-        config.image = UIImage(systemName: "sunglasses")?.withTintColor(.systemRed)
+        config.image = UIImage(systemName: "sunglasses")
         config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
         
-        config.title = "평가하기"
+        config.title = "평론하기"
         config.attributedTitle?.font = .systemFont(ofSize: 12, weight: .semibold)
         config.imagePlacement = .top
         config.imagePadding = 8
         
         
-        config.baseForegroundColor = .darkGray
+        config.baseForegroundColor = .systemRed
         
         $0.configuration = config
     }
@@ -179,6 +179,7 @@ final class MediaDetailViewController: UIViewController {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, isWatchlisted in
                 owner.updateWatchlistButton(isWatchlisted: isWatchlisted)
+                owner.reviewButton.configuration?.baseForegroundColor = isWatchlisted ? .systemRed : .darkGray
             }
             .disposed(by: disposeBag)
     }
