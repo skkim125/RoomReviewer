@@ -48,9 +48,11 @@ final class MediaDetailReactor: Reactor {
         case .viewDidLoad:
             let media = currentState.media
             
-            var tasks = [fetchMediaCredits()]
+            var tasks: [Observable<Mutation>] = [fetchMediaCredits()]
             
-            if let backdropPath = media.backdropPath, !backdropPath.isEmpty {
+            let availableBackdropPath = (media.backdropPath?.isEmpty == false) ? media.backdropPath : media.posterPath
+            
+            if let backdropPath = availableBackdropPath, !backdropPath.isEmpty {
                 tasks.append(loadBackdropImage(backdropPath))
             }
             
