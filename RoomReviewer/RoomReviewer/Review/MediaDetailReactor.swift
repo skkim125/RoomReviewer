@@ -13,11 +13,13 @@ final class MediaDetailReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
     private let imageProvider: ImageProviding
+    private let dbManager: DBManager
     
-    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding) {
-        initialState = State(media: media)
+    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, dbManager: DBManager) {
+        self.initialState = State(media: media)
         self.networkService = networkService
         self.imageProvider = imageProvider
+        self.dbManager = dbManager
     }
     
     struct State {
@@ -27,12 +29,14 @@ final class MediaDetailReactor: Reactor {
         var mediaDetail: MediaDetail?
         var isLoading: Bool?
         var errorType: Error?
+        var isWatchlisted: Bool?
     }
     
     enum Action {
         case viewDidLoad
         case loadBackdropImage(String?)
         case loadPosterImage(String?)
+        case watchlistButtonTapped
     }
     
     enum Mutation {
@@ -41,31 +45,31 @@ final class MediaDetailReactor: Reactor {
         case setBackdropImage(UIImage?)
         case setPosterImage(UIImage?)
         case showError(Error)
+        case setWatchlisted(Bool)
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad:
             let media = currentState.media
+            let checkWatchlist = dbManager.checkSavedMedia(id: String(media.id))
+                .asObservable()
+                .map { Mutation.setWatchlisted($0) }
+                .catch { .just(.showError($0)) }
             
-            var tasks: [Observable<Mutation>] = [fetchMediaCredits()]
-            
-            let availableBackdropPath = (media.backdropPath?.isEmpty == false) ? media.backdropPath : media.posterPath
-            
-            if let backdropPath = availableBackdropPath, !backdropPath.isEmpty {
-                tasks.append(loadBackdropImage(backdropPath))
-            }
-            
-            if let posterPath = media.posterPath, !posterPath.isEmpty {
-                tasks.append(loadPosterImage(posterPath))
-            }
+            let fetchOthers = Observable.merge(
+                self.fetchMediaCredits(),
+                media.backdropPath?.isEmpty == false ? self.loadBackdropImage(media.backdropPath!) :
+                    (media.posterPath.map { self.loadBackdropImage($0) } ?? .empty()),
+                (media.posterPath.map { self.loadPosterImage($0) } ?? .empty())
+            )
             
             return Observable.concat([
                 .just(.setLoading(true)),
-                Observable.merge(tasks)
-                    .observe(on: MainScheduler.instance),
+                Observable.merge(checkWatchlist, fetchOthers).observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
+
             
         case .loadBackdropImage(let backDropURL):
             guard let url = backDropURL else { return .empty() }
@@ -74,6 +78,37 @@ final class MediaDetailReactor: Reactor {
         case .loadPosterImage(let posterURL):
             guard let url = posterURL else { return .empty() }
             return loadPosterImage(url)
+            
+        case .watchlistButtonTapped:
+            let media = currentState.media
+            let isCurrentlyWatchlisted = currentState.isWatchlisted ?? false
+            
+            if isCurrentlyWatchlisted {
+                return dbManager.deleteMedia(id: String(media.id))
+                    .asObservable()
+                    .observe(on: MainScheduler.instance)
+                    .flatMap { _ -> Observable<Mutation> in
+                        return .just(.setWatchlisted(false))
+                    }
+                    .catch { .just(.showError($0)) }
+            } else {
+                let mediaTypeString = media.mediaType.rawValue
+                let releaseDate = date(from: media.releaseDate)
+                
+                return dbManager.createMedia(
+                    id: String(media.id),
+                    title: media.title,
+                    type: mediaTypeString,
+                    releaseDate: releaseDate,
+                    watchedDate: nil
+                )
+                .asObservable()
+                .observe(on: MainScheduler.instance)
+                .flatMap { _ -> Observable<Mutation> in
+                    return .just(.setWatchlisted(true))
+                }
+                .catch { .just(.showError($0)) }
+            }
         }
     }
     
@@ -95,6 +130,9 @@ final class MediaDetailReactor: Reactor {
             
         case .showError(let error):
             newState.errorType = error
+            
+        case .setWatchlisted(let isWatchlisted):
+            newState.isWatchlisted = isWatchlisted
         }
         
         return newState
@@ -102,6 +140,13 @@ final class MediaDetailReactor: Reactor {
 }
 
 extension MediaDetailReactor {
+    private func date(from string: String?) -> Date? {
+        guard let dateString = string else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.date(from: dateString)
+    }
+
     private func fetchMediaCredits() -> Observable<Mutation> {
         let targetType: TMDBTargetType
         let media = currentState.media

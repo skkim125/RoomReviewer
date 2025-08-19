@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import ReactorKit
 import SnapKit
 import Then
 
@@ -59,6 +60,31 @@ final class MediaDetailViewController: UIViewController {
         $0.numberOfLines = 0
     }
     
+    private let actionButtonStackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.distribution = .fillEqually
+        $0.spacing = 8
+    }
+
+    private let watchlistButton = UIButton()
+    
+    private let reviewButton = UIButton().then {
+        var config = UIButton.Configuration.plain()
+        
+        config.image = UIImage(systemName: "sunglasses")?.withTintColor(.systemRed)
+        config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
+        
+        config.title = "평가하기"
+        config.attributedTitle?.font = .systemFont(ofSize: 12, weight: .semibold)
+        config.imagePlacement = .top
+        config.imagePadding = 8
+        
+        
+        config.baseForegroundColor = .darkGray
+        
+        $0.configuration = config
+    }
+    
     private let overviewLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
         $0.numberOfLines = 0
@@ -94,6 +120,7 @@ final class MediaDetailViewController: UIViewController {
     
     private func bind() {
         bindState(reactor: reactor)
+        bindAction(reactor: reactor)
     }
     
     private func bindState(reactor: MediaDetailReactor) {
@@ -146,6 +173,81 @@ final class MediaDetailViewController: UIViewController {
                 print("로드 에러: \(error.localizedDescription)")
             }
             .disposed(by: disposeBag)
+        
+        reactor.state.compactMap { $0.isWatchlisted }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self) { owner, isWatchlisted in
+                owner.updateWatchlistButton(isWatchlisted: isWatchlisted)
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindAction(reactor: MediaDetailReactor) {
+        watchlistButton.rx.tap
+            .map { MediaDetailReactor.Action.watchlistButtonTapped }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reviewButton.rx.tap
+            .bind(with: self) { owner, _ in
+                
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func updateWatchlistButton(isWatchlisted: Bool) {
+        var config = UIButton.Configuration.plain()
+
+        config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
+        config.imagePlacement = .top
+        config.imagePadding = 8
+
+        let titleText: String
+        let color: UIColor
+        let imageName: String
+
+        if isWatchlisted {
+            titleText = "보고 싶은 미디어에 저장됨"
+            color = .systemBlue
+            imageName = "checkmark.circle.fill"
+        } else {
+            titleText = "보고 싶어요"
+            color = .darkGray
+            imageName = "plus.circle"
+        }
+
+        config.image = UIImage(systemName: imageName)
+        config.baseForegroundColor = color
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+
+        let nsAttr = NSAttributedString(
+            string: titleText,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 12, weight: .semibold),
+                .paragraphStyle: paragraphStyle
+            ]
+        )
+
+        if let attr = try? AttributedString(nsAttr, including: \.uiKit) {
+            config.attributedTitle = attr
+        }
+
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
+                self.watchlistButton.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+                self.watchlistButton.alpha = 0.0
+            }, completion: { _ in
+                self.watchlistButton.configuration = config
+                
+                UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseOut, animations: {
+                    self.watchlistButton.transform = .identity
+                    self.watchlistButton.alpha = 1.0
+                })
+            })
+        }
     }
 }
 
@@ -158,10 +260,14 @@ extension MediaDetailViewController {
         shadowView.addSubview(posterImageView)
         
         contentView.addSubview(infoStackView)
+        [titleAndYearLabel, mediaTypeLabel, genreLabel].forEach {
+            infoStackView.addArrangedSubview($0)
+        }
         
-        infoStackView.addArrangedSubview(titleAndYearLabel)
-        infoStackView.addArrangedSubview(mediaTypeLabel)
-        infoStackView.addArrangedSubview(genreLabel)
+        contentView.addSubview(actionButtonStackView)
+        [watchlistButton, reviewButton].forEach {
+            actionButtonStackView.addArrangedSubview($0)
+        }
         
         contentView.addSubview(overviewLabel)
         contentView.addSubview(creditsLabel)
@@ -200,8 +306,13 @@ extension MediaDetailViewController {
             $0.trailing.equalTo(contentView).inset(20)
         }
         
+        actionButtonStackView.snp.makeConstraints {
+            $0.top.equalTo(shadowView.snp.bottom).offset(15)
+            $0.horizontalEdges.equalTo(contentView).inset(20)
+        }
+        
         overviewLabel.snp.makeConstraints {
-            $0.top.equalTo(shadowView.snp.bottom).offset(20)
+            $0.top.equalTo(actionButtonStackView.snp.bottom).offset(15)
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         

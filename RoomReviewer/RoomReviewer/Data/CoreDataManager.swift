@@ -14,6 +14,7 @@ protocol DBManager {
     
     func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: String) -> Single<Void?>
+    func checkSavedMedia(id: String) -> Single<Bool>
 }
 
 final class CoreDataManager: DBManager {
@@ -107,6 +108,27 @@ final class CoreDataManager: DBManager {
                 observer(.failure(error))
             }
             
+            return Disposables.create()
+        }
+    }
+    
+    func checkSavedMedia(id: String) -> Single<Bool> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.success(false)); return Disposables.create()
+            }
+            let context = self.stack.viewContext
+            context.perform {
+                let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                request.fetchLimit = 1
+                request.predicate = NSPredicate(format: "id == %@", id)
+                do {
+                    let count = try context.count(for: request)
+                    observer(.success(count > 0))
+                } catch {
+                    observer(.failure(error))
+                }
+            }
             return Disposables.create()
         }
     }

@@ -16,6 +16,7 @@ final class HomeViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private let homeReactor: HomeReactor
     private let imageProvider: ImageProviding
+    private let dbManager: DBManager
     
     private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
@@ -24,9 +25,10 @@ final class HomeViewController: UIViewController {
         $0.showsHorizontalScrollIndicator = false
     }
     
-    init(reactor: HomeReactor, imageProvider: ImageProviding) {
+    init(reactor: HomeReactor, imageProvider: ImageProviding, dbManager: DBManager) {
         self.homeReactor = reactor
         self.imageProvider = imageProvider
+        self.dbManager = dbManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -127,7 +129,7 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider)
+                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, dbManager: owner.dbManager)
                 let vc = MediaDetailViewController(reactor: detailReactor)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
@@ -137,7 +139,7 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()), imageProvider: owner.imageProvider)
+                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()), imageProvider: owner.imageProvider, dbManager: owner.dbManager)
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 owner.navigationController?.present(nav, animated: true)
