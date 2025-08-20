@@ -37,6 +37,10 @@
 		044952802E082A1500D75C4A /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527F2E082A1500D75C4A /* RxTest */; };
 		0461E4D52E1A900C00EDB5D6 /* WriteReviewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */; };
 		0478296C2DFFFA3F008CBE67 /* HomeMediaCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0478296B2DFFFA3F008CBE67 /* HomeMediaCollectionViewCellReactor.swift */; };
+		04A722D92E5369DD00797731 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527B2E082A1500D75C4A /* RxRelay */; };
+		04A722DA2E5369DD00797731 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 04B3794A2E51EB0000C2F3EA /* RxRelay */; };
+		04A722DD2E549F3600797731 /* CustomAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A722DC2E549F3600797731 /* CustomAlertViewController.swift */; };
+		04A722DF2E54A1A200797731 /* CommonButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A722DE2E54A1A200797731 /* CommonButton.swift */; };
 		04B379012E51C0B300C2F3EA /* RoomReviewerEntity.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 04B378FF2E51C0B300C2F3EA /* RoomReviewerEntity.xcdatamodeld */; };
 		04B379062E51C50200C2F3EA /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B379052E51C50200C2F3EA /* CoreDataManager.swift */; };
 		04B3790A2E51D74E00C2F3EA /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B379092E51D74E00C2F3EA /* CoreDataStack.swift */; };
@@ -87,6 +91,13 @@
 			remoteGlobalIDString = 04FFC7A92DF169D60081AF7C;
 			remoteInfo = RoomReviewer;
 		};
+		04DD04F62E5599EF005DECAA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04FFC7A22DF169D60081AF7C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04FFC7A92DF169D60081AF7C;
+			remoteInfo = RoomReviewer;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -107,6 +118,8 @@
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
 		0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteReviewReactor.swift; sourceTree = "<group>"; };
 		0478296B2DFFFA3F008CBE67 /* HomeMediaCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMediaCollectionViewCellReactor.swift; sourceTree = "<group>"; };
+		04A722DC2E549F3600797731 /* CustomAlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlertViewController.swift; sourceTree = "<group>"; };
+		04A722DE2E54A1A200797731 /* CommonButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonButton.swift; sourceTree = "<group>"; };
 		04B379002E51C0B300C2F3EA /* RoomReviewerEntity.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = RoomReviewerEntity.xcdatamodel; sourceTree = "<group>"; };
 		04B379052E51C50200C2F3EA /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		04B379092E51D74E00C2F3EA /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
@@ -123,6 +136,7 @@
 		04DCA89F2DF2DB7100695361 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		04DCA8A12DF2DBD100695361 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		04DCA8A42DF2DBFC00695361 /* TargetType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetType.swift; sourceTree = "<group>"; };
+		04DD04F02E5599EF005DECAA /* CustomAlertViewControllerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CustomAlertViewControllerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		04EE7EBE2E52EE160006ECD5 /* CoreDataManagerUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManagerUnitTests.swift; sourceTree = "<group>"; };
 		04FFC7AA2DF169D60081AF7C /* RoomReviewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoomReviewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04FFC7C22DF16A840081AF7C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -149,6 +163,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04A722D92E5369DD00797731 /* RxRelay in Frameworks */,
 				0449527A2E082A1500D75C4A /* RxCocoa in Frameworks */,
 				044952762E082A1500D75C4A /* ReactorKit in Frameworks */,
 				0449527E2E082A1500D75C4A /* RxSwift in Frameworks */,
@@ -161,10 +176,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04A722DA2E5369DD00797731 /* RxRelay in Frameworks */,
 				04B379492E51EB0000C2F3EA /* RxCocoa in Frameworks */,
 				04B379452E51EB0000C2F3EA /* ReactorKit in Frameworks */,
 				04B3794D2E51EB0000C2F3EA /* RxSwift in Frameworks */,
 				04B379472E51EB0000C2F3EA /* RxBlocking in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04DD04ED2E5599EF005DECAA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +297,15 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		04A722DB2E549F2400797731 /* CustomView */ = {
+			isa = PBXGroup;
+			children = (
+				04A722DC2E549F3600797731 /* CustomAlertViewController.swift */,
+				04A722DE2E54A1A200797731 /* CommonButton.swift */,
+			);
+			path = CustomView;
+			sourceTree = "<group>";
+		};
 		04C97AAF2E20D8C4001EB1D4 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -332,6 +364,7 @@
 				041366582E0136C60026514E /* HomeTVCollectionViewCellReactorTests.xctest */,
 				044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */,
 				04B3792F2E51EA3E00C2F3EA /* CoreDataManagerUnitTests.xctest */,
+				04DD04F02E5599EF005DECAA /* CustomAlertViewControllerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -339,13 +372,14 @@
 		04FFC7CB2DF16A840081AF7C /* RoomReviewer */ = {
 			isa = PBXGroup;
 			children = (
-				046285AD2E4E1F9E00365B77 /* Utils */,
 				04C97AAF2E20D8C4001EB1D4 /* App */,
+				046285AD2E4E1F9E00365B77 /* Utils */,
 				0449525C2E08174000D75C4A /* Data */,
 				04DCA8A32DF2DBD500695361 /* Network */,
 				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
+				04A722DB2E549F2400797731 /* CustomView */,
 				042EFE602E1403DD00810E02 /* Review */,
 				042EFE5E2E1403C800810E02 /* Home */,
 			);
@@ -431,6 +465,26 @@
 			productReference = 04B3792F2E51EA3E00C2F3EA /* CoreDataManagerUnitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		04DD04EF2E5599EF005DECAA /* CustomAlertViewControllerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04DD04FA2E5599EF005DECAA /* Build configuration list for PBXNativeTarget "CustomAlertViewControllerUITests" */;
+			buildPhases = (
+				04DD04EC2E5599EF005DECAA /* Sources */,
+				04DD04ED2E5599EF005DECAA /* Frameworks */,
+				04DD04EE2E5599EF005DECAA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				04DD04F72E5599EF005DECAA /* PBXTargetDependency */,
+			);
+			name = CustomAlertViewControllerUITests;
+			packageProductDependencies = (
+			);
+			productName = CustomAlertViewControllerUITests;
+			productReference = 04DD04F02E5599EF005DECAA /* CustomAlertViewControllerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		04FFC7A92DF169D60081AF7C /* RoomReviewer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 04FFC7BD2DF169D70081AF7C /* Build configuration list for PBXNativeTarget "RoomReviewer" */;
@@ -480,6 +534,10 @@
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 04FFC7A92DF169D60081AF7C;
 					};
+					04DD04EF2E5599EF005DECAA = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 04FFC7A92DF169D60081AF7C;
+					};
 					04FFC7A92DF169D60081AF7C = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -510,6 +568,7 @@
 				041366572E0136C60026514E /* HomeTVCollectionViewCellReactorTests */,
 				044952682E08257000D75C4A /* HomeReactorLoadDataUnitTest */,
 				04B3792E2E51EA3E00C2F3EA /* CoreDataManagerUnitTests */,
+				04DD04EF2E5599EF005DECAA /* CustomAlertViewControllerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -530,6 +589,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		04B3792D2E51EA3E00C2F3EA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04DD04EE2E5599EF005DECAA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -572,6 +638,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		04DD04EC2E5599EF005DECAA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		04FFC7A62DF169D60081AF7C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -601,7 +674,9 @@
 				04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */,
 				04B9CBC02DFEAA8A00E84E78 /* HomeMediaCollectionViewCell.swift in Sources */,
 				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,
+				04A722DF2E54A1A200797731 /* CommonButton.swift in Sources */,
 				04C97ABA2E236D29001EB1D4 /* SearchMediaCollectionViewCellReactor.swift in Sources */,
+				04A722DD2E549F3600797731 /* CustomAlertViewController.swift in Sources */,
 				04B379062E51C50200C2F3EA /* CoreDataManager.swift in Sources */,
 				04DCA8A02DF2DB7100695361 /* NetworkError.swift in Sources */,
 				04B3790A2E51D74E00C2F3EA /* CoreDataStack.swift in Sources */,
@@ -625,6 +700,11 @@
 			isa = PBXTargetDependency;
 			target = 04FFC7A92DF169D60081AF7C /* RoomReviewer */;
 			targetProxy = 04B379332E51EA3E00C2F3EA /* PBXContainerItemProxy */;
+		};
+		04DD04F72E5599EF005DECAA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04FFC7A92DF169D60081AF7C /* RoomReviewer */;
+			targetProxy = 04DD04F62E5599EF005DECAA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -769,6 +849,48 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RoomReviewer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RoomReviewer";
+			};
+			name = Release;
+		};
+		04DD04F82E5599EF005DECAA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.CustomAlertViewControllerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = RoomReviewer;
+			};
+			name = Debug;
+		};
+		04DD04F92E5599EF005DECAA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.CustomAlertViewControllerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = RoomReviewer;
 			};
 			name = Release;
 		};
@@ -984,6 +1106,15 @@
 			buildConfigurations = (
 				04B379362E51EA3E00C2F3EA /* Debug */,
 				04B379372E51EA3E00C2F3EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04DD04FA2E5599EF005DECAA /* Build configuration list for PBXNativeTarget "CustomAlertViewControllerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04DD04F82E5599EF005DECAA /* Debug */,
+				04DD04F92E5599EF005DECAA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
