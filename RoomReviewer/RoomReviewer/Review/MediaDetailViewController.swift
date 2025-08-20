@@ -125,10 +125,10 @@ final class MediaDetailViewController: UIViewController {
     
     private func bindState(reactor: MediaDetailReactor) {
         
-        reactor.state.compactMap { $0.mediaDetail }
-            .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, detail in
-                let mediaInfo = detail.mediaInfo
+        reactor.state.map { $0.mediaDetail }
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, detail in
+                guard let mediaInfo = detail?.mediaInfo else { return }
                 
                 switch mediaInfo.mediaType {
                 case .movie:
@@ -148,7 +148,8 @@ final class MediaDetailViewController: UIViewController {
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.backDropImageData }
-            .bind(with: self) { owner, image in
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, image in
                 if let image = image {
                     owner.backDropImageView.image = image
                 } else {
@@ -158,7 +159,8 @@ final class MediaDetailViewController: UIViewController {
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.posterImageData }
-            .bind(with: self) { owner, image in
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, image in
                 if let image = image {
                     owner.posterImageView.image = image
                 } else {
@@ -167,9 +169,10 @@ final class MediaDetailViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        reactor.state.compactMap { $0.errorType }
-            .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, error in
+        reactor.state.map { $0.errorType }
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, error in
+                guard let error = error else { return }
                 print("로드 에러: \(error.localizedDescription)")
             }
             .disposed(by: disposeBag)
@@ -182,6 +185,24 @@ final class MediaDetailViewController: UIViewController {
                 owner.reviewButton.configuration?.baseForegroundColor = isWatchlisted ? .systemRed : .darkGray
             }
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$pushWriteReviewView)
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, flag in
+                if let _ = flag {
+                    owner.navigationController?.pushViewController(UIViewController(), animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$showSetWatchedDateAlert)
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, flag in
+                if let _ = flag {
+                    owner.presentCalendarAlert()
+                }
+            }
+            .disposed(by: disposeBag)
     }
     
     private func bindAction(reactor: MediaDetailReactor) {
@@ -191,9 +212,8 @@ final class MediaDetailViewController: UIViewController {
             .disposed(by: disposeBag)
         
         reviewButton.rx.tap
-            .bind(with: self) { owner, _ in
-                
-            }
+            .map { MediaDetailReactor.Action.writeReviewButtonTapped }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
@@ -348,5 +368,20 @@ extension MediaDetailViewController {
         }
         
         return attributed
+    }
+    
+    private func presentCalendarAlert() {
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .inline
+        datePicker.locale = Locale(identifier: "ko-KR")
+        datePicker.maximumDate = Date()
+        
+        let alert = CustomAlertViewController(title: "시청한 날짜 선택", subtitle: "미디어를 시청한 날짜를 선택해주세요.", buttonType: .twoButton, contentView: datePicker) { [weak self] in
+            let selectedDate = datePicker.date
+            self?.reactor.action.onNext(.updateWatchedDate(selectedDate))
+        }
+        
+        present(alert, animated: true)
     }
 }

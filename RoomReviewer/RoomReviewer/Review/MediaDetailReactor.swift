@@ -30,6 +30,9 @@ final class MediaDetailReactor: Reactor {
         var isLoading: Bool?
         var errorType: Error?
         var isWatchlisted: Bool?
+        var watchedDate: Date?
+        @Pulse var showSetWatchedDateAlert: Void?
+        @Pulse var pushWriteReviewView: Void?
     }
     
     enum Action {
@@ -37,6 +40,8 @@ final class MediaDetailReactor: Reactor {
         case loadBackdropImage(String?)
         case loadPosterImage(String?)
         case watchlistButtonTapped
+        case writeReviewButtonTapped
+        case updateWatchedDate(Date)
     }
     
     enum Mutation {
@@ -46,6 +51,9 @@ final class MediaDetailReactor: Reactor {
         case setPosterImage(UIImage?)
         case showError(Error)
         case setWatchlisted(Bool)
+        case showSetWatchedDateAlert
+        case setWatchedDate(Date)
+        case pushWriteReviewView
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -69,7 +77,7 @@ final class MediaDetailReactor: Reactor {
                 Observable.merge(checkWatchlist, fetchOthers).observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
-
+            
             
         case .loadBackdropImage(let backDropURL):
             guard let url = backDropURL else { return .empty() }
@@ -109,6 +117,23 @@ final class MediaDetailReactor: Reactor {
                 }
                 .catch { .just(.showError($0)) }
             }
+            
+        case .writeReviewButtonTapped:
+            if let date = currentState.watchedDate {
+                return .just(.pushWriteReviewView)
+            } else {
+                return .just(.showSetWatchedDateAlert)
+            }
+            
+        case .updateWatchedDate(let date):
+            let media = currentState.media
+            
+            return dbManager.updateWatchedDate(id: String(media.id), watchedDate: date)
+                .asObservable()
+                .flatMap { _ -> Observable<Mutation> in
+                    return .just(.setWatchedDate(date))
+                }
+                .catch { .just(.showError($0)) }
         }
     }
     
@@ -133,6 +158,16 @@ final class MediaDetailReactor: Reactor {
             
         case .setWatchlisted(let isWatchlisted):
             newState.isWatchlisted = isWatchlisted
+            
+        case .setWatchedDate(let date):
+            newState.watchedDate = date
+            newState.pushWriteReviewView = ()
+            
+        case .pushWriteReviewView:
+            newState.pushWriteReviewView = ()
+            
+        case .showSetWatchedDateAlert:
+            newState.showSetWatchedDateAlert = ()
         }
         
         return newState
