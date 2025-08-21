@@ -10,12 +10,12 @@ import CoreData
 import RxSwift
 
 protocol DBManager {
-    func createMedia(id: String, title: String, type: String, releaseDate: Date?, watchedDate: Date?) -> Single<NSManagedObjectID>
+    func createMedia(id: Int, title: String, overview: String?, type: String, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID>
     
-    func fetchAllMedia() -> Single<[MediaEntity]>
-    func deleteMedia(id: String) -> Single<Void?>
-    func checkSavedMedia(id: String) -> Single<Bool>
-    func updateWatchedDate(id: String, watchedDate: Date) -> Single<Void?>
+    func fetchAllMedia() -> Single<[Media]>
+    func deleteMedia(id: Int) -> Single<Void?>
+    func fetchMedia(id: Int) -> Single<Media?>
+    func updateWatchedDate(id: Int, watchedDate: Date) -> Single<Void?>
 }
 
 final class CoreDataManager: DBManager {
@@ -26,7 +26,7 @@ final class CoreDataManager: DBManager {
     }
 
     // 보고 싶은 or 리뷰 작성을 위한 Media 생성 & 저장
-    func createMedia(id: String, title: String, type: String, releaseDate: Date?, watchedDate: Date?) -> Single<NSManagedObjectID> {
+    func createMedia(id: Int, title: String, overview: String?, type: String, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID> {
         
         return Single.create { [weak self] observer in
             guard let self = self else {
@@ -38,16 +38,17 @@ final class CoreDataManager: DBManager {
             
             backgroundContext.perform {
                 let media = MediaEntity(context: backgroundContext)
-                media.id = id
+                media.id = Int64(id)
+                media.isStar = false
                 media.title = title
                 media.type = type
                 media.releaseDate = releaseDate
                 media.watchedDate = watchedDate
                 media.addedDate = Date()
-                
+                media.genres = genres
                 do {
                     try backgroundContext.save()
-                    print("\(media.title ?? "") 저장 완료")
+                    print("\(media.title) 저장 완료")
                     
                     observer(.success(media.objectID))
                 } catch {
@@ -62,7 +63,7 @@ final class CoreDataManager: DBManager {
     }
     
     // 보고싶은 모든 미디어 불러오기
-    func fetchAllMedia() -> Single<[MediaEntity]> {
+    func fetchAllMedia() -> Single<[Media]> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
@@ -74,12 +75,12 @@ final class CoreDataManager: DBManager {
             request.sortDescriptors = [sortDescriptor]
             
             do {
-                let results = try stack.viewContext.fetch(request)
+                let results = try stack.viewContext.fetch(request).map { $0.toDomain() }
                 observer(.success(results))
                 
             } catch {
                 print("Failed to fetch media: \(error)")
-                observer(.failure(error))
+                observer(.success([]))
             }
             
             return Disposables.create()
@@ -87,7 +88,7 @@ final class CoreDataManager: DBManager {
     }
     
     // 보고싶은 Media 삭제
-    func deleteMedia(id: String) -> Single<Void?> {
+    func deleteMedia(id: Int) -> Single<Void?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.success(nil))
@@ -98,7 +99,7 @@ final class CoreDataManager: DBManager {
                 if let deleteObject = try stack.viewContext.fetch(MediaEntity.fetchRequest()).first(where: { $0.id == id }) {
                     let object = deleteObject
                     stack.viewContext.delete(deleteObject)
-                    print("\(object.title ?? "이름없음") 삭제 완료")
+                    print("\(object.title) 삭제 완료")
                     observer(.success(()))
                 } else {
                     observer(.failure(NetworkError.commonError))
@@ -106,35 +107,44 @@ final class CoreDataManager: DBManager {
                 
             } catch {
                 print("Failed to fetch media: \(error)")
-                observer(.failure(error))
+                observer(.success(nil))
             }
             
             return Disposables.create()
         }
     }
     
-    func checkSavedMedia(id: String) -> Single<Bool> {
+    func fetchMedia(id: Int) -> Single<Media?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.success(false)); return Disposables.create()
+                observer(.failure(NetworkError.commonError))
+                
+                return Disposables.create()
             }
+            
             let context = self.stack.viewContext
             context.perform {
                 let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
                 request.fetchLimit = 1
-                request.predicate = NSPredicate(format: "id == %@", id)
+                request.predicate = NSPredicate(format: "id == %d", id)
                 do {
-                    let count = try context.count(for: request)
-                    observer(.success(count > 0))
+                    let data = try context.fetch(request)
+                    
+                    if data.isEmpty {
+                        observer(.success(nil))
+                    } else {
+                        observer(.success(data[0].toDomain()))
+                    }
+                    
                 } catch {
-                    observer(.failure(error))
+                    observer(.success(nil))
                 }
             }
             return Disposables.create()
         }
     }
     
-    func updateWatchedDate(id: String, watchedDate: Date) -> Single<Void?> {
+    func updateWatchedDate(id: Int, watchedDate: Date) -> Single<Void?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
@@ -145,13 +155,13 @@ final class CoreDataManager: DBManager {
             
             backgroundContext.perform {
                 let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id == %@", id)
+                request.predicate = NSPredicate(format: "id == %d", id)
                 
                 do {
                     if let mediaToUpdate = try backgroundContext.fetch(request).first {
                         mediaToUpdate.watchedDate = watchedDate
                         try backgroundContext.save()
-                        print("\(mediaToUpdate.title ?? "") 시청 날짜 업데이트 완료")
+                        print("\(mediaToUpdate.title) 시청 날짜 업데이트 완료")
                         observer(.success(()))
                     } else {
                         observer(.failure(NetworkError.commonError))

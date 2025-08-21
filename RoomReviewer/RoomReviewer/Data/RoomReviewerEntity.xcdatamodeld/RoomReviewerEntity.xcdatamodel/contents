@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G84" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
-    <entity name="MediaEntity" representedClassName="MediaEntity" syncable="YES" codeGenerationType="class">
+    <entity name="Media" representedClassName="MediaEntity" syncable="YES">
         <attribute name="addedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="backdropURL" optional="YES" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="String"/>
-        <attribute name="isStar" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="genres" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName"/>
+        <attribute name="id" attributeType="Integer 64" valueTransformerName="NSSecureUnarchiveFromDataTransformerName" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isStar" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="overview" optional="YES" attributeType="String"/>
         <attribute name="posterURL" optional="YES" attributeType="String"/>
-        <attribute name="releaseDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="title" optional="YES" attributeType="String"/>
-        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="releaseDate" optional="YES" attributeType="String"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="type" attributeType="String"/>
         <attribute name="watchedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <relationship name="review" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ReviewEntity" inverseName="media" inverseEntity="ReviewEntity"/>
+        <relationship name="review" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Review" inverseName="media" inverseEntity="Review"/>
     </entity>
-    <entity name="ReviewEntity" representedClassName="ReviewEntity" syncable="YES" codeGenerationType="class">
+    <entity name="Review" representedClassName="ReviewEntity" syncable="YES">
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="rate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="reviewText" optional="YES" attributeType="String"/>
         <attribute name="viewingDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <relationship name="media" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MediaEntity" inverseName="review" inverseEntity="MediaEntity"/>
+        <relationship name="media" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Media" inverseName="review" inverseEntity="Media"/>
     </entity>
 </model>
