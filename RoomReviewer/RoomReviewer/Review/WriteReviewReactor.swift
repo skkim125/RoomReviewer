@@ -62,7 +62,7 @@ final class WriteReviewReactor: Reactor {
                         switch result {
                         case .success(let success):
                             let datas = success.results.filter { $0.mediaType != .person }.map {
-                                Media(id: $0.id, mediaType: $0.mediaType == .movie ? .movie : .tv, title: ($0.title ?? $0.name) ?? "", overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS ?? [], releaseDate: $0.mediaType == .movie ? $0.releaseDate : $0.firstAirDate)
+                                Media(id: $0.id, mediaType: $0.mediaType == .movie ? .movie : .tv, title: ($0.title ?? $0.name) ?? "", overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS ?? [], releaseDate: $0.mediaType == .movie ? $0.releaseDate : $0.firstAirDate, watchedDate: nil)
                             }
                             return .just(.searchSuccessed(datas))
                         case .failure(let error):

@@ -60,10 +60,15 @@ final class MediaDetailReactor: Reactor {
         switch action {
         case .viewDidLoad:
             let media = currentState.media
-            let checkWatchlist = dbManager.checkSavedMedia(id: String(media.id))
+            let checkWatchlist = dbManager.fetchMedia(id: media.id)
                 .asObservable()
-                .map { Mutation.setWatchlisted($0) }
-                .catch { .just(.showError($0)) }
+                .map {
+                    if let _ = $0 {
+                        Mutation.setWatchlisted(true)
+                    } else {
+                        Mutation.setWatchlisted(false)
+                    }
+                }
             
             let fetchOthers = Observable.merge(
                 self.fetchMediaCredits(),
@@ -92,7 +97,7 @@ final class MediaDetailReactor: Reactor {
             let isCurrentlyWatchlisted = currentState.isWatchlisted ?? false
             
             if isCurrentlyWatchlisted {
-                return dbManager.deleteMedia(id: String(media.id))
+                return dbManager.deleteMedia(id: media.id)
                     .asObservable()
                     .observe(on: MainScheduler.instance)
                     .flatMap { _ -> Observable<Mutation> in
@@ -101,12 +106,14 @@ final class MediaDetailReactor: Reactor {
                     .catch { .just(.showError($0)) }
             } else {
                 let mediaTypeString = media.mediaType.rawValue
-                let releaseDate = date(from: media.releaseDate)
+                let releaseDate = media.releaseDate
                 
                 return dbManager.createMedia(
-                    id: String(media.id),
+                    id: media.id,
                     title: media.title,
+                    overview: media.overview,
                     type: mediaTypeString,
+                    genres: media.genreIDS,
                     releaseDate: releaseDate,
                     watchedDate: nil
                 )
@@ -119,7 +126,7 @@ final class MediaDetailReactor: Reactor {
             }
             
         case .writeReviewButtonTapped:
-            if let date = currentState.watchedDate {
+            if let _ = currentState.watchedDate {
                 return .just(.pushWriteReviewView)
             } else {
                 return .just(.showSetWatchedDateAlert)
@@ -128,7 +135,7 @@ final class MediaDetailReactor: Reactor {
         case .updateWatchedDate(let date):
             let media = currentState.media
             
-            return dbManager.updateWatchedDate(id: String(media.id), watchedDate: date)
+            return dbManager.updateWatchedDate(id: media.id, watchedDate: date)
                 .asObservable()
                 .flatMap { _ -> Observable<Mutation> in
                     return .just(.setWatchedDate(date))
