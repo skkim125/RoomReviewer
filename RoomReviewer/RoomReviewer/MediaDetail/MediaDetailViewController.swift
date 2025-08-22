@@ -145,7 +145,7 @@ final class MediaDetailViewController: UIViewController {
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                owner.mediaTypeLabel.text = media.mediaType.rawValue
+                owner.mediaTypeLabel.text = media.mediaType.displayName
                 
                 let yearString = media.releaseDate.map { String($0.prefix(4)) }
                 owner.titleAndYearLabel.attributedText = owner.setTitleStyle(title: media.title, year: yearString)
@@ -388,7 +388,7 @@ extension MediaDetailViewController {
         castCollectionView.snp.makeConstraints {
             $0.top.equalTo(directorLabel.snp.bottom).offset(10)
             $0.leading.trailing.equalTo(contentView).inset(10)
-            $0.height.equalTo(220)
+            $0.height.equalTo(205)
             $0.bottom.equalTo(contentView).inset(10)
         }
     }

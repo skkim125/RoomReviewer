@@ -11,7 +11,7 @@ import RxCocoa
 import SnapKit
 import Then
 
-final class WriteReviewViewController: UIViewController {
+final class SearchMediaViewController: UIViewController {
     private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnCollectionViewLayout()).then {
         $0.register(SearchMediaCollectionViewCell.self, forCellWithReuseIdentifier: SearchMediaCollectionViewCell.cellID)
         $0.backgroundColor = .white
@@ -24,13 +24,13 @@ final class WriteReviewViewController: UIViewController {
         $0.placeholder = "검색어를 입력하세요"
     }
     
-    private let writeReviewReactor: WriteReviewReactor
+    private let searchMediaReactor: SearchMediaReactor
     private let imageProvider: ImageProviding
     private let dbManager: DBManager
     private var disposeBag = DisposeBag()
     
-    init(writeReviewReactor: WriteReviewReactor, imageProvider: ImageProviding, dbManager: DBManager) {
-        self.writeReviewReactor = writeReviewReactor
+    init(searchMediaReactor: SearchMediaReactor, imageProvider: ImageProviding, dbManager: DBManager) {
+        self.searchMediaReactor = searchMediaReactor
         self.imageProvider = imageProvider
         self.dbManager = dbManager
         super.init(nibName: nil, bundle: nil)
@@ -51,34 +51,34 @@ final class WriteReviewViewController: UIViewController {
     }
     
     private func bind() {
-        bindAction(reactor: writeReviewReactor)
-        bindState(reactor: writeReviewReactor)
+        bindAction(reactor: searchMediaReactor)
+        bindState(reactor: searchMediaReactor)
     }
     
-    private func bindAction(reactor: WriteReviewReactor) {
+    private func bindAction(reactor: SearchMediaReactor) {
         searchTextField.rx.text
             .distinctUntilChanged()
-            .map { WriteReviewReactor.Action.updateQuery($0) }
+            .map { SearchMediaReactor.Action.updateQuery($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         searchTextField.rx.controlEvent(.editingDidEndOnExit)
-            .map { WriteReviewReactor.Action.searchButtonTapped }
+            .map { SearchMediaReactor.Action.searchButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.navigationItem.leftBarButtonItem?.rx.tap
-            .map { WriteReviewReactor.Action.dismissWriteReview }
+            .map { SearchMediaReactor.Action.dismissWriteReview }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         searchMediaCollectionView.rx.modelSelected(Media.self)
-            .map { WriteReviewReactor.Action.selectedMedia($0) }
+            .map { SearchMediaReactor.Action.selectedMedia($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
-    private func bindState(reactor: WriteReviewReactor) {
+    private func bindState(reactor: SearchMediaReactor) {
         
         reactor.pulse(\.$searchResults)
             .compactMap { $0 }
@@ -127,7 +127,7 @@ final class WriteReviewViewController: UIViewController {
     }
 }
 
-extension WriteReviewViewController {
+extension SearchMediaViewController {
     private func configureHierarchy() {
         view.addSubview(searchTextField)
         view.addSubview(searchMediaCollectionView)

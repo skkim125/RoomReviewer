@@ -32,7 +32,7 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
         $0.font = .systemFont(ofSize: 12)
         $0.textColor = .darkGray
         $0.textAlignment = .center
-        $0.numberOfLines = 2
+        $0.numberOfLines = 1
     }
     
     private let activityIndicator = UIActivityIndicatorView(style: .medium)

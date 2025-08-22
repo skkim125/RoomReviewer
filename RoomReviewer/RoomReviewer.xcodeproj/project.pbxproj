@@ -17,7 +17,7 @@
 		041366692E0138D40026514E /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 041366682E0138D40026514E /* RxSwift */; };
 		0413666B2E0139250026514E /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0413666A2E0139250026514E /* RxTest */; };
 		0413666D2E0139920026514E /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 0413666C2E0139920026514E /* RxCocoa */; };
-		042EFE642E14040500810E02 /* WriteReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042EFE632E14040500810E02 /* WriteReviewViewController.swift */; };
+		042EFE642E14040500810E02 /* SearchMediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042EFE632E14040500810E02 /* SearchMediaViewController.swift */; };
 		043BB0432DFC4D8800E5438D /* TV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0422DFC4D8800E5438D /* TV.swift */; };
 		043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0442DFC4DA700E5438D /* TMDBTarget.swift */; };
 		043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0462DFC4DDA00E5438D /* NetworkManager.swift */; };
@@ -35,7 +35,7 @@
 		0449527A2E082A1500D75C4A /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 044952792E082A1500D75C4A /* RxCocoa */; };
 		0449527E2E082A1500D75C4A /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527D2E082A1500D75C4A /* RxSwift */; };
 		044952802E082A1500D75C4A /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527F2E082A1500D75C4A /* RxTest */; };
-		0461E4D52E1A900C00EDB5D6 /* WriteReviewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */; };
+		0461E4D52E1A900C00EDB5D6 /* SearchMediaReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */; };
 		046E7A2E2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */; };
 		046E7A2F2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */; };
 		046E7A352E574D1000FAF58A /* CreditsCollectionVIewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A342E574D1000FAF58A /* CreditsCollectionVIewCell.swift */; };
@@ -115,7 +115,7 @@
 		0410D7922E4F2CBD009D38EE /* ImageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProvider.swift; sourceTree = "<group>"; };
 		041366582E0136C60026514E /* HomeTVCollectionViewCellReactorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeTVCollectionViewCellReactorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		041366612E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCellReactorTests.swift; sourceTree = "<group>"; };
-		042EFE632E14040500810E02 /* WriteReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteReviewViewController.swift; sourceTree = "<group>"; };
+		042EFE632E14040500810E02 /* SearchMediaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaViewController.swift; sourceTree = "<group>"; };
 		043BB0422DFC4D8800E5438D /* TV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TV.swift; sourceTree = "<group>"; };
 		043BB0442DFC4DA700E5438D /* TMDBTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBTarget.swift; sourceTree = "<group>"; };
 		043BB0462DFC4DDA00E5438D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
@@ -124,7 +124,7 @@
 		044952632E081A4A00D75C4A /* HomeSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSectionModel.swift; sourceTree = "<group>"; };
 		044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeReactorLoadDataUnitTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
-		0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteReviewReactor.swift; sourceTree = "<group>"; };
+		0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaReactor.swift; sourceTree = "<group>"; };
 		046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReviewEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReviewEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		046E7A342E574D1000FAF58A /* CreditsCollectionVIewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsCollectionVIewCell.swift; sourceTree = "<group>"; };
@@ -268,18 +268,14 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
-		042EFE602E1403DD00810E02 /* Review */ = {
+		042EFE602E1403DD00810E02 /* MediaDetail */ = {
 			isa = PBXGroup;
 			children = (
-				042EFE632E14040500810E02 /* WriteReviewViewController.swift */,
-				0461E4D42E1A900B00EDB5D6 /* WriteReviewReactor.swift */,
 				04C97ABD2E23784C001EB1D4 /* MediaDetailViewController.swift */,
 				04C97ADB2E23B595001EB1D4 /* MediaDetailReactor.swift */,
-				046E7A342E574D1000FAF58A /* CreditsCollectionVIewCell.swift */,
-				046E7A362E574D2B00FAF58A /* CreditsCollectionViewCellReactor.swift */,
-				04C97AB22E2286AD001EB1D4 /* Cell */,
+				04FE6C922E5887C200CCB76C /* Cell */,
 			);
-			path = Review;
+			path = MediaDetail;
 			sourceTree = "<group>";
 		};
 		0449525C2E08174000D75C4A /* Data */ = {
@@ -439,6 +435,25 @@
 			path = DBModel;
 			sourceTree = "<group>";
 		};
+		04FE6C912E58879D00CCB76C /* SearchMedia */ = {
+			isa = PBXGroup;
+			children = (
+				042EFE632E14040500810E02 /* SearchMediaViewController.swift */,
+				0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */,
+				04C97AB22E2286AD001EB1D4 /* Cell */,
+			);
+			path = SearchMedia;
+			sourceTree = "<group>";
+		};
+		04FE6C922E5887C200CCB76C /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				046E7A342E574D1000FAF58A /* CreditsCollectionVIewCell.swift */,
+				046E7A362E574D2B00FAF58A /* CreditsCollectionViewCellReactor.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
 		04FFC7A12DF169D60081AF7C = {
 			isa = PBXGroup;
 			children = (
@@ -476,7 +491,8 @@
 				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
 				04A722DB2E549F2400797731 /* CustomView */,
-				042EFE602E1403DD00810E02 /* Review */,
+				04FE6C912E58879D00CCB76C /* SearchMedia */,
+				042EFE602E1403DD00810E02 /* MediaDetail */,
 				042EFE5E2E1403C800810E02 /* Home */,
 			);
 			path = RoomReviewer;
@@ -746,7 +762,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				040AD09D2E1F879000C6EBC9 /* Movie.swift in Sources */,
-				0461E4D52E1A900C00EDB5D6 /* WriteReviewReactor.swift in Sources */,
+				0461E4D52E1A900C00EDB5D6 /* SearchMediaReactor.swift in Sources */,
 				046EFB552E56E5E200E2736B /* MediaEntity+CoreDataClass.swift in Sources */,
 				046E7A372E574D2B00FAF58A /* CreditsCollectionViewCellReactor.swift in Sources */,
 				04FE6C852E58672800CCB76C /* Cast.swift in Sources */,
@@ -763,7 +779,7 @@
 				0410D7932E4F2CBD009D38EE /* ImageProvider.swift in Sources */,
 				046EFB482E56E0A200E2736B /* RoomReviewerEntity.xcdatamodeld in Sources */,
 				04DCA8A22DF2DBD100695361 /* Configuration.swift in Sources */,
-				042EFE642E14040500810E02 /* WriteReviewViewController.swift in Sources */,
+				042EFE642E14040500810E02 /* SearchMediaViewController.swift in Sources */,
 				04FFC7D02DF16A840081AF7C /* AppDelegate.swift in Sources */,
 				043BB04D2DFC4F2A00E5438D /* HomeReactor.swift in Sources */,
 				04FE6C812E585F6C00CCB76C /* MovieCredits.swift in Sources */,
