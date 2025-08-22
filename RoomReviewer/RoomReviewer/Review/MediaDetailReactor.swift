@@ -26,7 +26,8 @@ final class MediaDetailReactor: Reactor {
         var media: Media
         var backDropImageData: UIImage?
         var posterImageData: UIImage?
-        var mediaDetail: MediaDetail?
+        var casts: [Cast]?
+        var director: Crew?
         var isLoading: Bool?
         var errorType: Error?
         var isWatchlisted: Bool?
@@ -46,7 +47,7 @@ final class MediaDetailReactor: Reactor {
     
     enum Mutation {
         case setLoading(Bool)
-        case setMediaDetail(MediaDetail)
+        case getCredits([Cast], Crew)
         case setBackdropImage(UIImage?)
         case setPosterImage(UIImage?)
         case showError(Error)
@@ -60,6 +61,7 @@ final class MediaDetailReactor: Reactor {
         switch action {
         case .viewDidLoad:
             let media = currentState.media
+            print(media.id)
             let checkWatchlist = dbManager.fetchMedia(id: media.id)
                 .asObservable()
                 .map {
@@ -151,8 +153,9 @@ final class MediaDetailReactor: Reactor {
         case .setLoading(let loading):
             newState.isLoading = loading
             
-        case .setMediaDetail(let detail):
-            newState.mediaDetail = detail
+        case .getCredits(let casts, let director):
+            newState.casts = casts
+            newState.director = director
             
         case .setBackdropImage(let image):
             newState.backDropImageData = image
@@ -207,7 +210,7 @@ extension MediaDetailReactor {
             .flatMap { (result: Result<Credits, Error>) -> Observable<Mutation> in
                 switch result {
                 case .success(let credits):
-                    return .just(.setMediaDetail(MediaDetail(mediaInfo: media, mediaCredits: credits)))
+                    return .just(.getCredits(Array(credits.cast.prefix(10)), credits.crew.filter({ $0.department == "Directing" })[0]))
                 case .failure(let error):
                     return .just(.showError(error))
                 }

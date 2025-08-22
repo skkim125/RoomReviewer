@@ -120,7 +120,7 @@ final class WriteReviewViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, dbManager: owner.dbManager))
+                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, dbManager: owner.dbManager), imageProvider: owner.imageProvider)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -156,7 +156,7 @@ extension WriteReviewViewController {
 extension UICollectionViewLayout {
     static func threeColumnCollectionViewLayout() -> UICollectionViewCompositionalLayout {
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0/3.0),
+            widthDimension: .fractionalWidth(1.0/3),
             heightDimension: .fractionalHeight(1.0)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)

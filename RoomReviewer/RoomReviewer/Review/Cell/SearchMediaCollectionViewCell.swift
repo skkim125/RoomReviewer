@@ -58,6 +58,7 @@ extension SearchMediaCollectionViewCell {
             .disposed(by: disposeBag)
 
         reactor.state.map { $0.imageData }
+            .distinctUntilChanged()
             .bind(with: self) { owner, image in
                 if let image = image {
                     owner.posterImageView.image = image

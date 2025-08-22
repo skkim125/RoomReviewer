@@ -130,7 +130,7 @@ final class HomeViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
                 let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, dbManager: owner.dbManager)
-                let vc = MediaDetailViewController(reactor: detailReactor)
+                let vc = MediaDetailViewController(reactor: detailReactor, imageProvider: owner.imageProvider)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
