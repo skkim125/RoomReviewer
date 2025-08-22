@@ -91,15 +91,31 @@ final class MediaDetailViewController: UIViewController {
         $0.textColor = .darkGray
     }
     
-    private let creditsLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 12)
+    private let creditsTitleLabel = UILabel().then {
+        $0.text = "주요 출연진"
+        $0.font = .boldSystemFont(ofSize: 18)
+    }
+    
+    private let directorLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 15)
+    }
+    
+    private lazy var castCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout()).then {
+        $0.showsHorizontalScrollIndicator = false
+        $0.register(CreditsCollectionViewCell.self, forCellWithReuseIdentifier: CreditsCollectionViewCell.cellID)
+        $0.backgroundColor = .gray.withAlphaComponent(0.1)
+        $0.showsVerticalScrollIndicator = false
+        $0.clipsToBounds = true
+        $0.layer.cornerRadius = 12
     }
     
     private let reactor: MediaDetailReactor
+    private let imageProvider: ImageProviding
     private let disposeBag = DisposeBag()
     
-    init(reactor: MediaDetailReactor) {
+    init(reactor: MediaDetailReactor, imageProvider: ImageProviding) {
         self.reactor = reactor
+        self.imageProvider = imageProvider
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -125,29 +141,23 @@ final class MediaDetailViewController: UIViewController {
     
     private func bindState(reactor: MediaDetailReactor) {
         
-        reactor.state.map { $0.mediaDetail }
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self) { owner, detail in
-                guard let mediaInfo = detail?.mediaInfo else { return }
+        reactor.state.map { $0.media }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, media in
+                owner.mediaTypeLabel.text = media.mediaType.rawValue
                 
-                switch mediaInfo.mediaType {
-                case .movie:
-                    owner.mediaTypeLabel.text = "영화"
-                case .tv:
-                    owner.mediaTypeLabel.text = "TV 시리즈"
-                default:
-                    owner.mediaTypeLabel.text = ""
-                }
+                let yearString = media.releaseDate.map { String($0.prefix(4)) }
+                owner.titleAndYearLabel.attributedText = owner.setTitleStyle(title: media.title, year: yearString)
                 
-                let yearString = mediaInfo.releaseDate.map { String($0.prefix(4)) }
-                owner.titleAndYearLabel.attributedText = owner.setTitleStyle(title: mediaInfo.title, year: yearString)
-                owner.overviewLabel.text = mediaInfo.overview
+                owner.overviewLabel.text = media.overview
                 
-                owner.genreLabel.text = API.convertGenreString(mediaInfo.mediaType, array: mediaInfo.genreIDS).joined(separator: " / ")
+                owner.genreLabel.text = API.convertGenreString(media.mediaType, array: media.genreIDS).joined(separator: " / ")
             }
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.backDropImageData }
+            .distinctUntilChanged()
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
@@ -159,6 +169,7 @@ final class MediaDetailViewController: UIViewController {
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.posterImageData }
+            .distinctUntilChanged()
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
@@ -200,6 +211,31 @@ final class MediaDetailViewController: UIViewController {
             .drive(with: self) { owner, flag in
                 if let _ = flag {
                     owner.presentCalendarAlert()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state.compactMap { $0.casts }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: [])
+            .map { casts in
+                return casts.map { cast in
+                    CreditsCollectionViewCellReactor(cast: cast, imageLoader: self.imageProvider)
+                }
+            }
+            .drive(castCollectionView.rx.items(cellIdentifier: CreditsCollectionViewCell.cellID, cellType: CreditsCollectionViewCell.self)) { index, reactor, cell in
+                cell.configureCell(reactor: reactor)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.director }
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, director in
+                if let director = director {
+                    owner.directorLabel.text = "연출: \(director.name)"
+                    owner.directorLabel.isHidden = false
+                } else {
+                    owner.directorLabel.isHidden = true
                 }
             }
             .disposed(by: disposeBag)
@@ -291,7 +327,9 @@ extension MediaDetailViewController {
         }
         
         contentView.addSubview(overviewLabel)
-        contentView.addSubview(creditsLabel)
+        contentView.addSubview(creditsTitleLabel)
+        contentView.addSubview(directorLabel)
+        contentView.addSubview(castCollectionView)
     }
     
     private func configureLayout() {
@@ -337,10 +375,20 @@ extension MediaDetailViewController {
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
-        creditsLabel.snp.makeConstraints {
-            $0.top.equalTo(overviewLabel.snp.bottom).offset(10)
-            $0.horizontalEdges.equalTo(contentView).inset(20)
-            $0.height.equalTo(800)
+        creditsTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(overviewLabel.snp.bottom).offset(20)
+            $0.leading.equalTo(contentView).inset(20)
+        }
+        
+        directorLabel.snp.makeConstraints {
+            $0.top.equalTo(creditsTitleLabel.snp.bottom).offset(10)
+            $0.leading.trailing.equalTo(contentView).inset(20)
+        }
+        
+        castCollectionView.snp.makeConstraints {
+            $0.top.equalTo(directorLabel.snp.bottom).offset(10)
+            $0.leading.trailing.equalTo(contentView).inset(10)
+            $0.height.equalTo(220)
             $0.bottom.equalTo(contentView).inset(10)
         }
     }
@@ -383,5 +431,29 @@ extension MediaDetailViewController {
         }
         
         present(alert, animated: true)
+    }
+}
+
+extension UICollectionViewLayout {
+    static func creditsCollectionViewLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0/3),
+            heightDimension: .fractionalHeight(1.0)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(180))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        group.interItemSpacing = .fixed(10)
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 10
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        
+        section.orthogonalScrollingBehavior = .continuous
+        
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        
+        return layout
     }
 }
