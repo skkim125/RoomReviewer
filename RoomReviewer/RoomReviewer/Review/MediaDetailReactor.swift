@@ -199,22 +199,37 @@ extension MediaDetailReactor {
         switch media.mediaType {
         case .movie:
             targetType = TMDBTargetType.movieCredits(media.id)
+            return networkService.callRequest(targetType)
+                .asObservable()
+                .flatMap { (result: Result<MovieCredits, Error>) -> Observable<Mutation> in
+                    switch result {
+                    case .success(let credits):
+                        let actors = Array(credits.cast.prefix(10)).map { $0.toDomain() }
+                        let director = credits.crew.map { $0.toDomain() }.filter { $0.department == "Director" }[0]
+                        
+                        return .just(.getCredits(actors, director))
+                    case .failure(let error):
+                        return .just(.showError(error))
+                    }
+                }
         case .tv:
             targetType = TMDBTargetType.tvCredits(media.id)
+            return networkService.callRequest(targetType)
+                .asObservable()
+                .flatMap { (result: Result<TVCredits, Error>) -> Observable<Mutation> in
+                    switch result {
+                    case .success(let credits):
+                        let actors = Array(credits.cast.prefix(10)).map { $0.toDomain() }
+                        let director = credits.crew.map { $0.toDomain() }.filter { $0.department == "Director" }[0]
+                        
+                        return .just(.getCredits(actors, director))
+                    case .failure(let error):
+                        return .just(.showError(error))
+                    }
+                }
         default:
             return .empty()
         }
-        
-        return networkService.callRequest(targetType)
-            .asObservable()
-            .flatMap { (result: Result<Credits, Error>) -> Observable<Mutation> in
-                switch result {
-                case .success(let credits):
-                    return .just(.getCredits(Array(credits.cast.prefix(10)), credits.crew.filter({ $0.department == "Directing" })[0]))
-                case .failure(let error):
-                    return .just(.showError(error))
-                }
-            }
     }
     
     private func loadBackdropImage(_ imagePath: String) -> Observable<Mutation> {
