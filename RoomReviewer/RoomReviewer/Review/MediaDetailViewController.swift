@@ -152,7 +152,7 @@ final class MediaDetailViewController: UIViewController {
                 
                 owner.overviewLabel.text = media.overview
                 
-                owner.genreLabel.text = API.convertGenreString(media.mediaType, array: media.genreIDS).joined(separator: " / ")
+                owner.genreLabel.text = API.convertGenreString(media.genreIDS).joined(separator: " / ")
             }
             .disposed(by: disposeBag)
         

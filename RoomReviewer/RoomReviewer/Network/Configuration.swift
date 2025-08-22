@@ -24,19 +24,10 @@ enum API {
     static let contentType = "accept"
     static let jsonContentType = "application/json"
 
-    static func convertGenreString(_ mediaType: MediaType, array: [Int]) -> [String] {
+    static func convertGenreString(_ array: [Int]) -> [String] {
         let genres = array.compactMap { Genre(rawValue: $0) }
         
-        var finalGenres: [Genre]
-
-        switch mediaType {
-        case .tv:
-            finalGenres = genres.filter { $0 != .drama }
-        case .movie, .person:
-            finalGenres = genres
-        }
-        
-        return finalGenres.map { $0.name }.sorted()
+        return genres.map { $0.name }.sorted()
     }
 
     enum Genre: Int, CaseIterable {
