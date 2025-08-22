@@ -32,7 +32,7 @@ extension TMDBTargetType: TargetType {
         case .movieCredits(let id):
             "movie/\(id)/credits"
         case .tvCredits(let id):
-            "tv/\(id)/credits"
+            "tv/\(id)/aggregate_credits"
         }
     }
     
