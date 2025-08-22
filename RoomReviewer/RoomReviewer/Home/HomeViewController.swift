@@ -139,7 +139,7 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = WriteReviewViewController(writeReviewReactor: WriteReviewReactor(networkService: NetworkManager()), imageProvider: owner.imageProvider, dbManager: owner.dbManager)
+                let vc = SearchMediaViewController(searchMediaReactor: SearchMediaReactor(networkService: NetworkManager()), imageProvider: owner.imageProvider, dbManager: owner.dbManager)
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 owner.navigationController?.present(nav, animated: true)

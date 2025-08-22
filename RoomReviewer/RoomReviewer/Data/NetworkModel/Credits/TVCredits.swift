@@ -59,7 +59,8 @@ struct Role: Decodable {
 
 extension TVCast {
     func toDomain() -> Cast {
-        return Cast(id: self.id, name: self.name, profilePath: self.profilePath, character: self.roles[0].character)
+        let character = self.roles[0].character.components(separatedBy: "/").first ?? ""
+        return Cast(id: self.id, name: self.name, profilePath: self.profilePath, character: character)
     }
 }
 

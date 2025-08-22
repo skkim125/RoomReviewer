@@ -23,6 +23,17 @@ enum MediaType: String, Codable {
     case movie = "movie"
     case tv = "tv"
     case person = "person"
+    
+    var displayName: String {
+        switch self {
+        case .movie:
+            return "영화"
+        case .tv:
+            return "드라마"
+        case .person:
+            return "인물"
+        }
+    }
 }
 
 extension Media {

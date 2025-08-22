@@ -48,7 +48,8 @@ struct MovieCrew: Decodable {
 
 extension MovieCast {
     func toDomain() -> Cast {
-        return Cast(id: self.id, name: self.name, profilePath: self.profilePath, character: self.character)
+        let character = self.character?.components(separatedBy: "/").first ?? ""
+        return Cast(id: self.id, name: self.name, profilePath: self.profilePath, character: character)
     }
 }
 

@@ -10,7 +10,7 @@ import RxSwift
 import RxDataSources
 import ReactorKit
 
-final class WriteReviewReactor: Reactor {
+final class SearchMediaReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
     
