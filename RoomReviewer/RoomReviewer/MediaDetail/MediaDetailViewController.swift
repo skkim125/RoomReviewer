@@ -20,8 +20,7 @@ final class MediaDetailViewController: UIViewController {
     private let contentView = UIView()
     
     private let backDropImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFill
-        $0.clipsToBounds = true
+        $0.contentMode = .scaleAspectFit
     }
     
     private let shadowView = UIView().then {
@@ -41,23 +40,33 @@ final class MediaDetailViewController: UIViewController {
     private let infoStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 6
-        $0.alignment = .leading
+        $0.alignment = .center
     }
     
-    private let titleAndYearLabel = UILabel().then {
+    private let titleLabel = UILabel().then {
         $0.font = .boldSystemFont(ofSize: 20)
         $0.numberOfLines = 0
+        $0.textAlignment = .center
+    }
+    
+    private let yearLabel = UILabel().then {
+        $0.font = .boldSystemFont(ofSize: 12)
+        $0.textColor = .gray
+        $0.numberOfLines = 0
+        $0.textAlignment = .center
     }
     
     private let mediaTypeLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14, weight: .semibold)
         $0.textColor = .gray
+        $0.textAlignment = .center
     }
     
     private let genreLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .darkGray
         $0.numberOfLines = 0
+        $0.textAlignment = .center
     }
     
     private let actionButtonStackView = UIStackView().then {
@@ -89,6 +98,7 @@ final class MediaDetailViewController: UIViewController {
         $0.font = .systemFont(ofSize: 14)
         $0.numberOfLines = 0
         $0.textColor = .darkGray
+        $0.textAlignment = .center
     }
     
     private let creditsTitleLabel = UILabel().then {
@@ -97,7 +107,7 @@ final class MediaDetailViewController: UIViewController {
     }
     
     private let directorLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 15)
+        $0.font = .systemFont(ofSize: 16)
     }
     
     private lazy var castCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout()).then {
@@ -148,7 +158,8 @@ final class MediaDetailViewController: UIViewController {
                 owner.mediaTypeLabel.text = media.mediaType.displayName
                 
                 let yearString = media.releaseDate.map { String($0.prefix(4)) }
-                owner.titleAndYearLabel.attributedText = owner.setTitleStyle(title: media.title, year: yearString)
+                owner.titleLabel.text = media.title
+                owner.yearLabel.text = yearString
                 
                 owner.overviewLabel.text = media.overview
                 
@@ -265,7 +276,7 @@ final class MediaDetailViewController: UIViewController {
         let imageName: String
 
         if isWatchlisted {
-            titleText = "보고 싶은 미디어에 저장됨"
+            titleText = "저장됨"
             color = .systemBlue
             imageName = "checkmark.circle.fill"
         } else {
@@ -317,7 +328,7 @@ extension MediaDetailViewController {
         shadowView.addSubview(posterImageView)
         
         contentView.addSubview(infoStackView)
-        [titleAndYearLabel, mediaTypeLabel, genreLabel].forEach {
+        [titleLabel, mediaTypeLabel, genreLabel].forEach {
             infoStackView.addArrangedSubview($0)
         }
         
@@ -344,13 +355,16 @@ extension MediaDetailViewController {
         }
         
         backDropImageView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalTo(contentView)
-            $0.height.equalTo(200)
+            $0.top.equalTo(contentView.snp.top)
+            $0.width.equalTo(view.bounds.width)
+            let ratio: CGFloat = 578/1028
+            $0.height.equalTo(view.bounds.width * ratio)
+            $0.centerX.equalTo(contentView)
         }
         
         shadowView.snp.makeConstraints {
-            $0.top.equalTo(backDropImageView.snp.bottom).inset(50)
-            $0.leading.equalTo(contentView).offset(20)
+            $0.centerY.equalTo(backDropImageView.snp.bottom).inset(20)
+            $0.centerX.equalTo(contentView)
             $0.width.equalTo(view.bounds.width/3)
             $0.height.equalTo(180)
         }
@@ -360,13 +374,12 @@ extension MediaDetailViewController {
         }
         
         infoStackView.snp.makeConstraints {
-            $0.top.equalTo(backDropImageView.snp.bottom).offset(15)
-            $0.leading.equalTo(shadowView.snp.trailing).offset(15)
-            $0.trailing.equalTo(contentView).inset(20)
+            $0.top.equalTo(shadowView.snp.bottom).offset(15)
+            $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
         actionButtonStackView.snp.makeConstraints {
-            $0.top.equalTo(shadowView.snp.bottom).offset(15)
+            $0.top.equalTo(infoStackView.snp.bottom).offset(15)
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
@@ -395,29 +408,6 @@ extension MediaDetailViewController {
 }
 
 extension MediaDetailViewController {
-    func setTitleStyle(title: String, year: String?) -> NSAttributedString {
-        let fullText: String
-        if let year = year {
-            fullText = "\(title) \(year)"
-        } else {
-            fullText = title
-        }
-        
-        let attributed = NSMutableAttributedString(string: fullText)
-        
-        if let year = year,
-           let range = fullText.range(of: "\(year)") {
-            let nsRange = NSRange(range, in: fullText)
-            
-            attributed.addAttributes([
-                .font: UIFont.systemFont(ofSize: 12),
-                .foregroundColor: UIColor.gray
-            ], range: nsRange)
-        }
-        
-        return attributed
-    }
-    
     private func presentCalendarAlert() {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
