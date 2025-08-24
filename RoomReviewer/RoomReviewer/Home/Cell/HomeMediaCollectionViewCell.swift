@@ -33,7 +33,7 @@ final class HomeMediaCollectionViewCell: UICollectionViewCell, View {
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
     private let tvNameLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14, weight: .bold)
-        $0.textColor = .black
+        $0.textColor = .white
         $0.textAlignment = .center
         $0.numberOfLines = 2
     }

@@ -52,7 +52,7 @@ final class MediaDetailViewController: UIViewController {
     
     private let semiInfoLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .darkGray
+        $0.textColor = .lightGray
         $0.textAlignment = .center
     }
     
@@ -64,7 +64,7 @@ final class MediaDetailViewController: UIViewController {
     
     private let genreLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .darkGray
+        $0.textColor = .lightGray
         $0.numberOfLines = 0
         $0.textAlignment = .center
     }
@@ -97,17 +97,19 @@ final class MediaDetailViewController: UIViewController {
     private let overviewLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
         $0.numberOfLines = 0
-        $0.textColor = .darkGray
+        $0.textColor = .lightGray
         $0.textAlignment = .center
     }
     
     private let creditsTitleLabel = UILabel().then {
         $0.text = "주요 출연진"
+        $0.textColor = .white
         $0.font = .boldSystemFont(ofSize: 18)
     }
     
     private let creatorLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16)
+        $0.textColor = .white
     }
     
     private lazy var castCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout()).then {
@@ -136,7 +138,7 @@ final class MediaDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         configureHierarchy()
         configureLayout()
         setupPlaceholderState()
@@ -223,7 +225,7 @@ final class MediaDetailViewController: UIViewController {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, isWatchlisted in
                 owner.updateWatchlistButton(isWatchlisted: isWatchlisted)
-                owner.reviewButton.configuration?.baseForegroundColor = isWatchlisted ? .systemRed : .darkGray
+                owner.reviewButton.configuration?.baseForegroundColor = isWatchlisted ? .systemRed : .lightGray
                 owner.reviewButton.isEnabled = isWatchlisted
             }
             .disposed(by: disposeBag)
@@ -305,7 +307,7 @@ final class MediaDetailViewController: UIViewController {
             imageName = "checkmark.circle.fill"
         } else {
             titleText = "보고 싶어요"
-            color = .darkGray
+            color = .lightGray
             imageName = "plus.circle"
         }
 
@@ -472,13 +474,13 @@ extension MediaDetailViewController {
     private func removePlaceholderState() {
         [genreLabel, semiInfoLabel, creatorLabel, overviewLabel].forEach {
             $0.backgroundColor = .clear
-            $0.textColor = .black
+            $0.textColor = .white
         }
         
-        genreLabel.textColor = .darkGray
-        semiInfoLabel.textColor = .darkGray
-        overviewLabel.textColor = .darkGray
-        creatorLabel.textColor = .black
+        genreLabel.textColor = .lightGray
+        semiInfoLabel.textColor = .lightGray
+        overviewLabel.textColor = .lightGray
+        creatorLabel.textColor = .white
         
         castCollectionView.backgroundColor = .gray.withAlphaComponent(0.1)
     }

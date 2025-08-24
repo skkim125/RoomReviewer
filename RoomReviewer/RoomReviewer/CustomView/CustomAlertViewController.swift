@@ -78,30 +78,29 @@ final class CustomAlertViewController: UIViewController {
             make.center.equalToSuperview()
             make.horizontalEdges.equalToSuperview().inset(20)
             make.top.greaterThanOrEqualToSuperview().offset(20)
-            make.bottom.lessThanOrEqualToSuperview().offset(-20)
+            make.bottom.lessThanOrEqualToSuperview().inset(20)
         }
         
         entireStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(15)
+            make.edges.equalToSuperview().inset(20)
         }
     }
     
     private func configureView() {
         self.view.backgroundColor = .black.withAlphaComponent(0.4)
         
-        containerView.backgroundColor = .white
+        containerView.backgroundColor = .systemGray5
         containerView.layer.cornerRadius = 12
         containerView.clipsToBounds = true
         
         entireStackView.axis = .vertical
-        entireStackView.spacing = 16
         
         contentStackView.axis = .vertical
-        contentStackView.spacing = 8
+        contentStackView.spacing = 5
         
         buttonStackView.axis = .horizontal
         buttonStackView.distribution = .fillEqually
-        buttonStackView.spacing = 10
+        buttonStackView.spacing = 20
         
         titleLabel.font = .systemFont(ofSize: 18, weight: .semibold)
         titleLabel.textAlignment = .center
