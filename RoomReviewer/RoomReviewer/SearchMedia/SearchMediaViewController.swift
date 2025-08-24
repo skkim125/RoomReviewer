@@ -14,7 +14,7 @@ import Then
 final class SearchMediaViewController: UIViewController {
     private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnCollectionViewLayout()).then {
         $0.register(SearchMediaCollectionViewCell.self, forCellWithReuseIdentifier: SearchMediaCollectionViewCell.cellID)
-        $0.backgroundColor = .white
+        $0.backgroundColor = .systemBackground
         $0.showsVerticalScrollIndicator = false
     }
     private let searchTextField = UITextField().then {
@@ -43,11 +43,11 @@ final class SearchMediaViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .systemBackground
         configureHierarchy()
         configureLayout()
         configureNavigationBar()
         bind()
-        view.backgroundColor = .white
     }
     
     private func bind() {

@@ -24,13 +24,13 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
     
     private let nameLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14, weight: .semibold)
-        $0.textColor = .black
+        $0.textColor = .white
         $0.textAlignment = .center
     }
     
     private let characterLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
-        $0.textColor = .darkGray
+        $0.textColor = .lightGray
         $0.textAlignment = .center
         $0.numberOfLines = 1
     }

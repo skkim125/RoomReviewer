@@ -21,8 +21,8 @@ final class HomeViewController: UIViewController {
     private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
         $0.register(HomeSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HomeSectionHeaderView.reusableID)
-        $0.backgroundColor = .white
         $0.showsHorizontalScrollIndicator = false
+        $0.backgroundColor = .clear
     }
     
     init(reactor: HomeReactor, imageProvider: ImageProviding, dbManager: DBManager) {
@@ -38,12 +38,11 @@ final class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemBackground
         configureView()
         bind()
         
         homeReactor.action.onNext(.fetchData)
-        
-        view.backgroundColor = .white
     }
     
     private func configureView() {
