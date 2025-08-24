@@ -86,9 +86,16 @@ struct Provider: Decodable {
 
 extension MovieDetail {
     func toDomain() -> MediaDetail {
-        let filterReleaseDate = releaseDate.results.filter{ $0.iso3166_1 == "KR" }[0].releaseDates[0]
-        let certificate = filterReleaseDate.certification
-        let releaseYear = String(filterReleaseDate.releaseDate.prefix(4))
+        let filterReleaseDate = releaseDate.results.filter { $0.iso3166_1 == "KR" }
+        let certificate: String
+        let releaseYear: String
+        if filterReleaseDate.isEmpty {
+            certificate = "정보 없음"
+            releaseYear = "정보 없음"
+        } else {
+            certificate = filterReleaseDate[0].releaseDates[0].certification + "세 이상"
+            releaseYear = String(filterReleaseDate[0].releaseDates[0].releaseDate.prefix(4))
+        }
         let runtimeInfo = "\(runtime ?? 0)분"
         
         let directors = credits.crew.filter { $0.job == "Director" }.map { Crew(id: $0.id, name: $0.name, profilePath: $0.profilePath) }

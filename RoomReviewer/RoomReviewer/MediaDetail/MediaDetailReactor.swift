@@ -16,7 +16,7 @@ final class MediaDetailReactor: Reactor {
     private let dbManager: DBManager
     
     init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, dbManager: DBManager) {
-        self.initialState = State(media: media)
+        self.initialState = State(media: media, title: media.title, overview: media.overview, genres: API.convertGenreString(media.genreIDS).joined(separator: " / "))
         self.networkService = networkService
         self.imageProvider = imageProvider
         self.dbManager = dbManager
@@ -24,10 +24,14 @@ final class MediaDetailReactor: Reactor {
     
     struct State {
         var media: Media
+        var title: String
+        var overview: String?
+        var genres: String?
         var backDropImageData: UIImage?
         var posterImageData: UIImage?
         var casts: [Cast]?
-        var director: Crew?
+        var creatorInfo: (MediaType?,[Crew]?)
+        var mediaSemiInfo: String?
         var isLoading: Bool?
         var errorType: Error?
         var isWatchlisted: Bool?
@@ -47,7 +51,7 @@ final class MediaDetailReactor: Reactor {
     
     enum Mutation {
         case setLoading(Bool)
-        case getCredits([Cast], Crew)
+        case getMediaDetail((MediaType,MediaDetail))
         case setBackdropImage(UIImage?)
         case setPosterImage(UIImage?)
         case showError(Error)
@@ -153,9 +157,18 @@ final class MediaDetailReactor: Reactor {
         case .setLoading(let loading):
             newState.isLoading = loading
             
-        case .getCredits(let casts, let director):
-            newState.casts = casts
-            newState.director = director
+        case .getMediaDetail(let mediaInfo):
+            let (mediaType, detail) = mediaInfo
+            newState.casts = detail.cast
+            newState.creatorInfo = (mediaType, detail.creator)
+            
+            let mediaSemiInfoItems: [String?] = [
+                detail.runtimeOrEpisodeInfo,
+                detail.certificate,
+                detail.releaseYear
+            ]
+            
+            newState.mediaSemiInfo = mediaSemiInfoItems.compactMap { $0 }.joined(separator: " • ")
             
         case .setBackdropImage(let image):
             newState.backDropImageData = image
@@ -191,38 +204,32 @@ extension MediaDetailReactor {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.date(from: dateString)
     }
-
+    
     private func fetchMediaCredits() -> Observable<Mutation> {
         let targetType: TMDBTargetType
         let media = currentState.media
         
         switch media.mediaType {
         case .movie:
-            targetType = TMDBTargetType.movieCredits(media.id)
+            targetType = TMDBTargetType.getMovieDetail(media.id)
             return networkService.callRequest(targetType)
                 .asObservable()
-                .flatMap { (result: Result<MovieCredits, Error>) -> Observable<Mutation> in
+                .flatMap { (result: Result<MovieDetail, Error>) -> Observable<Mutation> in
                     switch result {
-                    case .success(let credits):
-                        let actors = Array(credits.cast.prefix(10)).map { $0.toDomain() }
-                        let director = credits.crew.map { $0.toDomain() }[0]
-                        
-                        return .just(.getCredits(actors, director))
+                    case .success(let detail):
+                        return .just(.getMediaDetail((media.mediaType, detail.toDomain())))
                     case .failure(let error):
                         return .just(.showError(error))
                     }
                 }
         case .tv:
-            targetType = TMDBTargetType.tvCredits(media.id)
+            targetType = TMDBTargetType.getTVDetail(media.id)
             return networkService.callRequest(targetType)
                 .asObservable()
-                .flatMap { (result: Result<TVCredits, Error>) -> Observable<Mutation> in
+                .flatMap { (result: Result<TVDetail, Error>) -> Observable<Mutation> in
                     switch result {
-                    case .success(let credits):
-                        let actors = Array(credits.cast.prefix(10)).map { $0.toDomain() }
-                        let director = credits.crew.map { $0.toDomain() }[0]
-                        
-                        return .just(.getCredits(actors, director))
+                    case .success(let detail):
+                        return .just(.getMediaDetail((media.mediaType, detail.toDomain())))
                     case .failure(let error):
                         return .just(.showError(error))
                     }
