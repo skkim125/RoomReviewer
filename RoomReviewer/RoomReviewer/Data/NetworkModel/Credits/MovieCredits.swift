@@ -55,6 +55,6 @@ extension MovieCast {
 
 extension MovieCrew {
     func toDomain() -> Crew {
-        return Crew(id: self.id, name: self.name, profilePath: self.profilePath, department: self.job)
+        return Crew(id: self.id, name: self.name, profilePath: self.profilePath)
     }
 }

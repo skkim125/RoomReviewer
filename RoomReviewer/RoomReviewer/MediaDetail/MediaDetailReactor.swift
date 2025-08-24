@@ -205,7 +205,7 @@ extension MediaDetailReactor {
                     switch result {
                     case .success(let credits):
                         let actors = Array(credits.cast.prefix(10)).map { $0.toDomain() }
-                        let director = credits.crew.map { $0.toDomain() }.filter { $0.department == "Director" }[0]
+                        let director = credits.crew.map { $0.toDomain() }[0]
                         
                         return .just(.getCredits(actors, director))
                     case .failure(let error):
@@ -220,7 +220,7 @@ extension MediaDetailReactor {
                     switch result {
                     case .success(let credits):
                         let actors = Array(credits.cast.prefix(10)).map { $0.toDomain() }
-                        let director = credits.crew.map { $0.toDomain() }.filter { $0.department == "Director" }[0]
+                        let director = credits.crew.map { $0.toDomain() }[0]
                         
                         return .just(.getCredits(actors, director))
                     case .failure(let error):

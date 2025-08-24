@@ -66,6 +66,6 @@ extension TVCast {
 
 extension TVCrew {
     func toDomain() -> Crew {
-        return Crew(id: self.id, name: self.name, profilePath: self.profilePath, department: self.jobs[0].job)
+        return Crew(id: self.id, name: self.name, profilePath: self.profilePath)
     }
 }
