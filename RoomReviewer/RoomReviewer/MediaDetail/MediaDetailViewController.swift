@@ -20,7 +20,8 @@ final class MediaDetailViewController: UIViewController {
     private let contentView = UIView()
     
     private let backDropImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
+        $0.contentMode = .scaleAspectFill
+        $0.clipsToBounds = true
     }
     
     private let shadowView = UIView().then {
@@ -49,10 +50,9 @@ final class MediaDetailViewController: UIViewController {
         $0.textAlignment = .center
     }
     
-    private let yearLabel = UILabel().then {
-        $0.font = .boldSystemFont(ofSize: 12)
-        $0.textColor = .gray
-        $0.numberOfLines = 0
+    private let semiInfoLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .darkGray
         $0.textAlignment = .center
     }
     
@@ -106,7 +106,7 @@ final class MediaDetailViewController: UIViewController {
         $0.font = .boldSystemFont(ofSize: 18)
     }
     
-    private let directorLabel = UILabel().then {
+    private let creatorLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16)
     }
     
@@ -139,6 +139,7 @@ final class MediaDetailViewController: UIViewController {
         view.backgroundColor = .white
         configureHierarchy()
         configureLayout()
+        setupPlaceholderState()
         bind()
         
         reactor.action.onNext(.viewDidLoad)
@@ -151,20 +152,38 @@ final class MediaDetailViewController: UIViewController {
     
     private func bindState(reactor: MediaDetailReactor) {
         
-        reactor.state.map { $0.media }
+        reactor.state.map { $0.isLoading }
             .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, media in
-                owner.mediaTypeLabel.text = media.mediaType.displayName
-                
-                let yearString = media.releaseDate.map { String($0.prefix(4)) }
-                owner.titleLabel.text = media.title
-                owner.yearLabel.text = yearString
-                
-                owner.overviewLabel.text = media.overview
-                
-                owner.genreLabel.text = API.convertGenreString(media.genreIDS).joined(separator: " / ")
+            .compactMap { $0 }
+            .filter { !$0 }
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self) { owner, isLoading in
+                owner.removePlaceholderState()
             }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.genres }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: "")
+            .drive(genreLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.overview }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: "")
+            .drive(overviewLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.title }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: "")
+            .drive(titleLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.mediaSemiInfo }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: "")
+            .drive(semiInfoLabel.rx.text)
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.backDropImageData }
@@ -205,6 +224,7 @@ final class MediaDetailViewController: UIViewController {
             .drive(with: self) { owner, isWatchlisted in
                 owner.updateWatchlistButton(isWatchlisted: isWatchlisted)
                 owner.reviewButton.configuration?.baseForegroundColor = isWatchlisted ? .systemRed : .darkGray
+                owner.reviewButton.isEnabled = isWatchlisted
             }
             .disposed(by: disposeBag)
         
@@ -239,14 +259,18 @@ final class MediaDetailViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.director }
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self) { owner, director in
-                if let director = director {
-                    owner.directorLabel.text = "연출: \(director.name)"
-                    owner.directorLabel.isHidden = false
+        reactor.state.map { $0.creatorInfo }
+            .asDriver(onErrorJustReturn: (nil, nil))
+            .drive(with: self) { owner, creator in
+                let (mediaType, creator) = creator
+                let creatorTypeText: String
+                if let creator = creator {
+                    let creatorsText = creator.map { $0.name }.joined(separator: ", ")
+                    creatorTypeText = mediaType == .movie ? "감독" : "제작진"
+                    owner.creatorLabel.text = "\(creatorTypeText): \(creatorsText)"
+                    owner.creatorLabel.isHidden = false
                 } else {
-                    owner.directorLabel.isHidden = true
+                    owner.creatorLabel.isHidden = true
                 }
             }
             .disposed(by: disposeBag)
@@ -328,7 +352,7 @@ extension MediaDetailViewController {
         shadowView.addSubview(posterImageView)
         
         contentView.addSubview(infoStackView)
-        [titleLabel, mediaTypeLabel, genreLabel].forEach {
+        [titleLabel, genreLabel, semiInfoLabel].forEach {
             infoStackView.addArrangedSubview($0)
         }
         
@@ -339,7 +363,7 @@ extension MediaDetailViewController {
         
         contentView.addSubview(overviewLabel)
         contentView.addSubview(creditsTitleLabel)
-        contentView.addSubview(directorLabel)
+        contentView.addSubview(creatorLabel)
         contentView.addSubview(castCollectionView)
     }
     
@@ -356,9 +380,8 @@ extension MediaDetailViewController {
         
         backDropImageView.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.top)
-            $0.width.equalTo(view.bounds.width)
-            let ratio: CGFloat = 578/1028
-            $0.height.equalTo(view.bounds.width * ratio)
+            $0.horizontalEdges.equalTo(contentView)
+            $0.height.equalTo(280)
             $0.centerX.equalTo(contentView)
         }
         
@@ -393,13 +416,13 @@ extension MediaDetailViewController {
             $0.leading.equalTo(contentView).inset(20)
         }
         
-        directorLabel.snp.makeConstraints {
+        creatorLabel.snp.makeConstraints {
             $0.top.equalTo(creditsTitleLabel.snp.bottom).offset(10)
             $0.leading.trailing.equalTo(contentView).inset(20)
         }
         
         castCollectionView.snp.makeConstraints {
-            $0.top.equalTo(directorLabel.snp.bottom).offset(10)
+            $0.top.equalTo(creatorLabel.snp.bottom).offset(10)
             $0.leading.trailing.equalTo(contentView).inset(10)
             $0.height.equalTo(205)
             $0.bottom.equalTo(contentView).inset(10)
@@ -421,6 +444,43 @@ extension MediaDetailViewController {
         }
         
         present(alert, animated: true)
+    }
+    
+    private func setupPlaceholderState() {
+        backDropImageView.backgroundColor = .systemGray6
+        posterImageView.backgroundColor = .systemGray6
+        
+        let placeholderColor = UIColor.systemGray5
+        
+        [genreLabel, semiInfoLabel, creatorLabel].forEach {
+            $0.text = "\n"
+            $0.backgroundColor = placeholderColor
+            $0.textColor = .clear
+            $0.clipsToBounds = true
+            $0.layer.cornerRadius = 8
+        }
+        
+        overviewLabel.text = "\n\n\n"
+        overviewLabel.backgroundColor = placeholderColor
+        overviewLabel.textColor = .clear
+        overviewLabel.clipsToBounds = true
+        overviewLabel.layer.cornerRadius = 8
+        
+        castCollectionView.backgroundColor = .systemGray6
+    }
+    
+    private func removePlaceholderState() {
+        [genreLabel, semiInfoLabel, creatorLabel, overviewLabel].forEach {
+            $0.backgroundColor = .clear
+            $0.textColor = .black
+        }
+        
+        genreLabel.textColor = .darkGray
+        semiInfoLabel.textColor = .darkGray
+        overviewLabel.textColor = .darkGray
+        creatorLabel.textColor = .black
+        
+        castCollectionView.backgroundColor = .gray.withAlphaComponent(0.1)
     }
 }
 

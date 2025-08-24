@@ -60,7 +60,14 @@ struct ContentRating: Decodable {
 extension TVDetail {
     func toDomain() -> MediaDetail {
         let releaseYear = String(firstAirDate.prefix(4))
-        let certification = certificate.results.filter({ $0.iso3166_1 == "KR" })[0].rating
+        let certificationOfKR = certificate.results.filter({ $0.iso3166_1 == "KR" })
+        let certification: String
+        if certificationOfKR.isEmpty {
+            certification = "업데이트 예정"
+        } else {
+            certification = certificationOfKR[0].rating + "세 이상"
+        }
+        
         let episodeInfo = "\(numberOfEpisodes)부작"
         
         let creators = createdBy.map { Crew(id: $0.id, name: $0.name, profilePath: $0.profilePath) }
