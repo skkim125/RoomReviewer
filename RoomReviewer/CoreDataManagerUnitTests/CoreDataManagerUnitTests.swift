@@ -33,16 +33,16 @@ final class CoreDataManagerUnitTests: XCTestCase {
     func test_createMedia_Success() {
         let expectation = XCTestExpectation(description: "미디어 생성 성공")
         
-        let testId = "test_id_123"
+        let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, type: "movie", releaseDate: nil, watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", genres: [], releaseDate: "", watchedDate: nil)
             .observe(on: MainScheduler.instance)
             .subscribe { objectID in
                 XCTAssertNotNil(objectID)
                 do {
                     let savedObject = try self.mockDataStack.viewContext.existingObject(with: objectID) as? MediaEntity
-                    XCTAssertEqual(savedObject?.id, testId)
+                    XCTAssertEqual(savedObject?.id, Int64(testId))
                     XCTAssertEqual(savedObject?.title, testTitle)
                 } catch {
                     XCTFail("ID로 객체를 가져오는 데 실패했습니다: \(error)")
@@ -61,11 +61,11 @@ final class CoreDataManagerUnitTests: XCTestCase {
     func test_fetchAllMedia_Success() {
         let expectation = XCTestExpectation(description: "미디어 생성 & 모든 미디어 불러오기 성공")
         
-        let testId = "test_id_123"
+        let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, type: "movie", releaseDate: nil, watchedDate: nil)
-            .flatMap { [weak self] createdObjectID -> Single<[MediaEntity]> in
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", genres: [], releaseDate: "", watchedDate: nil)
+            .flatMap { [weak self] createdObjectID -> Single<[Media]> in
                 XCTAssertNotNil(createdObjectID)
                 
                 guard let self = self else {
@@ -100,10 +100,10 @@ final class CoreDataManagerUnitTests: XCTestCase {
     func test_deleteMedia_Success() {
         let expectation = XCTestExpectation(description: "미디어 삭제 성공")
         
-        let testId = "test_id_123"
+        let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, type: "movie", releaseDate: nil, watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", genres: [], releaseDate: "", watchedDate: nil)
             .flatMap { [weak self] createdObjectID -> Single<Void?> in
                 XCTAssertNotNil(createdObjectID)
                 
@@ -114,7 +114,7 @@ final class CoreDataManagerUnitTests: XCTestCase {
                 
                 return self.sut.deleteMedia(id: testId)
             }
-            .flatMap { [weak self] result -> Single<[MediaEntity]> in
+            .flatMap { [weak self] result -> Single<[Media]> in
                 guard let self = self else {
                     XCTFail("실패")
                     return .just([])
@@ -138,11 +138,11 @@ final class CoreDataManagerUnitTests: XCTestCase {
     func test_updateWatchedDate_Success() {
         let expectation = XCTestExpectation(description: "미디어 시청 날짜 업데이트 성공")
         
-        let testId = "test_id_123"
+        let testId = 123
         let testTitle = "Test Movie"
         let watchedDate = Date()
         
-        sut.createMedia(id: testId, title: testTitle, type: "movie", releaseDate: nil, watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", genres: [], releaseDate: "", watchedDate: nil)
             .flatMap { [weak self] createdObjectID -> Single<Void?> in
                 XCTAssertNotNil(createdObjectID)
                 
@@ -153,7 +153,7 @@ final class CoreDataManagerUnitTests: XCTestCase {
                 
                 return self.sut.updateWatchedDate(id: testId, watchedDate: watchedDate)
             }
-            .flatMap { [weak self] _ -> Single<[MediaEntity]> in
+            .flatMap { [weak self] _ -> Single<[Media]> in
                 guard let self = self else {
                     XCTFail("실패")
                     return .just([])
@@ -165,7 +165,6 @@ final class CoreDataManagerUnitTests: XCTestCase {
             .subscribe { list in
                 XCTAssertEqual(list.count, 1)
                 let data = list[0]
-                XCTAssertNotNil(data.addedDate)
                 XCTAssert(data.watchedDate == watchedDate)
                 expectation.fulfill()
                 

@@ -11,6 +11,8 @@ enum TMDBTargetType {
     case movie
     case tv
     case searchMulti(String, Int)
+    case getMovieDetail(Int)
+    case getTVDetail(Int)
     case movieCredits(Int)
     case tvCredits(Int)
 }
@@ -29,6 +31,10 @@ extension TMDBTargetType: TargetType {
             "discover/tv"
         case .searchMulti:
             "search/multi"
+        case .getMovieDetail(let id):
+            "movie/\(id)"
+        case .getTVDetail(let id):
+            "tv/\(id)"
         case .movieCredits(let id):
             "movie/\(id)/credits"
         case .tvCredits(let id):
@@ -43,6 +49,10 @@ extension TMDBTargetType: TargetType {
         case .tv:
             return .get
         case .searchMulti:
+            return .get
+        case .getMovieDetail:
+            return .get
+        case .getTVDetail:
             return .get
         case .movieCredits:
             return .get
@@ -94,13 +104,25 @@ extension TMDBTargetType: TargetType {
                 URLQueryItem(name: "language", value: "ko-KR"),
                 URLQueryItem(name: "page", value: "\(page)"),
             ]
-        case .movieCredits(_):
+        case .movieCredits:
             return [
                 URLQueryItem(name: "language", value: "ko-KR")
             ]
         case .tvCredits:
             return [
                 URLQueryItem(name: "language", value: "ko-KR")
+            ]
+        case .getMovieDetail:
+            return [
+                URLQueryItem(name: "append_to_response", value: "credits,release_dates,watch/providers"),
+                URLQueryItem(name: "language", value: "ko-KR"),
+                URLQueryItem(name: "region", value: "KR"),
+            ]
+        case .getTVDetail:
+            return [
+                URLQueryItem(name: "append_to_response", value: "credits,content_ratings,recommendations,watch/providers"),
+                URLQueryItem(name: "language", value: "ko-KR"),
+                URLQueryItem(name: "region", value: "KR"),
             ]
         }
     }
@@ -116,6 +138,10 @@ extension TMDBTargetType: TargetType {
         case .movieCredits:
             return nil
         case .tvCredits:
+            return nil
+        case .getMovieDetail:
+            return nil
+        case .getTVDetail:
             return nil
         }
     }
