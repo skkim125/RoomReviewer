@@ -14,7 +14,7 @@ protocol DBManager {
     
     func fetchAllMedia() -> Single<[Media]>
     func deleteMedia(id: Int) -> Single<Void?>
-    func fetchMedia(id: Int) -> Single<Media?>
+    func fetchMedia(id: Int) -> Single<(Media, Date?)?>
     func updateWatchedDate(id: Int, watchedDate: Date) -> Single<Void?>
 }
 
@@ -114,7 +114,7 @@ final class CoreDataManager: DBManager {
         }
     }
     
-    func fetchMedia(id: Int) -> Single<Media?> {
+    func fetchMedia(id: Int) -> Single<(Media, Date?)?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
@@ -133,7 +133,7 @@ final class CoreDataManager: DBManager {
                     if data.isEmpty {
                         observer(.success(nil))
                     } else {
-                        observer(.success(data[0].toDomain()))
+                        observer(.success((data[0].toDomain(), data[0].watchedDate ?? Date())))
                     }
                     
                 } catch {

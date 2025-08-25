@@ -123,11 +123,13 @@ final class MediaDetailViewController: UIViewController {
     
     private let reactor: MediaDetailReactor
     private let imageProvider: ImageProviding
+    private let dbManager: DBManager
     private let disposeBag = DisposeBag()
     
-    init(reactor: MediaDetailReactor, imageProvider: ImageProviding) {
+    init(reactor: MediaDetailReactor, imageProvider: ImageProviding, dbManager: DBManager) {
         self.reactor = reactor
         self.imageProvider = imageProvider
+        self.dbManager = dbManager
         super.init(nibName: nil, bundle: nil)
     }
     

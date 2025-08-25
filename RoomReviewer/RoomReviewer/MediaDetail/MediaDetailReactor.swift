@@ -37,7 +37,7 @@ final class MediaDetailReactor: Reactor {
         var isWatchlisted: Bool?
         var watchedDate: Date?
         @Pulse var showSetWatchedDateAlert: Void?
-        @Pulse var pushWriteReviewView: Void?
+        @Pulse var pushWriteReviewView: Media?
     }
     
     enum Action {
@@ -55,7 +55,7 @@ final class MediaDetailReactor: Reactor {
         case setBackdropImage(UIImage?)
         case setPosterImage(UIImage?)
         case showError(Error)
-        case setWatchlisted(Bool)
+        case setWatchlistStatus(isWatchlisted: Bool, watchedDate: Date?)
         case showSetWatchedDateAlert
         case setWatchedDate(Date)
         case pushWriteReviewView
@@ -65,14 +65,14 @@ final class MediaDetailReactor: Reactor {
         switch action {
         case .viewDidLoad:
             let media = currentState.media
-            print(media.id)
+            
             let checkWatchlist = dbManager.fetchMedia(id: media.id)
                 .asObservable()
-                .map {
-                    if let _ = $0 {
-                        Mutation.setWatchlisted(true)
+                .map { result in
+                    if let (_, watchedDate) = result {
+                        return Mutation.setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate)
                     } else {
-                        Mutation.setWatchlisted(false)
+                        return Mutation.setWatchlistStatus(isWatchlisted: false, watchedDate: nil)
                     }
                 }
             
@@ -88,7 +88,6 @@ final class MediaDetailReactor: Reactor {
                 Observable.merge(checkWatchlist, fetchOthers).observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
-            
             
         case .loadBackdropImage(let backDropURL):
             guard let url = backDropURL else { return .empty() }
@@ -107,31 +106,29 @@ final class MediaDetailReactor: Reactor {
                     .asObservable()
                     .observe(on: MainScheduler.instance)
                     .flatMap { _ -> Observable<Mutation> in
-                        return .just(.setWatchlisted(false))
+                        return .just(.setWatchlistStatus(isWatchlisted: false, watchedDate: nil))
                     }
                     .catch { .just(.showError($0)) }
             } else {
-                let mediaTypeString = media.mediaType.rawValue
-                let releaseDate = media.releaseDate
-                
                 return dbManager.createMedia(
                     id: media.id,
                     title: media.title,
                     overview: media.overview,
-                    type: mediaTypeString,
+                    type: media.mediaType.rawValue,
                     genres: media.genreIDS,
-                    releaseDate: releaseDate,
+                    releaseDate: media.releaseDate,
                     watchedDate: nil
                 )
                 .asObservable()
                 .observe(on: MainScheduler.instance)
                 .flatMap { _ -> Observable<Mutation> in
-                    return .just(.setWatchlisted(true))
+                    return .just(.setWatchlistStatus(isWatchlisted: true, watchedDate: nil))
                 }
                 .catch { .just(.showError($0)) }
             }
             
         case .writeReviewButtonTapped:
+            // State에 이미 watchedDate가 있는지 확인합니다.
             if let _ = currentState.watchedDate {
                 return .just(.pushWriteReviewView)
             } else {
@@ -179,15 +176,16 @@ final class MediaDetailReactor: Reactor {
         case .showError(let error):
             newState.errorType = error
             
-        case .setWatchlisted(let isWatchlisted):
+        case .setWatchlistStatus(let isWatchlisted, let date):
             newState.isWatchlisted = isWatchlisted
+            newState.watchedDate = date
             
         case .setWatchedDate(let date):
             newState.watchedDate = date
-            newState.pushWriteReviewView = ()
+            newState.pushWriteReviewView = currentState.media
             
         case .pushWriteReviewView:
-            newState.pushWriteReviewView = ()
+            newState.pushWriteReviewView = currentState.media
             
         case .showSetWatchedDateAlert:
             newState.showSetWatchedDateAlert = ()
