@@ -234,9 +234,11 @@ final class MediaDetailViewController: UIViewController {
         
         reactor.pulse(\.$pushWriteReviewView)
             .asDriver(onErrorJustReturn: nil)
-            .drive(with: self) { owner, flag in
-                if let _ = flag {
-                    owner.navigationController?.pushViewController(UIViewController(), animated: true)
+            .drive(with: self) { owner, media in
+                if let media = media {
+                    let reactor = WriteReviewReactor(media: media, dbManager: owner.dbManager, imageProvider: owner.imageProvider)
+                    let vc = WriteReviewViewController(reactor: reactor)
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 }
             }
             .disposed(by: disposeBag)
