@@ -262,6 +262,7 @@
 				043BB0482DFC4EA800E5438D /* HomeViewController.swift */,
 				043BB04C2DFC4F2A00E5438D /* HomeReactor.swift */,
 				042EFE5F2E1403D200810E02 /* Cell */,
+				04D0D0972E5C31A9002A6951 /* SectionModel */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -292,7 +293,6 @@
 				04FE6C882E58674B00CCB76C /* DomainModel */,
 				04FE6C892E58675700CCB76C /* NetworkModel */,
 				04FE6C902E5867F200CCB76C /* DBModel */,
-				044952632E081A4A00D75C4A /* HomeSectionModel.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -338,6 +338,14 @@
 				04C97AB92E236D29001EB1D4 /* SearchMediaCollectionViewCellReactor.swift */,
 			);
 			path = Cell;
+			sourceTree = "<group>";
+		};
+		04D0D0972E5C31A9002A6951 /* SectionModel */ = {
+			isa = PBXGroup;
+			children = (
+				044952632E081A4A00D75C4A /* HomeSectionModel.swift */,
+			);
+			path = SectionModel;
 			sourceTree = "<group>";
 		};
 		04DCA8A32DF2DBD500695361 /* Network */ = {
@@ -519,9 +527,9 @@
 				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
 				04A722DB2E549F2400797731 /* CustomView */,
+				042EFE5E2E1403C800810E02 /* Home */,
 				04FE6C912E58879D00CCB76C /* SearchMedia */,
 				042EFE602E1403DD00810E02 /* MediaDetail */,
-				042EFE5E2E1403C800810E02 /* Home */,
 			);
 			path = RoomReviewer;
 			sourceTree = "<group>";
