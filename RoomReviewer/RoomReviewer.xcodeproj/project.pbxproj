@@ -58,6 +58,9 @@
 		04C97ABA2E236D29001EB1D4 /* SearchMediaCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB92E236D29001EB1D4 /* SearchMediaCollectionViewCellReactor.swift */; };
 		04C97ABE2E23784C001EB1D4 /* MediaDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97ABD2E23784C001EB1D4 /* MediaDetailViewController.swift */; };
 		04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97ADB2E23B595001EB1D4 /* MediaDetailReactor.swift */; };
+		04D0D09F2E5C7E61002A6951 /* Cosmos in Frameworks */ = {isa = PBXBuildFile; productRef = 04D0D09E2E5C7E61002A6951 /* Cosmos */; };
+		04D0D0A32E5C7EB0002A6951 /* WriteReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D0D0A22E5C7EB0002A6951 /* WriteReviewViewController.swift */; };
+		04D0D0A52E5C7EB9002A6951 /* WriteReviewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D0D0A42E5C7EB9002A6951 /* WriteReviewReactor.swift */; };
 		04DCA88E2DF2D78500695361 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA88D2DF2D78500695361 /* SnapKit */; };
 		04DCA8912DF2D78A00695361 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA8902DF2D78A00695361 /* ReactorKit */; };
 		04DCA8942DF2D78F00695361 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 04DCA8932DF2D78F00695361 /* Then */; };
@@ -148,6 +151,8 @@
 		04C97AB92E236D29001EB1D4 /* SearchMediaCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaCollectionViewCellReactor.swift; sourceTree = "<group>"; };
 		04C97ABD2E23784C001EB1D4 /* MediaDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDetailViewController.swift; sourceTree = "<group>"; };
 		04C97ADB2E23B595001EB1D4 /* MediaDetailReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDetailReactor.swift; sourceTree = "<group>"; };
+		04D0D0A22E5C7EB0002A6951 /* WriteReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteReviewViewController.swift; sourceTree = "<group>"; };
+		04D0D0A42E5C7EB9002A6951 /* WriteReviewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteReviewReactor.swift; sourceTree = "<group>"; };
 		04DCA89A2DF2D99200695361 /* API.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = API.xcconfig; sourceTree = "<group>"; };
 		04DCA89F2DF2DB7100695361 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		04DCA8A12DF2DBD100695361 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
@@ -222,6 +227,7 @@
 				044952592E08169D00D75C4A /* Differentiator in Frameworks */,
 				043BB0542DFD5EE000E5438D /* RxSwift in Frameworks */,
 				04DCA8912DF2D78A00695361 /* ReactorKit in Frameworks */,
+				04D0D09F2E5C7E61002A6951 /* Cosmos in Frameworks */,
 				043BB0502DFD5EE000E5438D /* RxBlocking in Frameworks */,
 				043BB0522DFD5EE000E5438D /* RxCocoa in Frameworks */,
 				0449525B2E08169D00D75C4A /* RxDataSources in Frameworks */,
@@ -346,6 +352,15 @@
 				044952632E081A4A00D75C4A /* HomeSectionModel.swift */,
 			);
 			path = SectionModel;
+			sourceTree = "<group>";
+		};
+		04D0D0A02E5C7E8F002A6951 /* WriteReview */ = {
+			isa = PBXGroup;
+			children = (
+				04D0D0A22E5C7EB0002A6951 /* WriteReviewViewController.swift */,
+				04D0D0A42E5C7EB9002A6951 /* WriteReviewReactor.swift */,
+			);
+			path = WriteReview;
 			sourceTree = "<group>";
 		};
 		04DCA8A32DF2DBD500695361 /* Network */ = {
@@ -530,6 +545,7 @@
 				042EFE5E2E1403C800810E02 /* Home */,
 				04FE6C912E58879D00CCB76C /* SearchMedia */,
 				042EFE602E1403DD00810E02 /* MediaDetail */,
+				04D0D0A02E5C7E8F002A6951 /* WriteReview */,
 			);
 			path = RoomReviewer;
 			sourceTree = "<group>";
@@ -655,6 +671,7 @@
 				043BB0532DFD5EE000E5438D /* RxSwift */,
 				044952582E08169D00D75C4A /* Differentiator */,
 				0449525A2E08169D00D75C4A /* RxDataSources */,
+				04D0D09E2E5C7E61002A6951 /* Cosmos */,
 			);
 			productName = RoomReviewer;
 			productReference = 04FFC7AA2DF169D60081AF7C /* RoomReviewer.app */;
@@ -706,6 +723,7 @@
 				04DCA8922DF2D78F00695361 /* XCRemoteSwiftPackageReference "Then" */,
 				043BB04E2DFD5EE000E5438D /* XCRemoteSwiftPackageReference "RxSwift" */,
 				044952572E08169D00D75C4A /* XCRemoteSwiftPackageReference "RxDataSources" */,
+				04D0D09D2E5C7E61002A6951 /* XCRemoteSwiftPackageReference "Cosmos" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04FFC7AB2DF169D60081AF7C /* Products */;
@@ -801,6 +819,7 @@
 				040AD09D2E1F879000C6EBC9 /* Movie.swift in Sources */,
 				0461E4D52E1A900C00EDB5D6 /* SearchMediaReactor.swift in Sources */,
 				046EFB552E56E5E200E2736B /* MediaEntity+CoreDataClass.swift in Sources */,
+				04D0D0A32E5C7EB0002A6951 /* WriteReviewViewController.swift in Sources */,
 				046E7A372E574D2B00FAF58A /* CreditsCollectionViewCellReactor.swift in Sources */,
 				046EFB562E56E5E200E2736B /* MediaEntity+CoreDataProperties.swift in Sources */,
 				04C97AB42E2286C3001EB1D4 /* SearchMediaCollectionViewCell.swift in Sources */,
@@ -837,6 +856,7 @@
 				04B379062E51C50200C2F3EA /* CoreDataManager.swift in Sources */,
 				04DCA8A02DF2DB7100695361 /* NetworkError.swift in Sources */,
 				04FE6C9F2E599F7800CCB76C /* CrewResponse.swift in Sources */,
+				04D0D0A52E5C7EB9002A6951 /* WriteReviewReactor.swift in Sources */,
 				04FE6CA02E599F7800CCB76C /* CastResponse.swift in Sources */,
 				04B3790A2E51D74E00C2F3EA /* CoreDataStack.swift in Sources */,
 				046E7A352E574D1000FAF58A /* CreditsCollectionVIewCell.swift in Sources */,
@@ -1320,6 +1340,14 @@
 				minimumVersion = 5.0.2;
 			};
 		};
+		04D0D09D2E5C7E61002A6951 /* XCRemoteSwiftPackageReference "Cosmos" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/evgenyneu/Cosmos.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 25.0.1;
+			};
+		};
 		04DCA88C2DF2D78500695361 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -1441,6 +1469,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 043BB04E2DFD5EE000E5438D /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
+		};
+		04D0D09E2E5C7E61002A6951 /* Cosmos */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04D0D09D2E5C7E61002A6951 /* XCRemoteSwiftPackageReference "Cosmos" */;
+			productName = Cosmos;
 		};
 		04DCA88D2DF2D78500695361 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

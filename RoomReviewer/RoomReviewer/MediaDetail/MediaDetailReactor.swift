@@ -128,7 +128,6 @@ final class MediaDetailReactor: Reactor {
             }
             
         case .writeReviewButtonTapped:
-            // State에 이미 watchedDate가 있는지 확인합니다.
             if let _ = currentState.watchedDate {
                 return .just(.pushWriteReviewView)
             } else {
