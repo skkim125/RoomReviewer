@@ -10,7 +10,7 @@ import ReactorKit
 import RxSwift
 
 final class WriteReviewReactor: Reactor {
-    
+    private let reviewDBManager: ReviewDBManager
     struct State {
         let media: Media
         var contentType: MediaType
@@ -46,11 +46,12 @@ final class WriteReviewReactor: Reactor {
     
     var initialState: State
     
-    private let dbManager: DBManager
+    private let dbManager: MediaDBManager
     private let imageProvider: ImageProviding
     
-    init(media: Media, dbManager: DBManager, imageProvider: ImageProviding) {
+    init(media: Media, dbManager: MediaDBManager, imageProvider: ImageProviding, reviewDBManager: ReviewDBManager) {
         self.initialState = State(media: media, contentType: media.mediaType)
+        self.reviewDBManager = reviewDBManager
         self.dbManager = dbManager
         self.imageProvider = imageProvider
     }

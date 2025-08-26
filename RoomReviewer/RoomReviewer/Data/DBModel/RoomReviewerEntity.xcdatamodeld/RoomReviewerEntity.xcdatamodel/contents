@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G84" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G90" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="Media" representedClassName="MediaEntity" syncable="YES">
         <attribute name="addedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="backdropURL" optional="YES" attributeType="String"/>
@@ -15,11 +15,12 @@
         <relationship name="review" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Review" inverseName="media" inverseEntity="Review"/>
     </entity>
     <entity name="Review" representedClassName="ReviewEntity" syncable="YES">
+        <attribute name="comment" optional="YES" attributeType="String"/>
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="rate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="reviewText" optional="YES" attributeType="String"/>
-        <attribute name="viewingDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="quote" optional="YES" attributeType="String"/>
+        <attribute name="rating" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="review" optional="YES" attributeType="String"/>
         <relationship name="media" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Media" inverseName="review" inverseEntity="Media"/>
     </entity>
 </model>

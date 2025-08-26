@@ -23,7 +23,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func setupVC() -> UITabBarController {
         let tabBarController = UITabBarController()
-        let homeVC = HomeViewController(reactor: HomeReactor(networkService: NetworkManager()), imageProvider: ImageProvider(), dbManager: CoreDataManager(stack: CoreDataStack(modelName: "RoomReviewerEntity")))
+        let dataStack = CoreDataStack(modelName: "RoomReviewerEntity")
+        let homeVC = HomeViewController(reactor: HomeReactor(networkService: NetworkManager()), imageProvider: ImageProvider(), dbManager: MediaDatabaseManager(stack: dataStack), reviewDBManager: ReviewDatabaseManager(stack: dataStack))
         let homeNav = UINavigationController(rootViewController: homeVC)
         homeVC.tabBarItem.image = UIImage(systemName: "house")
         homeVC.tabBarItem.title = "홈"

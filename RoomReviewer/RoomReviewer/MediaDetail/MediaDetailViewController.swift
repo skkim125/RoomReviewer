@@ -123,13 +123,15 @@ final class MediaDetailViewController: UIViewController {
     
     private let reactor: MediaDetailReactor
     private let imageProvider: ImageProviding
-    private let dbManager: DBManager
+    private let dbManager: MediaDBManager
+    private let reviewDBManager: ReviewDBManager
     private let disposeBag = DisposeBag()
     
-    init(reactor: MediaDetailReactor, imageProvider: ImageProviding, dbManager: DBManager) {
+    init(reactor: MediaDetailReactor, imageProvider: ImageProviding, dbManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.reactor = reactor
         self.imageProvider = imageProvider
         self.dbManager = dbManager
+        self.reviewDBManager = reviewDBManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -236,7 +238,7 @@ final class MediaDetailViewController: UIViewController {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, media in
                 if let media = media {
-                    let reactor = WriteReviewReactor(media: media, dbManager: owner.dbManager, imageProvider: owner.imageProvider)
+                    let reactor = WriteReviewReactor(media: media, dbManager: owner.dbManager, imageProvider: owner.imageProvider, reviewDBManager: owner.reviewDBManager)
                     let vc = WriteReviewViewController(reactor: reactor)
                     owner.navigationController?.pushViewController(vc, animated: true)
                 }

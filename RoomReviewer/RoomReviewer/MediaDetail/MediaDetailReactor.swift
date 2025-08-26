@@ -13,9 +13,9 @@ final class MediaDetailReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
     private let imageProvider: ImageProviding
-    private let dbManager: DBManager
+    private let dbManager: MediaDBManager
     
-    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, dbManager: DBManager) {
+    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, dbManager: MediaDBManager) {
         self.initialState = State(media: media, title: media.title, overview: media.overview, genres: API.convertGenreString(media.genreIDS).joined(separator: " / "))
         self.networkService = networkService
         self.imageProvider = imageProvider
