@@ -16,9 +16,7 @@ import Then
 final class WriteReviewViewController: UIViewController, View {
     var disposeBag = DisposeBag()
 
-    private let scrollView = UIScrollView().then {
-        $0.showsVerticalScrollIndicator = false
-    }
+    private let scrollView = UIScrollView()
     
     private let contentView = UIView()
     
@@ -35,16 +33,6 @@ final class WriteReviewViewController: UIViewController, View {
         $0.textAlignment = .center
     }
     
-    private let reviewTargetButton = UIButton(type: .system).then {
-        var config = UIButton.Configuration.filled()
-        config.title = "시즌 1 전체"
-        config.image = UIImage(systemName: "chevron.down")
-        config.imagePlacement = .trailing
-        config.baseBackgroundColor = .darkGray
-        config.baseForegroundColor = .white
-        $0.configuration = config
-    }
-    
     private let ratingSectionTitle = UILabel().then {
         $0.text = "별점 매기기"
         $0.font = .boldSystemFont(ofSize: 18)
@@ -53,11 +41,11 @@ final class WriteReviewViewController: UIViewController, View {
         var setting = CosmosSettings()
         setting.fillMode = .half
         setting.totalStars = 5
-        setting.starSize = 50
+        setting.starSize = 40
         setting.minTouchRating = 0
         setting.starMargin = 5
-        setting.emptyBorderWidth = 3
-        setting.filledBorderWidth = 3
+        setting.emptyBorderWidth = 2
+        setting.filledBorderWidth = 2
         setting.emptyBorderColor = .systemYellow
         setting.filledBorderColor = .systemYellow
         setting.filledColor = .systemYellow
@@ -66,11 +54,37 @@ final class WriteReviewViewController: UIViewController, View {
         $0.rating = 0
     }
     
-    private let summaryTitleLabel = UILabel().then {
-        $0.text = "✍️ 한줄평"
+    private let reviewTitleLabel = UILabel().then {
+        $0.text = "한줄평 작성하기"
         $0.font = .boldSystemFont(ofSize: 18)
     }
-
+    private let reviewTextField = UITextField().then {
+        $0.font = .systemFont(ofSize: 14)
+        $0.backgroundColor = .secondarySystemBackground
+        $0.layer.cornerRadius = 8
+    }
+    
+    private let reviewDetailTitleLabel = UILabel().then {
+        $0.text = "상세한 코멘트 남기기"
+        $0.font = .boldSystemFont(ofSize: 18)
+    }
+    private let reviewDetailTextView = UITextView().then {
+        $0.font = .systemFont(ofSize: 14)
+        $0.backgroundColor = .secondarySystemBackground
+        $0.layer.cornerRadius = 8
+        $0.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+    }
+    private let quoteTitleaLabel = UILabel().then {
+        $0.text = "내가 꼽은 명대사"
+        $0.font = .boldSystemFont(ofSize: 18)
+    }
+    private let quoteTitleTextView = UITextView().then {
+        $0.font = .systemFont(ofSize: 14)
+        $0.backgroundColor = .secondarySystemBackground
+        $0.layer.cornerRadius = 8
+        $0.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+    }
+    
     private let saveButton = UIButton(type: .system).then {
         $0.setTitle("내 서재에 저장", for: .normal)
         $0.titleLabel?.font = .boldSystemFont(ofSize: 18)
@@ -133,6 +147,12 @@ final class WriteReviewViewController: UIViewController, View {
                 owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
+        
+        reviewTextField.rx.text.orEmpty
+            .bind(with: self) { owner, text in
+                print(text.count)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -147,6 +167,15 @@ extension WriteReviewViewController {
         
         contentView.addSubview(ratingSectionTitle)
         contentView.addSubview(ratingView)
+        
+        contentView.addSubview(reviewTitleLabel)
+        contentView.addSubview(reviewTextField)
+        
+        contentView.addSubview(reviewDetailTitleLabel)
+        contentView.addSubview(reviewDetailTextView)
+        
+        contentView.addSubview(quoteTitleaLabel)
+        contentView.addSubview(quoteTitleTextView)
         
         view.addSubview(saveButton)
     }
@@ -179,7 +208,41 @@ extension WriteReviewViewController {
         }
         ratingView.snp.makeConstraints {
             $0.top.equalTo(ratingSectionTitle.snp.bottom).offset(20)
-            $0.centerX.equalTo(contentView.snp.centerX)
+            $0.centerX.equalToSuperview()
+        }
+        
+        reviewTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(ratingView.snp.bottom).offset(25)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+        }
+        
+        reviewTextField.snp.makeConstraints {
+            $0.top.equalTo(reviewTitleLabel.snp.bottom).offset(15)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.height.equalTo(37)
+        }
+        
+        reviewDetailTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(reviewTextField.snp.bottom).offset(25)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+        }
+        
+        reviewDetailTextView.snp.makeConstraints {
+            $0.top.equalTo(reviewDetailTitleLabel.snp.bottom).offset(15)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.height.equalTo(100)
+        }
+        
+        quoteTitleaLabel.snp.makeConstraints {
+            $0.top.equalTo(reviewDetailTextView.snp.bottom).offset(25)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+        }
+        
+        quoteTitleTextView.snp.makeConstraints {
+            $0.top.equalTo(quoteTitleaLabel.snp.bottom).offset(15)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.height.equalTo(100)
+            $0.bottom.equalTo(contentView.snp.bottom).inset(20)
         }
         
         saveButton.snp.makeConstraints {
