@@ -62,6 +62,13 @@ final class WriteReviewViewController: UIViewController, View {
         $0.font = .systemFont(ofSize: 14)
         $0.backgroundColor = .secondarySystemBackground
         $0.layer.cornerRadius = 8
+        $0.placeholder = "ex) 시리즈의 결정판이나 동전 던지기는 진부해"
+        
+        let padding = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: $0.frame.height))
+        $0.leftView = padding
+        $0.leftViewMode = .always
+        $0.rightView = padding
+        $0.rightViewMode = .always
     }
     
     private let reviewDetailTitleLabel = UILabel().then {
@@ -74,15 +81,28 @@ final class WriteReviewViewController: UIViewController, View {
         $0.layer.cornerRadius = 8
         $0.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
     }
+    private let reviewDetailPlaceholderLabel = UILabel().then {
+        $0.text = "한줄평으로 부족하다면 코멘트를 추가하세요"
+        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .lightGray
+        $0.isUserInteractionEnabled = false
+    }
+    
     private let quoteTitleaLabel = UILabel().then {
-        $0.text = "내가 꼽은 명대사"
+        $0.text = "내가 뽑은 명대사"
         $0.font = .boldSystemFont(ofSize: 18)
     }
-    private let quoteTitleTextView = UITextView().then {
+    private let quoteTextField = UITextField().then {
         $0.font = .systemFont(ofSize: 14)
         $0.backgroundColor = .secondarySystemBackground
         $0.layer.cornerRadius = 8
-        $0.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        $0.placeholder = "ex) 호의가 계속되면 그게 권리인 줄 알아"
+        
+        let padding = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: $0.frame.height))
+        $0.leftView = padding
+        $0.leftViewMode = .always
+        $0.rightView = padding
+        $0.rightViewMode = .always
     }
     
     private let saveButton = UIButton(type: .system).then {
@@ -173,9 +193,10 @@ extension WriteReviewViewController {
         
         contentView.addSubview(reviewDetailTitleLabel)
         contentView.addSubview(reviewDetailTextView)
+        reviewDetailTextView.addSubview(reviewDetailPlaceholderLabel)
         
         contentView.addSubview(quoteTitleaLabel)
-        contentView.addSubview(quoteTitleTextView)
+        contentView.addSubview(quoteTextField)
         
         view.addSubview(saveButton)
     }
@@ -203,7 +224,7 @@ extension WriteReviewViewController {
         }
         
         ratingSectionTitle.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(15)
             $0.horizontalEdges.equalToSuperview().inset(20)
         }
         ratingView.snp.makeConstraints {
@@ -217,7 +238,7 @@ extension WriteReviewViewController {
         }
         
         reviewTextField.snp.makeConstraints {
-            $0.top.equalTo(reviewTitleLabel.snp.bottom).offset(15)
+            $0.top.equalTo(reviewTitleLabel.snp.bottom).offset(10)
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(37)
         }
@@ -228,9 +249,14 @@ extension WriteReviewViewController {
         }
         
         reviewDetailTextView.snp.makeConstraints {
-            $0.top.equalTo(reviewDetailTitleLabel.snp.bottom).offset(15)
+            $0.top.equalTo(reviewDetailTitleLabel.snp.bottom).offset(10)
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(100)
+        }
+        
+        reviewDetailPlaceholderLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(10)
+            $0.leading.equalToSuperview().inset(15)
         }
         
         quoteTitleaLabel.snp.makeConstraints {
@@ -238,10 +264,10 @@ extension WriteReviewViewController {
             $0.horizontalEdges.equalToSuperview().inset(20)
         }
         
-        quoteTitleTextView.snp.makeConstraints {
-            $0.top.equalTo(quoteTitleaLabel.snp.bottom).offset(15)
+        quoteTextField.snp.makeConstraints {
+            $0.top.equalTo(quoteTitleaLabel.snp.bottom).offset(10)
             $0.horizontalEdges.equalToSuperview().inset(20)
-            $0.height.equalTo(100)
+            $0.height.equalTo(37)
             $0.bottom.equalTo(contentView.snp.bottom).inset(20)
         }
         
