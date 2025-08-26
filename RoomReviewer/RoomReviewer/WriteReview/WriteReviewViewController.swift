@@ -64,14 +64,14 @@ final class WriteReviewViewController: UIViewController, View {
         $0.layer.cornerRadius = 8
         $0.placeholder = "ex) 시리즈의 결정판이나 동전 던지기는 진부해"
         
-        let padding = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: $0.frame.height))
+        let padding = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: $0.frame.height))
         $0.leftView = padding
         $0.leftViewMode = .always
         $0.rightView = padding
         $0.rightViewMode = .always
     }
     
-    private let reviewDetailTitleLabel = UILabel().then {
+    private let commentTitleLabel = UILabel().then {
         $0.text = "상세한 코멘트 남기기"
         $0.font = .boldSystemFont(ofSize: 18)
     }
@@ -79,12 +79,12 @@ final class WriteReviewViewController: UIViewController, View {
         $0.font = .systemFont(ofSize: 14)
         $0.backgroundColor = .secondarySystemBackground
         $0.layer.cornerRadius = 8
-        $0.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        $0.textContainerInset = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
     }
     private let reviewDetailPlaceholderLabel = UILabel().then {
-        $0.text = "한줄평으로 부족하다면 코멘트를 추가하세요"
+        $0.text = "한줄평으로 부족하다면 코멘트를 추가하세요(선택)"
         $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .lightGray
+        $0.textColor = .placeholderText
         $0.isUserInteractionEnabled = false
     }
     
@@ -96,9 +96,9 @@ final class WriteReviewViewController: UIViewController, View {
         $0.font = .systemFont(ofSize: 14)
         $0.backgroundColor = .secondarySystemBackground
         $0.layer.cornerRadius = 8
-        $0.placeholder = "ex) 호의가 계속되면 그게 권리인 줄 알아"
+        $0.placeholder = "ex) 호의가 계속되면 그게 권리인 줄 알아(선택)"
         
-        let padding = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: $0.frame.height))
+        let padding = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: $0.frame.height))
         $0.leftView = padding
         $0.leftViewMode = .always
         $0.rightView = padding
@@ -134,6 +134,10 @@ final class WriteReviewViewController: UIViewController, View {
     }
     
     func bind(reactor: WriteReviewReactor) {
+        ratingView.didTouchCosmos = { [weak self] rating in
+            guard let self = self else { return }
+            self.reactor?.action.onNext(.ratingChanged(rating))
+        }
         
         reactor.state.map { $0.media.title }
             .asDriver(onErrorJustReturn: nil)
@@ -168,9 +172,41 @@ final class WriteReviewViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
+        reactor.state.map { $0.rating }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: 0)
+            .drive(with: self) { owner, rating in
+                owner.ratingView.rating = rating
+            }
+            .disposed(by: disposeBag)
+        
         reviewTextField.rx.text.orEmpty
-            .bind(with: self) { owner, text in
-                print(text.count)
+            .map(Reactor.Action.reviewChanged)
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reviewDetailTextView.rx.text.orEmpty
+            .map(Reactor.Action.commentChanged)
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reviewDetailTextView.rx.text.orEmpty
+            .map { !$0.isEmpty }
+            .asDriver(onErrorJustReturn: false)
+            .drive(reviewDetailPlaceholderLabel.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        quoteTextField.rx.text.orEmpty
+            .map(Reactor.Action.quoteChanged)
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.canSave }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self) { owner, canSave in
+                owner.saveButton.isEnabled = canSave
+                owner.saveButton.backgroundColor = canSave ? .systemRed : .darkGray
             }
             .disposed(by: disposeBag)
     }
@@ -191,7 +227,7 @@ extension WriteReviewViewController {
         contentView.addSubview(reviewTitleLabel)
         contentView.addSubview(reviewTextField)
         
-        contentView.addSubview(reviewDetailTitleLabel)
+        contentView.addSubview(commentTitleLabel)
         contentView.addSubview(reviewDetailTextView)
         reviewDetailTextView.addSubview(reviewDetailPlaceholderLabel)
         
@@ -243,20 +279,20 @@ extension WriteReviewViewController {
             $0.height.equalTo(37)
         }
         
-        reviewDetailTitleLabel.snp.makeConstraints {
+        commentTitleLabel.snp.makeConstraints {
             $0.top.equalTo(reviewTextField.snp.bottom).offset(25)
             $0.horizontalEdges.equalToSuperview().inset(20)
         }
         
         reviewDetailTextView.snp.makeConstraints {
-            $0.top.equalTo(reviewDetailTitleLabel.snp.bottom).offset(10)
+            $0.top.equalTo(commentTitleLabel.snp.bottom).offset(10)
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(100)
         }
         
         reviewDetailPlaceholderLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(10)
-            $0.leading.equalToSuperview().inset(15)
+            $0.leading.equalToSuperview().inset(10)
         }
         
         quoteTitleaLabel.snp.makeConstraints {
