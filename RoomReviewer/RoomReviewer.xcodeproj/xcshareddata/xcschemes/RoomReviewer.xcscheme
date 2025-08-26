@@ -58,8 +58,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "04B3792E2E51EA3E00C2F3EA"
-               BuildableName = "CoreDataManagerUnitTests.xctest"
-               BlueprintName = "CoreDataManagerUnitTests"
+               BuildableName = "MediaDatabaseManagerUnitTests.xctest"
+               BlueprintName = "MediaDatabaseManagerUnitTests"
                ReferencedContainer = "container:RoomReviewer.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -71,6 +71,17 @@
                BlueprintIdentifier = "04FE6CA42E59A6D600CCB76C"
                BuildableName = "NetworkTransformMediaDetailTests.xctest"
                BlueprintName = "NetworkTransformMediaDetailTests"
+               ReferencedContainer = "container:RoomReviewer.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "048096562E5DC6BD002033A0"
+               BuildableName = "ReviewDatabaseManagerUnitTests.xctest"
+               BlueprintName = "ReviewDatabaseManagerUnitTests"
                ReferencedContainer = "container:RoomReviewer.xcodeproj">
             </BuildableReference>
          </TestableReference>

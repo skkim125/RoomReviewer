@@ -1,15 +1,15 @@
 //
-//  CoreDataManager.swift
+//  MediaDataManager.swift
 //  RoomReviewer
 //
-//  Created by 김상규 on 8/17/25.
+//  Created by 김상규 on 8/26/25.
 //
 
 import Foundation
 import CoreData
 import RxSwift
 
-protocol DBManager {
+protocol MediaDBManager {
     func createMedia(id: Int, title: String, overview: String?, type: String, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID>
     
     func fetchAllMedia() -> Single<[Media]>
@@ -18,7 +18,7 @@ protocol DBManager {
     func updateWatchedDate(id: Int, watchedDate: Date) -> Single<Void?>
 }
 
-final class CoreDataManager: DBManager {
+final class MediaDatabaseManager: MediaDBManager {
     private let stack: DataStack
     
     init(stack: DataStack) {
@@ -37,20 +37,20 @@ final class CoreDataManager: DBManager {
             let backgroundContext = self.stack.newBackgroundContext()
             
             backgroundContext.perform {
-                let media = MediaEntity(context: backgroundContext)
-                media.id = Int64(id)
-                media.isStar = false
-                media.title = title
-                media.type = type
-                media.releaseDate = releaseDate
-                media.watchedDate = watchedDate
-                media.addedDate = Date()
-                media.genres = genres
+                let entity = MediaEntity(context: backgroundContext)
+                entity.id = Int64(id)
+                entity.isStar = false
+                entity.title = title
+                entity.type = type
+                entity.releaseDate = releaseDate
+                entity.watchedDate = watchedDate
+                entity.addedDate = Date()
+                entity.genres = genres
                 do {
                     try backgroundContext.save()
-                    print("\(media.title) 저장 완료")
+                    print("\(entity.title) 저장 완료")
                     
-                    observer(.success(media.objectID))
+                    observer(.success(entity.objectID))
                 } catch {
                     print("저장 실패: \(error.localizedDescription)")
                     
@@ -175,14 +175,4 @@ final class CoreDataManager: DBManager {
             return Disposables.create()
         }
     }
-
-    // Review 생성
-//    func createReview(_ media: MediaEntity, rate: Double, viewingDate: Date, text: String?) -> ReviewEntity {
-//
-//    }
-    
-    // Review 삭제
-//    func deleteReview(_ media: MediaEntity) {
-//
-//    }
 }

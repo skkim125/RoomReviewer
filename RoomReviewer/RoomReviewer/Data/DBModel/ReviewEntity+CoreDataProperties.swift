@@ -18,9 +18,10 @@ extension ReviewEntity {
 
     @NSManaged public var creationDate: Date?
     @NSManaged public var id: UUID
-    @NSManaged public var rate: Double
-    @NSManaged public var reviewText: String?
-    @NSManaged public var viewingDate: Date?
+    @NSManaged public var rating: Double
+    @NSManaged public var review: String
+    @NSManaged public var comment: String?
+    @NSManaged public var quote: String?
     @NSManaged public var media: MediaEntity
 
 }
