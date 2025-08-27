@@ -14,8 +14,8 @@ protocol MediaDBManager {
     
     func fetchAllMedia() -> Single<[Media]>
     func deleteMedia(id: Int) -> Single<Void?>
-    func fetchMedia(id: Int) -> Single<(Media, Date?)?>
-    func updateWatchedDate(id: Int, watchedDate: Date) -> Single<Void?>
+    func fetchMedia(id: Int) -> Single<(NSManagedObjectID, Media, Date?)?>
+    func updateWatchedDate(id: Int, watchedDate: Date) -> Single<NSManagedObjectID?>
 }
 
 final class MediaDatabaseManager: MediaDBManager {
@@ -114,11 +114,10 @@ final class MediaDatabaseManager: MediaDBManager {
         }
     }
     
-    func fetchMedia(id: Int) -> Single<(Media, Date?)?> {
+    func fetchMedia(id: Int) -> Single<(NSManagedObjectID, Media, Date?)?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
-                
                 return Disposables.create()
             }
             
@@ -128,12 +127,10 @@ final class MediaDatabaseManager: MediaDBManager {
                 request.fetchLimit = 1
                 request.predicate = NSPredicate(format: "id == %d", id)
                 do {
-                    let data = try context.fetch(request)
-                    
-                    if data.isEmpty {
-                        observer(.success(nil))
+                    if let entity = try context.fetch(request).first {
+                        observer(.success((entity.objectID, entity.toDomain(), entity.watchedDate)))
                     } else {
-                        observer(.success((data[0].toDomain(), data[0].watchedDate ?? Date())))
+                        observer(.success(nil))
                     }
                     
                 } catch {
@@ -144,7 +141,7 @@ final class MediaDatabaseManager: MediaDBManager {
         }
     }
     
-    func updateWatchedDate(id: Int, watchedDate: Date) -> Single<Void?> {
+    func updateWatchedDate(id: Int, watchedDate: Date) -> Single<NSManagedObjectID?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
@@ -162,7 +159,7 @@ final class MediaDatabaseManager: MediaDBManager {
                         mediaToUpdate.watchedDate = watchedDate
                         try backgroundContext.save()
                         print("\(mediaToUpdate.title) 시청 날짜 업데이트 완료")
-                        observer(.success(()))
+                        observer(.success((mediaToUpdate.objectID)))
                     } else {
                         observer(.failure(NetworkError.commonError))
                     }

@@ -8,12 +8,14 @@
 import UIKit
 import ReactorKit
 import RxSwift
+import CoreData
 
 final class WriteReviewReactor: Reactor {
-    private let reviewDBManager: ReviewDBManager
     struct State {
-        let media: Media
-        var contentType: MediaType
+        let mediaObjectID: NSManagedObjectID
+        let title: String
+        let posterPath: String?
+//        var contentType: MediaType
         var posterImage: UIImage?
         var rating: Double = 0
         var review: String = ""
@@ -30,8 +32,7 @@ final class WriteReviewReactor: Reactor {
         case reviewChanged(String)
         case commentChanged(String)
         case quoteChanged(String)
-        
-//        case saveButtonTapped
+        case saveButtonTapped
     }
     
     enum Mutation {
@@ -46,20 +47,21 @@ final class WriteReviewReactor: Reactor {
     
     var initialState: State
     
-    private let dbManager: MediaDBManager
     private let imageProvider: ImageProviding
+    private let mediaDBManager: MediaDBManager
+    private let reviewDBManager: ReviewDBManager
     
-    init(media: Media, dbManager: MediaDBManager, imageProvider: ImageProviding, reviewDBManager: ReviewDBManager) {
-        self.initialState = State(media: media, contentType: media.mediaType)
-        self.reviewDBManager = reviewDBManager
-        self.dbManager = dbManager
+    init(mediaObjectID: NSManagedObjectID, title: String, posterPath: String?, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+        self.initialState = State(mediaObjectID: mediaObjectID, title: title, posterPath: posterPath)
         self.imageProvider = imageProvider
+        self.mediaDBManager = mediaDBManager
+        self.reviewDBManager = reviewDBManager
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad:
-            return loadPosterImage(currentState.media.posterPath)
+            return loadPosterImage(currentState.posterPath)
             
         case .ratingChanged(let score):
             return .just(.setRating(score))
@@ -72,6 +74,9 @@ final class WriteReviewReactor: Reactor {
             
         case .quoteChanged(let quote):
             return .just(.setQuote(quote))
+        case .saveButtonTapped:
+            let state = currentState
+            return saveReview(mediaObjectID: state.mediaObjectID, rating: state.rating, review: state.review, comment: state.comment, quote: state.quote)
         }
     }
     
@@ -104,6 +109,14 @@ final class WriteReviewReactor: Reactor {
         return imageProvider.fetchImage(from: imagePath)
             .map { image in
                 return .setPosterImage(image)
+            }
+    }
+    
+    private func saveReview(mediaObjectID: NSManagedObjectID, rating: Double, review: String, comment: String?, quote: String?) -> Observable<Mutation> {
+        return reviewDBManager.createReview(mediaObjectID, rating: rating, review: review, comment: comment, quote: quote)
+            .asObservable()
+            .map { reviewID in
+                return .dismissView
             }
     }
 }

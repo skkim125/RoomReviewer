@@ -123,14 +123,14 @@ final class MediaDetailViewController: UIViewController {
     
     private let reactor: MediaDetailReactor
     private let imageProvider: ImageProviding
-    private let dbManager: MediaDBManager
+    private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     private let disposeBag = DisposeBag()
     
-    init(reactor: MediaDetailReactor, imageProvider: ImageProviding, dbManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(reactor: MediaDetailReactor, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.reactor = reactor
         self.imageProvider = imageProvider
-        self.dbManager = dbManager
+        self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         super.init(nibName: nil, bundle: nil)
     }
@@ -235,13 +235,17 @@ final class MediaDetailViewController: UIViewController {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$pushWriteReviewView)
+            .compactMap { $0 }
             .asDriver(onErrorJustReturn: nil)
-            .drive(with: self) { owner, media in
-                if let media = media {
-                    let reactor = WriteReviewReactor(media: media, dbManager: owner.dbManager, imageProvider: owner.imageProvider, reviewDBManager: owner.reviewDBManager)
-                    let vc = WriteReviewViewController(reactor: reactor)
-                    owner.navigationController?.pushViewController(vc, animated: true)
+            .drive(with: self) { owner, mediaInfo in
+                guard let (media, id) = mediaInfo, let validObjectID = id else {
+                    print("Media ObjectID 없음")
+                    return
                 }
+                
+                let reactor = WriteReviewReactor(mediaObjectID: validObjectID, title: media.title, posterPath: media.posterPath, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = WriteReviewViewController(reactor: reactor)
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
         

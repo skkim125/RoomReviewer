@@ -139,7 +139,7 @@ final class WriteReviewViewController: UIViewController, View {
             self.reactor?.action.onNext(.ratingChanged(rating))
         }
         
-        reactor.state.map { $0.media.title }
+        reactor.state.map { $0.title }
             .asDriver(onErrorJustReturn: nil)
             .drive(titleLabel.rx.text)
             .disposed(by: disposeBag)
@@ -198,6 +198,13 @@ final class WriteReviewViewController: UIViewController, View {
         
         quoteTextField.rx.text.orEmpty
             .map(Reactor.Action.quoteChanged)
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        saveButton.rx.tap
+            .map { _ in
+                return Reactor.Action.saveButtonTapped
+            }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
