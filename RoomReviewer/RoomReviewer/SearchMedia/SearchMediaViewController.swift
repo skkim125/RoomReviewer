@@ -122,7 +122,7 @@ final class SearchMediaViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)

@@ -71,11 +71,30 @@ final class MediaDetailViewController: UIViewController {
     
     private let actionButtonStackView = UIStackView().then {
         $0.axis = .horizontal
-        $0.distribution = .fillEqually
-        $0.spacing = 8
+        $0.spacing = 20
     }
 
-    private let watchlistButton = UIButton()
+    private let watchlistButton = UIButton().then {
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: "plus.circle")
+        config.title = "보고 싶어요"
+        config.attributedTitle?.font = .systemFont(ofSize: 12, weight: .semibold)
+        config.imagePlacement = .top
+        config.imagePadding = 8
+        
+        $0.configuration = config
+    }
+    
+    private let watchedButton = UIButton().then {
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: "eye")
+        config.title = "시청함"
+        config.attributedTitle?.font = .systemFont(ofSize: 12, weight: .semibold)
+        config.imagePlacement = .top
+        config.imagePadding = 8
+        
+        $0.configuration = config
+    }
     
     private let reviewButton = UIButton().then {
         var config = UIButton.Configuration.plain()
@@ -87,9 +106,6 @@ final class MediaDetailViewController: UIViewController {
         config.attributedTitle?.font = .systemFont(ofSize: 12, weight: .semibold)
         config.imagePlacement = .top
         config.imagePadding = 8
-        
-        
-        config.baseForegroundColor = .systemRed
         
         $0.configuration = config
     }
@@ -229,8 +245,23 @@ final class MediaDetailViewController: UIViewController {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, isWatchlisted in
                 owner.updateWatchlistButton(isWatchlisted: isWatchlisted)
-                owner.reviewButton.configuration?.baseForegroundColor = isWatchlisted ? .systemRed : .lightGray
-                owner.reviewButton.isEnabled = isWatchlisted
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { ($0.isWatchlisted, $0.watchedDate, $0.isReviewed) }
+            .compactMap { watchlisted, watchedDate, reviewed -> (Bool, Date?, Bool)? in
+                return (watchlisted, watchedDate, reviewed)
+            }
+//            .distinctUntilChanged { prev, curr in
+//                return prev.0 == curr.0 && prev.1 == curr.1 && prev.2 == curr.2
+//            }
+            .asDriver(onErrorJustReturn: (false, nil, false))
+            .drive(with: self) { owner, statuses in
+                let (isWatchlisted, watchedDate, isReviewed) = statuses
+                
+                owner.updateWatchlistButton(isWatchlisted: isWatchlisted)
+                owner.updateWatchedButton(isWatchlisted: isWatchlisted, watchedDate: watchedDate)
+                owner.updateReviewButton(watchedDate: watchedDate, isReviewed: isReviewed)
             }
             .disposed(by: disposeBag)
         
@@ -294,6 +325,11 @@ final class MediaDetailViewController: UIViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        watchedButton.rx.tap
+            .map { MediaDetailReactor.Action.watchedButtonTapped }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reviewButton.rx.tap
             .map { MediaDetailReactor.Action.writeReviewButtonTapped }
             .bind(to: reactor.action)
@@ -301,57 +337,94 @@ final class MediaDetailViewController: UIViewController {
     }
     
     private func updateWatchlistButton(isWatchlisted: Bool) {
-        var config = UIButton.Configuration.plain()
-
-        config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
+        var config = watchlistButton.configuration ?? UIButton.Configuration.plain()
+        
         config.imagePlacement = .top
         config.imagePadding = 8
-
-        let titleText: String
-        let color: UIColor
-        let imageName: String
-
+        config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
+        
         if isWatchlisted {
-            titleText = "저장됨"
-            color = .systemBlue
-            imageName = "checkmark.circle.fill"
+            config.title = "저장됨"
+            config.image = UIImage(systemName: "bookmark.fill")
+            config.baseForegroundColor = .systemYellow
         } else {
-            titleText = "보고 싶어요"
-            color = .lightGray
-            imageName = "plus.circle"
+            config.title = "보고 싶어요"
+            config.image = UIImage(systemName: "plus.circle")
+            config.baseForegroundColor = .lightGray
         }
-
-        config.image = UIImage(systemName: imageName)
-        config.baseForegroundColor = color
-
+        
+        let attr = attributedTitle(with: config.title ?? "")
+        if let attr = try? AttributedString(attr, including: \.uiKit) {
+            config.attributedTitle = attr
+        }
+        
+        watchlistButton.configuration = config
+    }
+    
+    private func updateWatchedButton(isWatchlisted: Bool, watchedDate: Date?) {
+        watchedButton.isEnabled = isWatchlisted
+        
+        var config = watchedButton.configuration ?? UIButton.Configuration.plain()
+        config.imagePlacement = .top
+        config.imagePadding = 8
+        config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
+        
+        if let _ = watchedDate {
+            config.title = "시청 완료"
+            config.image = UIImage(systemName: "eye.fill")
+            config.baseForegroundColor = .white
+        } else { 
+            config.title = "시청함"
+            config.image = UIImage(systemName: "eye")
+            config.baseForegroundColor = .lightGray
+        }
+        
+        let attr = attributedTitle(with: config.title ?? "")
+        if let attr = try? AttributedString(attr, including: \.uiKit) {
+            config.attributedTitle = attr
+        }
+        
+        watchedButton.configuration = config
+    }
+    
+    private func updateReviewButton(watchedDate: Date?, isReviewed: Bool) {
+        let isEnabled = (watchedDate != nil)
+        reviewButton.isEnabled = isEnabled
+        
+        var config = reviewButton.configuration ?? UIButton.Configuration.plain()
+        config.imagePlacement = .top
+        config.imagePadding = 8
+        config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
+        
+        if isReviewed {
+            config.title = "리뷰 보기"
+            config.image = UIImage(systemName: "doc.text.fill")
+            config.baseForegroundColor = .systemGreen
+        } else {
+            config.title = "평론하기"
+            config.image = UIImage(systemName: "sunglasses")
+            config.baseForegroundColor = isEnabled ? .white : .lightGray
+        }
+        
+        let attr = attributedTitle(with: config.title ?? "")
+        if let attr = try? AttributedString(attr, including: \.uiKit) {
+            config.attributedTitle = attr
+        }
+        
+        reviewButton.configuration = config
+    }
+    
+    private func attributedTitle(with text: String) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
-
-        let nsAttr = NSAttributedString(
-            string: titleText,
+        
+        return NSAttributedString(
+            string: text,
             attributes: [
                 .font: UIFont.systemFont(ofSize: 12, weight: .semibold),
                 .paragraphStyle: paragraphStyle
             ]
         )
-
-        if let attr = try? AttributedString(nsAttr, including: \.uiKit) {
-            config.attributedTitle = attr
-        }
-
-        DispatchQueue.main.async {
-            UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
-                self.watchlistButton.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-                self.watchlistButton.alpha = 0.0
-            }, completion: { _ in
-                self.watchlistButton.configuration = config
-                
-                UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseOut, animations: {
-                    self.watchlistButton.transform = .identity
-                    self.watchlistButton.alpha = 1.0
-                })
-            })
-        }
     }
 }
 
@@ -369,7 +442,7 @@ extension MediaDetailViewController {
         }
         
         contentView.addSubview(actionButtonStackView)
-        [watchlistButton, reviewButton].forEach {
+        [watchlistButton, watchedButton, reviewButton].forEach {
             actionButtonStackView.addArrangedSubview($0)
         }
         
@@ -415,7 +488,13 @@ extension MediaDetailViewController {
         
         actionButtonStackView.snp.makeConstraints {
             $0.top.equalTo(infoStackView.snp.bottom).offset(15)
-            $0.horizontalEdges.equalTo(contentView).inset(20)
+            $0.centerX.equalTo(contentView)
+        }
+        
+        [watchlistButton, watchedButton, reviewButton].forEach {
+            $0.snp.makeConstraints { make in
+                make.width.equalTo(90)
+            }
         }
         
         overviewLabel.snp.makeConstraints {

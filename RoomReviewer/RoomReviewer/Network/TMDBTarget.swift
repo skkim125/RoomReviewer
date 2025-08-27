@@ -120,7 +120,7 @@ extension TMDBTargetType: TargetType {
             ]
         case .getTVDetail:
             return [
-                URLQueryItem(name: "append_to_response", value: "credits,content_ratings,recommendations,watch/providers"),
+                URLQueryItem(name: "append_to_response", value: "aggregate_credits,content_ratings,recommendations,watch/providers"),
                 URLQueryItem(name: "language", value: "ko-KR"),
                 URLQueryItem(name: "region", value: "KR"),
             ]

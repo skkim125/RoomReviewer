@@ -17,7 +17,7 @@ struct MovieDetail: Decodable {
     let genres: [Genre]
     let releaseDate: ReleaseDateResult
     let runtime: Int?
-    let credits: CreditsResponse
+    let credits: MovieCreditsResponse
     let watchProviders: WatchProviders
 
     enum CodingKeys: String, CodingKey {
@@ -34,9 +34,52 @@ struct Genre: Decodable {
 }
 
 struct CreditsResponse: Decodable {
-    let cast: [CastResponse]
-    let crew: [CrewResponse]
+    let cast: [MovieCastResponse]
+    let crew: [MovieCrewResponse]
 }
+
+//[
+//  {
+//                "adult": false,
+//                "gender": 2,
+//                "id": 3116034,
+//                "known_for_department": "Acting",
+//                "name": "홍민기",
+//                "original_name": "홍민기",
+//                "popularity": 1.5563,
+//                "profile_path": "/oBov91CkPmAbqEa42Fu6OZbnocU.jpg",
+//                "roles": [
+//                    {
+//                        "credit_id": "682ae39e80692bab55648d7f",
+//                        "character": "",
+//                        "episode_count": 8
+//                    }
+//                ],
+//                "total_episode_count": 8,
+//                "order": 9
+//            }
+//        ],
+//        "crew": [
+//            {
+//                "adult": false,
+//                "gender": 2,
+//                "id": 1717334,
+//                "known_for_department": "Directing",
+//                "name": "Lee Seong-tae",
+//                "original_name": "Lee Seong-tae",
+//                "popularity": 0.0193,
+//                "profile_path": "/oJfdym07hbsegpqfoLnVxRd1qLN.jpg",
+//                "jobs": [
+//                    {
+//                        "credit_id": "64e5af31c3c891013ab0956b",
+//                        "job": "Director",
+//                        "episode_count": 8
+//                    }
+//                ],
+//                "department": "Directing",
+//                "total_episode_count": 8
+//            }
+//        ]
 
 struct ReleaseDateResult: Decodable {
     let results: [ReleaseDateInfo]
