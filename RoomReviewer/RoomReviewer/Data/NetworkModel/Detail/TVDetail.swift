@@ -18,17 +18,18 @@ struct TVDetail: Decodable {
     let firstAirDate: String
     let numberOfEpisodes: Int
     let certificate: ContentRatingResult
-    let credits: CreditsResponse
     let createdBy: [Creator]
+    let aggregateCredits: TVCreditsResponse
 
     enum CodingKeys: String, CodingKey {
-        case id, name, overview, genres, credits
+        case id, name, overview, genres
         case posterPath = "poster_path"
         case backdropPath = "backdrop_path"
         case firstAirDate = "first_air_date"
         case numberOfEpisodes = "number_of_episodes"
         case certificate = "content_ratings"
         case createdBy = "created_by"
+        case aggregateCredits = "aggregate_credits"
     }
 }
 
@@ -70,10 +71,16 @@ extension TVDetail {
         
         let episodeInfo = "\(numberOfEpisodes)부작"
         
-        let creators = createdBy.map { Crew(id: $0.id, name: $0.name, profilePath: $0.profilePath) }
+        let creators: [Crew]
         
-        let cast = credits.cast.map {
-            Cast(id: $0.id, name: $0.name, profilePath: $0.profilePath, character: $0.character)
+        if createdBy.isEmpty {
+            creators = aggregateCredits.crew.filter { $0.department == "Directing" || $0.department == "Writing" }.map { Crew(id: $0.id, name: $0.name, profilePath: $0.profilePath) }
+        } else {
+            creators = createdBy.map { Crew(id: $0.id, name: $0.name, profilePath: $0.profilePath) }
+        }
+        
+        let cast = aggregateCredits.cast.map {
+            Cast(id: $0.id, name: $0.name, profilePath: $0.profilePath, character: $0.roles?[0].character ?? "")
         }
         
         return MediaDetail(

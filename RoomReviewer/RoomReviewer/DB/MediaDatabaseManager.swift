@@ -14,8 +14,8 @@ protocol MediaDBManager {
     
     func fetchAllMedia() -> Single<[Media]>
     func deleteMedia(id: Int) -> Single<Void?>
-    func fetchMedia(id: Int) -> Single<(NSManagedObjectID, Media, Date?)?>
-    func updateWatchedDate(id: Int, watchedDate: Date) -> Single<NSManagedObjectID?>
+    func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, media: Media, watchedDate: Date?, isReviewed: Bool)?>
+    func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?>
 }
 
 final class MediaDatabaseManager: MediaDBManager {
@@ -114,7 +114,7 @@ final class MediaDatabaseManager: MediaDBManager {
         }
     }
     
-    func fetchMedia(id: Int) -> Single<(NSManagedObjectID, Media, Date?)?> {
+    func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, media: Media, watchedDate: Date?, isReviewed: Bool)?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
@@ -128,7 +128,8 @@ final class MediaDatabaseManager: MediaDBManager {
                 request.predicate = NSPredicate(format: "id == %d", id)
                 do {
                     if let entity = try context.fetch(request).first {
-                        observer(.success((entity.objectID, entity.toDomain(), entity.watchedDate)))
+                        let isReviewed = !(entity.review == nil)
+                        observer(.success((entity.objectID, entity.toDomain(), entity.watchedDate, isReviewed)))
                     } else {
                         observer(.success(nil))
                     }
@@ -141,7 +142,7 @@ final class MediaDatabaseManager: MediaDBManager {
         }
     }
     
-    func updateWatchedDate(id: Int, watchedDate: Date) -> Single<NSManagedObjectID?> {
+    func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))

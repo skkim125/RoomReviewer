@@ -15,12 +15,14 @@ final class MediaDetailReactor: Reactor {
     private let networkService: NetworkService
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
+    private let reviewDBManager: ReviewDBManager
     
-    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, mediaDBManager: MediaDBManager) {
+    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.initialState = State(media: media, title: media.title, overview: media.overview, genres: API.convertGenreString(media.genreIDS).joined(separator: " / "))
         self.networkService = networkService
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
+        self.reviewDBManager = reviewDBManager
     }
     
     struct State {
@@ -35,9 +37,10 @@ final class MediaDetailReactor: Reactor {
         var mediaSemiInfo: String?
         var isLoading: Bool?
         var errorType: Error?
-        var isWatchlisted: Bool?
+        var isWatchlisted: Bool = false
         var watchedDate: Date?
         var mediaObjectID: NSManagedObjectID?
+        var isReviewed: Bool = false
         @Pulse var showSetWatchedDateAlert: Void?
         @Pulse var pushWriteReviewView: (Media, NSManagedObjectID?)?
     }
@@ -47,6 +50,7 @@ final class MediaDetailReactor: Reactor {
         case loadBackdropImage(String?)
         case loadPosterImage(String?)
         case watchlistButtonTapped
+        case watchedButtonTapped
         case writeReviewButtonTapped
         case updateWatchedDate(Date)
     }
@@ -57,7 +61,7 @@ final class MediaDetailReactor: Reactor {
         case setBackdropImage(UIImage?)
         case setPosterImage(UIImage?)
         case showError(Error)
-        case setWatchlistStatus(isWatchlisted: Bool, watchedDate: Date?, mediaObjectID: NSManagedObjectID?)
+        case setWatchlistStatus(isWatchlisted: Bool, watchedDate: Date?, mediaObjectID: NSManagedObjectID?, isReviewed: Bool)
         case showSetWatchedDateAlert
         case setWatchedDate(Date)
         case pushWriteReviewView
@@ -67,14 +71,14 @@ final class MediaDetailReactor: Reactor {
         switch action {
         case .viewDidLoad:
             let media = currentState.media
-            
+            print(media.id)
             let checkWatchlist = mediaDBManager.fetchMedia(id: media.id)
                 .asObservable()
                 .map { result -> Mutation in
-                    if let (objectID, _, watchedDate) = result {
-                        return .setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate, mediaObjectID: objectID)
+                    if let (objectID, _, watchedDate, isReviewed) = result {
+                        return .setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed)
                     } else {
-                        return .setWatchlistStatus(isWatchlisted: false, watchedDate: nil, mediaObjectID: nil)
+                        return .setWatchlistStatus(isWatchlisted: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)
                     }
                 }
             
@@ -101,44 +105,56 @@ final class MediaDetailReactor: Reactor {
             
         case .watchlistButtonTapped:
             let media = currentState.media
-            let isCurrentlyWatchlisted = currentState.isWatchlisted ?? false
+            let isCurrentlyWatchlisted = currentState.isWatchlisted
+            let isReviewed = currentState.isReviewed
             
-            if isCurrentlyWatchlisted {
-                return mediaDBManager.deleteMedia(id: media.id)
+            if isReviewed {
+                return .empty()
+            } else {
+                if isCurrentlyWatchlisted {
+                    return mediaDBManager.deleteMedia(id: media.id)
+                        .asObservable()
+                        .observe(on: MainScheduler.instance)
+                        .flatMap { _ -> Observable<Mutation> in
+                            return .just(.setWatchlistStatus(isWatchlisted: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false))
+                        }
+                        .catch { .just(.showError($0)) }
+                } else {
+                    return mediaDBManager.createMedia(
+                        id: media.id,
+                        title: media.title,
+                        overview: media.overview,
+                        type: media.mediaType.rawValue,
+                        genres: media.genreIDS,
+                        releaseDate: media.releaseDate,
+                        watchedDate: nil
+                    )
+                    .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }
                     .asObservable()
                     .observe(on: MainScheduler.instance)
-                    .flatMap { _ -> Observable<Mutation> in
-                        return .just(.setWatchlistStatus(isWatchlisted: false, watchedDate: nil, mediaObjectID: nil))
+                    .flatMap { result -> Observable<Mutation> in
+                        if let (objectID, _, watchedDate, isReviewed) = result {
+                            return .just(.setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed))
+                        }
+                        return .empty()
                     }
                     .catch { .just(.showError($0)) }
-            } else {
-                return mediaDBManager.createMedia(
-                    id: media.id,
-                    title: media.title,
-                    overview: media.overview,
-                    type: media.mediaType.rawValue,
-                    genres: media.genreIDS,
-                    releaseDate: media.releaseDate,
-                    watchedDate: nil
-                )
-                .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }
-                .asObservable()
-                .observe(on: MainScheduler.instance)
-                .flatMap { result -> Observable<Mutation> in
-                    if let (objectID, _, watchedDate) = result {
-                        return .just(.setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate, mediaObjectID: objectID))
-                    }
-                    return .empty()
                 }
-                .catch { .just(.showError($0)) }
+            }
+        case .watchedButtonTapped:
+            let state = currentState
+            if currentState.watchedDate == nil {
+                return .just(.showSetWatchedDateAlert)
+            } else {
+                return mediaDBManager.updateWatchedDate(id: currentState.media.id, watchedDate: nil)
+                    .asObservable()
+                    .flatMap { _ -> Observable<Mutation> in
+                        return .just(.setWatchlistStatus(isWatchlisted: state.isWatchlisted, watchedDate: nil, mediaObjectID: state.mediaObjectID, isReviewed: state.isReviewed))
+                    }
             }
             
         case .writeReviewButtonTapped:
-            if let _ = currentState.watchedDate {
-                return .just(.pushWriteReviewView)
-            } else {
-                return .just(.showSetWatchedDateAlert)
-            }
+            return .just(.pushWriteReviewView)
             
         case .updateWatchedDate(let date):
             let media = currentState.media
@@ -181,14 +197,14 @@ final class MediaDetailReactor: Reactor {
         case .showError(let error):
             newState.errorType = error
             
-        case .setWatchlistStatus(let isWatchlisted, let date, let objectID):
+        case .setWatchlistStatus(let isWatchlisted, let date, let objectID, let isReviewed):
             newState.isWatchlisted = isWatchlisted
             newState.watchedDate = date
             newState.mediaObjectID = objectID
+            newState.isReviewed = isReviewed
             
         case .setWatchedDate(let date):
             newState.watchedDate = date
-            newState.pushWriteReviewView = (currentState.media, currentState.mediaObjectID)
             
         case .pushWriteReviewView:
             newState.pushWriteReviewView = (currentState.media, currentState.mediaObjectID)
