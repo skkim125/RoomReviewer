@@ -26,14 +26,14 @@ final class SearchMediaViewController: UIViewController {
     
     private let searchMediaReactor: SearchMediaReactor
     private let imageProvider: ImageProviding
-    private let dbManager: MediaDBManager
+    private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     private var disposeBag = DisposeBag()
     
-    init(searchMediaReactor: SearchMediaReactor, imageProvider: ImageProviding, dbManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(searchMediaReactor: SearchMediaReactor, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.searchMediaReactor = searchMediaReactor
         self.imageProvider = imageProvider
-        self.dbManager = dbManager
+        self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         super.init(nibName: nil, bundle: nil)
     }
@@ -122,7 +122,7 @@ final class SearchMediaViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, dbManager: owner.dbManager), imageProvider: owner.imageProvider, dbManager: owner.dbManager, reviewDBManager: owner.reviewDBManager)
+                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)

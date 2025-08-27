@@ -16,7 +16,7 @@ final class HomeViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private let homeReactor: HomeReactor
     private let imageProvider: ImageProviding
-    private let dbManager: MediaDBManager
+    private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
     private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
@@ -26,10 +26,10 @@ final class HomeViewController: UIViewController {
         $0.backgroundColor = .clear
     }
     
-    init(reactor: HomeReactor, imageProvider: ImageProviding, dbManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(reactor: HomeReactor, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.homeReactor = reactor
         self.imageProvider = imageProvider
-        self.dbManager = dbManager
+        self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         super.init(nibName: nil, bundle: nil)
     }
@@ -130,8 +130,8 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, dbManager: owner.dbManager)
-                let vc = MediaDetailViewController(reactor: detailReactor, imageProvider: owner.imageProvider, dbManager: owner.dbManager, reviewDBManager: owner.reviewDBManager)
+                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager)
+                let vc = MediaDetailViewController(reactor: detailReactor, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -140,7 +140,7 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = SearchMediaViewController(searchMediaReactor: SearchMediaReactor(networkService: NetworkManager()), imageProvider: owner.imageProvider, dbManager: owner.dbManager, reviewDBManager: owner.reviewDBManager)
+                let vc = SearchMediaViewController(searchMediaReactor: SearchMediaReactor(networkService: NetworkManager()), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 owner.navigationController?.present(nav, animated: true)
