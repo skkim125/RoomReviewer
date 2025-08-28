@@ -24,18 +24,18 @@ final class WriteReviewViewController: UIViewController, View {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = .systemGray5
+        $0.backgroundColor = AppColor.secondaryBackgroundColor
     }
     
     private let titleLabel = UILabel().then {
-        $0.font = .boldSystemFont(ofSize: 22)
+        $0.font = AppFont.boldLargeTitle
         $0.numberOfLines = 0
         $0.textAlignment = .center
     }
     
     private let ratingSectionTitle = UILabel().then {
         $0.text = "별점 매기기"
-        $0.font = .boldSystemFont(ofSize: 18)
+        $0.font = AppFont.boldTitle
     }
     private let ratingView = CosmosView().then {
         var setting = CosmosSettings()
@@ -56,10 +56,10 @@ final class WriteReviewViewController: UIViewController, View {
     
     private let reviewTitleLabel = UILabel().then {
         $0.text = "한줄평 작성하기"
-        $0.font = .boldSystemFont(ofSize: 18)
+        $0.font = AppFont.boldTitle
     }
     private let reviewTextField = UITextField().then {
-        $0.font = .systemFont(ofSize: 14)
+        $0.font = AppFont.subTitle
         $0.backgroundColor = .secondarySystemBackground
         $0.layer.cornerRadius = 8
         $0.placeholder = "ex) 시리즈의 결정판이나 동전 던지기는 진부해"
@@ -73,27 +73,27 @@ final class WriteReviewViewController: UIViewController, View {
     
     private let commentTitleLabel = UILabel().then {
         $0.text = "상세한 코멘트 남기기"
-        $0.font = .boldSystemFont(ofSize: 18)
+        $0.font = AppFont.boldTitle
     }
     private let reviewDetailTextView = UITextView().then {
-        $0.font = .systemFont(ofSize: 14)
+        $0.font = AppFont.subTitle
         $0.backgroundColor = .secondarySystemBackground
         $0.layer.cornerRadius = 8
         $0.textContainerInset = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
     }
     private let reviewDetailPlaceholderLabel = UILabel().then {
         $0.text = "한줄평으로 부족하다면 코멘트를 추가하세요(선택)"
-        $0.font = .systemFont(ofSize: 14)
+        $0.font = AppFont.subTitle
         $0.textColor = .placeholderText
         $0.isUserInteractionEnabled = false
     }
     
     private let quoteTitleaLabel = UILabel().then {
         $0.text = "내가 뽑은 명대사"
-        $0.font = .boldSystemFont(ofSize: 18)
+        $0.font = AppFont.boldTitle
     }
     private let quoteTextField = UITextField().then {
-        $0.font = .systemFont(ofSize: 14)
+        $0.font = AppFont.subTitle
         $0.backgroundColor = .secondarySystemBackground
         $0.layer.cornerRadius = 8
         $0.placeholder = "ex) 호의가 계속되면 그게 권리인 줄 알아(선택)"
@@ -107,10 +107,10 @@ final class WriteReviewViewController: UIViewController, View {
     
     private let saveButton = UIButton(type: .system).then {
         $0.setTitle("내 서재에 저장", for: .normal)
-        $0.titleLabel?.font = .boldSystemFont(ofSize: 18)
+        $0.titleLabel?.font = AppFont.boldTitle
         $0.backgroundColor = .systemRed
-        $0.setTitleColor(.white, for: .normal)
-        $0.setTitleColor(.lightGray, for: .disabled)
+        $0.setTitleColor(AppColor.primaryColor, for: .normal)
+        $0.setTitleColor(AppColor.inactiveColor, for: .disabled)
         $0.layer.cornerRadius = 12
         $0.isEnabled = false
     }
@@ -125,7 +125,7 @@ final class WriteReviewViewController: UIViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = AppColor.appBackgroundColor
         self.title = "감상 기록하기"
         
         configureHierarchy()
@@ -150,7 +150,7 @@ final class WriteReviewViewController: UIViewController, View {
                 if let image = image {
                     owner.posterImageView.image = image
                 } else {
-                    owner.posterImageView.backgroundColor = .systemGray5
+                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
                 }
             }
             .disposed(by: disposeBag)
@@ -160,7 +160,7 @@ final class WriteReviewViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, canSave in
                 owner.saveButton.isEnabled = canSave
-                owner.saveButton.backgroundColor = canSave ? .systemRed : .darkGray
+                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.secondaryColor
             }
             .disposed(by: disposeBag)
         
@@ -213,7 +213,7 @@ final class WriteReviewViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, canSave in
                 owner.saveButton.isEnabled = canSave
-                owner.saveButton.backgroundColor = canSave ? .systemRed : .darkGray
+                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.secondaryColor
             }
             .disposed(by: disposeBag)
     }

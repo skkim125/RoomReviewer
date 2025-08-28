@@ -40,7 +40,7 @@ final class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = AppColor.appBackgroundColor
         configureView()
         bind()
         
@@ -163,7 +163,7 @@ extension HomeViewController {
     
     private func configureNavigationBar() {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 28, weight: .bold)
+        label.font = AppFont.appIconTitle
         label.text = "방구석 평론가"
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: label)
         

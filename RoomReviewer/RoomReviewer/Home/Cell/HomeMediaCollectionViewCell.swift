@@ -32,8 +32,8 @@ final class HomeMediaCollectionViewCell: UICollectionViewCell, View {
     }
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
     private let tvNameLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 14, weight: .bold)
-        $0.textColor = .white
+        $0.font = AppFont.semiboldSubTitle
+        $0.textColor = AppColor.primaryColor
         $0.textAlignment = .center
         $0.numberOfLines = 2
     }
@@ -72,7 +72,7 @@ extension HomeMediaCollectionViewCell {
                 if let image = image {
                     owner.posterImageView.image = image
                 } else {
-                    owner.posterImageView.backgroundColor = .systemGray6
+                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
                 }
             }
             .disposed(by: disposeBag)
