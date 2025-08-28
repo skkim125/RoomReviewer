@@ -14,12 +14,12 @@ import Then
 final class SearchMediaViewController: UIViewController {
     private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnCollectionViewLayout()).then {
         $0.register(SearchMediaCollectionViewCell.self, forCellWithReuseIdentifier: SearchMediaCollectionViewCell.cellID)
-        $0.backgroundColor = .systemBackground
+        $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = false
     }
     private let searchTextField = UITextField().then {
         $0.borderStyle = .roundedRect
-        $0.font = .systemFont(ofSize: 14)
+        $0.font = AppFont.subTitle
         $0.returnKeyType = .search
         $0.placeholder = "검색어를 입력하세요"
     }
@@ -45,7 +45,7 @@ final class SearchMediaViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = AppColor.appBackgroundColor
         configureHierarchy()
         configureLayout()
         configureNavigationBar()

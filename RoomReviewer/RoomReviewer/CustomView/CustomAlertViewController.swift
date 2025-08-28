@@ -29,8 +29,8 @@ final class CustomAlertViewController: UIViewController {
     
     private let customContentView: UIView?
     
-    private lazy var confirmButton = CommonButton(title: "확인", foregroundColor: .white, backgroundColor: .systemBlue)
-    private lazy var cancelButton = CommonButton(title: "취소", foregroundColor: .white, backgroundColor: .lightGray)
+    private lazy var confirmButton = CommonButton(title: "확인", foregroundColor: AppColor.primaryColor, backgroundColor: .systemBlue)
+    private lazy var cancelButton = CommonButton(title: "취소", foregroundColor: AppColor.primaryColor, backgroundColor: AppColor.secondaryColor)
 
     init(title: String, subtitle: String? = nil, buttonType: AlertButtonType, contentView: UIView? = nil, confirmAction: CompletionHandler? = nil) {
         self.customContentView = contentView
@@ -89,7 +89,7 @@ final class CustomAlertViewController: UIViewController {
     private func configureView() {
         self.view.backgroundColor = .black.withAlphaComponent(0.4)
         
-        containerView.backgroundColor = .systemGray5
+        containerView.backgroundColor = AppColor.secondaryBackgroundColor
         containerView.layer.cornerRadius = 12
         containerView.clipsToBounds = true
         
@@ -102,11 +102,12 @@ final class CustomAlertViewController: UIViewController {
         buttonStackView.distribution = .fillEqually
         buttonStackView.spacing = 20
         
-        titleLabel.font = .systemFont(ofSize: 18, weight: .semibold)
+        titleLabel.font = AppFont.semiboldTitle
         titleLabel.textAlignment = .center
+        titleLabel.textColor = AppColor.primaryColor
         
-        subtitleLabel.font = .systemFont(ofSize: 14)
-        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.font = AppFont.subTitle
+        subtitleLabel.textColor = AppColor.secondaryColor
         subtitleLabel.numberOfLines = 0
         subtitleLabel.textAlignment = .center
     }

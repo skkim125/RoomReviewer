@@ -13,7 +13,7 @@ final class CommonButton: UIButton {
         super.init(frame: .zero)
         var configuration = UIButton.Configuration.filled()
         let container = AttributeContainer(
-            [.font: UIFont.systemFont(ofSize: 14, weight: .bold)]
+            [.font: AppFont.semiboldSubTitle]
         )
         configuration.attributedTitle = AttributedString(
             title,

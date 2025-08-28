@@ -63,7 +63,7 @@ extension SearchMediaCollectionViewCell {
                 if let image = image {
                     owner.posterImageView.image = image
                 } else {
-                    owner.posterImageView.backgroundColor = .systemGray6
+                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
                 }
             }
             .disposed(by: disposeBag)

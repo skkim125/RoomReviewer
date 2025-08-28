@@ -12,8 +12,8 @@ final class HomeSectionHeaderView: UICollectionReusableView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 20)
-        label.textColor = .label
+        label.font = AppFont.largeTitle
+        label.textColor = AppColor.primaryColor
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

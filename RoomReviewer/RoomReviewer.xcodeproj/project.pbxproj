@@ -35,6 +35,8 @@
 		0449527A2E082A1500D75C4A /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 044952792E082A1500D75C4A /* RxCocoa */; };
 		0449527E2E082A1500D75C4A /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527D2E082A1500D75C4A /* RxSwift */; };
 		044952802E082A1500D75C4A /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527F2E082A1500D75C4A /* RxTest */; };
+		044B8C312E60422A00EB016D /* AppColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044B8C302E60422A00EB016D /* AppColor.swift */; };
+		044B8C342E60423900EB016D /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044B8C332E60423900EB016D /* AppFont.swift */; };
 		0461E4D52E1A900C00EDB5D6 /* SearchMediaReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */; };
 		046E7A2E2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */; };
 		046E7A2F2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */; };
@@ -139,6 +141,8 @@
 		044952632E081A4A00D75C4A /* HomeSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSectionModel.swift; sourceTree = "<group>"; };
 		044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeReactorLoadDataUnitTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
+		044B8C302E60422A00EB016D /* AppColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColor.swift; sourceTree = "<group>"; };
+		044B8C332E60423900EB016D /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
 		0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaReactor.swift; sourceTree = "<group>"; };
 		046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReviewEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReviewEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -326,6 +330,15 @@
 				044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */,
 			);
 			path = HomeReactorLoadDataUnitTest;
+			sourceTree = "<group>";
+		};
+		044B8C322E60422E00EB016D /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				044B8C302E60422A00EB016D /* AppColor.swift */,
+				044B8C332E60423900EB016D /* AppFont.swift */,
+			);
+			path = Design;
 			sourceTree = "<group>";
 		};
 		046285AD2E4E1F9E00365B77 /* Utils */ = {
@@ -560,12 +573,13 @@
 		04FFC7CB2DF16A840081AF7C /* RoomReviewer */ = {
 			isa = PBXGroup;
 			children = (
+				044B8C322E60422E00EB016D /* Design */,
+				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04C97AAF2E20D8C4001EB1D4 /* App */,
 				046285AD2E4E1F9E00365B77 /* Utils */,
 				04FE6C8F2E5867D300CCB76C /* DB */,
 				0449525C2E08174000D75C4A /* Data */,
 				04DCA8A32DF2DBD500695361 /* Network */,
-				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
 				04A722DB2E549F2400797731 /* CustomView */,
@@ -893,6 +907,7 @@
 				04FE6C952E599C3A00CCB76C /* MovieDetail.swift in Sources */,
 				048096642E5DC9CB002033A0 /* MockDatastack.swift in Sources */,
 				043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */,
+				044B8C312E60422A00EB016D /* AppColor.swift in Sources */,
 				04DCA8A52DF2DBFC00695361 /* TargetType.swift in Sources */,
 				04C97ABE2E23784C001EB1D4 /* MediaDetailViewController.swift in Sources */,
 				04FE6C972E599C4100CCB76C /* TVDetail.swift in Sources */,
@@ -914,6 +929,7 @@
 				043BB0492DFC4EA800E5438D /* HomeViewController.swift in Sources */,
 				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,
 				04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */,
+				044B8C342E60423900EB016D /* AppFont.swift in Sources */,
 				04B9CBC02DFEAA8A00E84E78 /* HomeMediaCollectionViewCell.swift in Sources */,
 				04FE6C9C2E599E3000CCB76C /* MediaDetail.swift in Sources */,
 				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,

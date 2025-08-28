@@ -45,26 +45,21 @@ final class MediaDetailViewController: UIViewController {
     }
     
     private let titleLabel = UILabel().then {
-        $0.font = .boldSystemFont(ofSize: 20)
+        $0.font = AppFont.boldLargeTitle
         $0.numberOfLines = 0
         $0.textAlignment = .center
+        $0.textColor = AppColor.primaryColor
     }
     
     private let semiInfoLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .lightGray
-        $0.textAlignment = .center
-    }
-    
-    private let mediaTypeLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 14, weight: .semibold)
-        $0.textColor = .gray
+        $0.font = AppFont.subTitle
+        $0.textColor = AppColor.secondaryColor
         $0.textAlignment = .center
     }
     
     private let genreLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .lightGray
+        $0.font = AppFont.subTitle
+        $0.textColor = AppColor.secondaryColor
         $0.numberOfLines = 0
         $0.textAlignment = .center
     }
@@ -78,7 +73,7 @@ final class MediaDetailViewController: UIViewController {
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: "plus.circle")
         config.title = "보고 싶어요"
-        config.attributedTitle?.font = .systemFont(ofSize: 12, weight: .semibold)
+        config.attributedTitle?.font = AppFont.semiboldCallout
         config.imagePlacement = .top
         config.imagePadding = 8
         
@@ -89,7 +84,7 @@ final class MediaDetailViewController: UIViewController {
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: "eye")
         config.title = "시청함"
-        config.attributedTitle?.font = .systemFont(ofSize: 12, weight: .semibold)
+        config.attributedTitle?.font = AppFont.semiboldCallout
         config.imagePlacement = .top
         config.imagePadding = 8
         
@@ -103,7 +98,7 @@ final class MediaDetailViewController: UIViewController {
         config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
         
         config.title = "평론하기"
-        config.attributedTitle?.font = .systemFont(ofSize: 12, weight: .semibold)
+        config.attributedTitle?.font = AppFont.semiboldCallout
         config.imagePlacement = .top
         config.imagePadding = 8
         
@@ -111,30 +106,30 @@ final class MediaDetailViewController: UIViewController {
     }
     
     private let overviewLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 14)
+        $0.font = AppFont.subTitle
         $0.numberOfLines = 0
-        $0.textColor = .lightGray
+        $0.textColor = AppColor.bodyTextColor
         $0.textAlignment = .center
     }
     
     private let creditsTitleLabel = UILabel().then {
         $0.text = "주요 출연진"
-        $0.textColor = .white
-        $0.font = .boldSystemFont(ofSize: 18)
+        $0.textColor = AppColor.primaryColor
+        $0.font = AppFont.boldTitle
     }
     
     private let creatorLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 16)
-        $0.textColor = .white
+        $0.font = AppFont.subTitle
+        $0.textColor = AppColor.primaryColor
     }
     
     private lazy var castCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout()).then {
         $0.showsHorizontalScrollIndicator = false
         $0.register(CreditsCollectionViewCell.self, forCellWithReuseIdentifier: CreditsCollectionViewCell.cellID)
-        $0.backgroundColor = .gray.withAlphaComponent(0.1)
         $0.showsVerticalScrollIndicator = false
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 12
+        $0.backgroundColor = .clear
     }
     
     private let reactor: MediaDetailReactor
@@ -158,7 +153,7 @@ final class MediaDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = AppColor.appBackgroundColor
         configureHierarchy()
         configureLayout()
         setupPlaceholderState()
@@ -215,7 +210,7 @@ final class MediaDetailViewController: UIViewController {
                 if let image = image {
                     owner.backDropImageView.image = image
                 } else {
-                    owner.backDropImageView.backgroundColor = .systemGray6
+                    owner.backDropImageView.backgroundColor = AppColor.secondaryBackgroundColor
                 }
             }
             .disposed(by: disposeBag)
@@ -227,7 +222,7 @@ final class MediaDetailViewController: UIViewController {
                 if let image = image {
                     owner.posterImageView.image = image
                 } else {
-                    owner.posterImageView.backgroundColor = .systemGray6
+                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
                 }
             }
             .disposed(by: disposeBag)
@@ -252,9 +247,6 @@ final class MediaDetailViewController: UIViewController {
             .compactMap { watchlisted, watchedDate, reviewed -> (Bool, Date?, Bool)? in
                 return (watchlisted, watchedDate, reviewed)
             }
-//            .distinctUntilChanged { prev, curr in
-//                return prev.0 == curr.0 && prev.1 == curr.1 && prev.2 == curr.2
-//            }
             .asDriver(onErrorJustReturn: (false, nil, false))
             .drive(with: self) { owner, statuses in
                 let (isWatchlisted, watchedDate, isReviewed) = statuses
@@ -350,7 +342,7 @@ final class MediaDetailViewController: UIViewController {
         } else {
             config.title = "보고 싶어요"
             config.image = UIImage(systemName: "plus.circle")
-            config.baseForegroundColor = .lightGray
+            config.baseForegroundColor = AppColor.primaryColor
         }
         
         let attr = attributedTitle(with: config.title ?? "")
@@ -372,11 +364,11 @@ final class MediaDetailViewController: UIViewController {
         if let _ = watchedDate {
             config.title = "시청 완료"
             config.image = UIImage(systemName: "eye.fill")
-            config.baseForegroundColor = .white
-        } else { 
+            config.baseForegroundColor = AppColor.primaryColor
+        } else {
             config.title = "시청함"
             config.image = UIImage(systemName: "eye")
-            config.baseForegroundColor = .lightGray
+            config.baseForegroundColor = AppColor.inactiveColor
         }
         
         let attr = attributedTitle(with: config.title ?? "")
@@ -397,13 +389,13 @@ final class MediaDetailViewController: UIViewController {
         config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
         
         if isReviewed {
-            config.title = "리뷰 보기"
+            config.title = "평론 보기"
             config.image = UIImage(systemName: "doc.text.fill")
             config.baseForegroundColor = .systemGreen
         } else {
             config.title = "평론하기"
             config.image = UIImage(systemName: "sunglasses")
-            config.baseForegroundColor = isEnabled ? .white : .lightGray
+            config.baseForegroundColor = isEnabled ? AppColor.primaryColor : AppColor.inactiveColor
         }
         
         let attr = attributedTitle(with: config.title ?? "")
@@ -421,7 +413,7 @@ final class MediaDetailViewController: UIViewController {
         return NSAttributedString(
             string: text,
             attributes: [
-                .font: UIFont.systemFont(ofSize: 12, weight: .semibold),
+                .font: AppFont.semiboldCallout,
                 .paragraphStyle: paragraphStyle
             ]
         )
@@ -466,7 +458,7 @@ extension MediaDetailViewController {
         backDropImageView.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.top)
             $0.horizontalEdges.equalTo(contentView)
-            $0.height.equalTo(280)
+            $0.height.equalTo(250)
             $0.centerX.equalTo(contentView)
         }
         
@@ -508,13 +500,13 @@ extension MediaDetailViewController {
         }
         
         creatorLabel.snp.makeConstraints {
-            $0.top.equalTo(creditsTitleLabel.snp.bottom).offset(10)
-            $0.leading.trailing.equalTo(contentView).inset(20)
+            $0.top.equalTo(creditsTitleLabel.snp.bottom).offset(5)
+            $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
         castCollectionView.snp.makeConstraints {
-            $0.top.equalTo(creatorLabel.snp.bottom).offset(10)
-            $0.leading.trailing.equalTo(contentView).inset(10)
+            $0.top.equalTo(creatorLabel.snp.bottom).offset(5)
+            $0.horizontalEdges.equalTo(contentView).inset(20)
             $0.height.equalTo(205)
             $0.bottom.equalTo(contentView).inset(10)
         }
@@ -538,10 +530,10 @@ extension MediaDetailViewController {
     }
     
     private func setupPlaceholderState() {
-        backDropImageView.backgroundColor = .systemGray6
-        posterImageView.backgroundColor = .systemGray6
+        backDropImageView.backgroundColor = AppColor.secondaryBackgroundColor
+        posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
         
-        let placeholderColor = UIColor.systemGray5
+        let placeholderColor = AppColor.placeholderTextColor
         
         [genreLabel, semiInfoLabel, creatorLabel].forEach {
             $0.text = "\n"
@@ -556,22 +548,18 @@ extension MediaDetailViewController {
         overviewLabel.textColor = .clear
         overviewLabel.clipsToBounds = true
         overviewLabel.layer.cornerRadius = 8
-        
-        castCollectionView.backgroundColor = .systemGray6
     }
     
     private func removePlaceholderState() {
         [genreLabel, semiInfoLabel, creatorLabel, overviewLabel].forEach {
             $0.backgroundColor = .clear
-            $0.textColor = .white
+            $0.textColor = AppColor.primaryColor
         }
         
-        genreLabel.textColor = .lightGray
-        semiInfoLabel.textColor = .lightGray
-        overviewLabel.textColor = .lightGray
-        creatorLabel.textColor = .white
-        
-        castCollectionView.backgroundColor = .gray.withAlphaComponent(0.1)
+        genreLabel.textColor = AppColor.secondaryColor
+        semiInfoLabel.textColor = AppColor.secondaryColor
+        overviewLabel.textColor = AppColor.secondaryColor
+        creatorLabel.textColor = AppColor.primaryColor
     }
 }
 
@@ -585,11 +573,11 @@ extension UICollectionViewLayout {
         
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(180))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        group.interItemSpacing = .fixed(10)
+        group.interItemSpacing = .fixed(15)
         
         let section = NSCollectionLayoutSection(group: group)
         section.interGroupSpacing = 10
-        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 15, leading: 0, bottom: 15, trailing: 0)
         
         section.orthogonalScrollingBehavior = .continuous
         
