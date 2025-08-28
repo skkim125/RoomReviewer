@@ -18,19 +18,19 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = AppColor.secondaryColor
-        $0.tintColor = AppColor.primaryColor
+        $0.backgroundColor = AppColor.appSecondaryColor
+        $0.tintColor = AppColor.appPrimaryColor
     }
     
     private let nameLabel = UILabel().then {
         $0.font = AppFont.semiboldSubTitle
-        $0.textColor = AppColor.primaryColor
+        $0.textColor = AppColor.appPrimaryColor
         $0.textAlignment = .center
     }
     
     private let characterLabel = UILabel().then {
         $0.font = AppFont.callout
-        $0.textColor = AppColor.secondaryColor
+        $0.textColor = AppColor.appSecondaryColor
         $0.textAlignment = .center
         $0.numberOfLines = 1
     }
@@ -73,10 +73,6 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
         activityIndicator.snp.makeConstraints {
             $0.center.equalTo(profileImageView)
         }
-    }
-    
-    func configureCell(reactor: CreditsCollectionViewCellReactor) {
-        self.reactor = reactor
     }
     
     func bind(reactor: CreditsCollectionViewCellReactor) {

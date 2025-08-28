@@ -109,15 +109,14 @@ final class WriteReviewViewController: UIViewController, View {
         $0.setTitle("내 서재에 저장", for: .normal)
         $0.titleLabel?.font = AppFont.boldTitle
         $0.backgroundColor = .systemRed
-        $0.setTitleColor(AppColor.primaryColor, for: .normal)
-        $0.setTitleColor(AppColor.inactiveColor, for: .disabled)
+        $0.setTitleColor(AppColor.appPrimaryColor, for: .normal)
+        $0.setTitleColor(AppColor.appInactiveColor, for: .disabled)
         $0.layer.cornerRadius = 12
         $0.isEnabled = false
     }
     
-    init(reactor: WriteReviewReactor) {
+    init() {
         super.init(nibName: nil, bundle: nil)
-        self.reactor = reactor
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -134,11 +133,11 @@ final class WriteReviewViewController: UIViewController, View {
     }
     
     func bind(reactor: WriteReviewReactor) {
-        ratingView.didTouchCosmos = { [weak self] rating in
-            guard let self = self else { return }
-            self.reactor?.action.onNext(.ratingChanged(rating))
-        }
-        
+        bindState(reactor: reactor)
+        bindAction(reactor: reactor)
+    }
+    
+    private func bindState(reactor: WriteReviewReactor) {
         reactor.state.map { $0.title }
             .asDriver(onErrorJustReturn: nil)
             .drive(titleLabel.rx.text)
@@ -160,7 +159,7 @@ final class WriteReviewViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, canSave in
                 owner.saveButton.isEnabled = canSave
-                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.secondaryColor
+                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.appSecondaryColor
             }
             .disposed(by: disposeBag)
         
@@ -179,6 +178,22 @@ final class WriteReviewViewController: UIViewController, View {
                 owner.ratingView.rating = rating
             }
             .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.canSave }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self) { owner, canSave in
+                owner.saveButton.isEnabled = canSave
+                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.appSecondaryColor
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindAction(reactor: WriteReviewReactor) {
+        ratingView.didTouchCosmos = { [weak self] rating in
+            guard let self = self else { return }
+            self.reactor?.action.onNext(.ratingChanged(rating))
+        }
         
         reviewTextField.rx.text.orEmpty
             .map(Reactor.Action.reviewChanged)
@@ -206,15 +221,6 @@ final class WriteReviewViewController: UIViewController, View {
                 return Reactor.Action.saveButtonTapped
             }
             .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        reactor.state.map { $0.canSave }
-            .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self) { owner, canSave in
-                owner.saveButton.isEnabled = canSave
-                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.secondaryColor
-            }
             .disposed(by: disposeBag)
     }
 }

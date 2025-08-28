@@ -6,13 +6,13 @@
 //
 
 import UIKit
-import RxSwift
+import ReactorKit
 import RxCocoa
 import SnapKit
 import Then
 
-final class SearchMediaViewController: UIViewController {
-    private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnCollectionViewLayout()).then {
+final class SearchMediaViewController: UIViewController, View {
+    private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnCollectionViewLayout).then {
         $0.register(SearchMediaCollectionViewCell.self, forCellWithReuseIdentifier: SearchMediaCollectionViewCell.cellID)
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = false
@@ -24,14 +24,12 @@ final class SearchMediaViewController: UIViewController {
         $0.placeholder = "검색어를 입력하세요"
     }
     
-    private let searchMediaReactor: SearchMediaReactor
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
-    private var disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
-    init(searchMediaReactor: SearchMediaReactor, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
-        self.searchMediaReactor = searchMediaReactor
+    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
@@ -49,12 +47,11 @@ final class SearchMediaViewController: UIViewController {
         configureHierarchy()
         configureLayout()
         configureNavigationBar()
-        bind()
     }
     
-    private func bind() {
-        bindAction(reactor: searchMediaReactor)
-        bindState(reactor: searchMediaReactor)
+    func bind(reactor: SearchMediaReactor) {
+        bindAction(reactor: reactor)
+        bindState(reactor: reactor)
     }
     
     private func bindAction(reactor: SearchMediaReactor) {
@@ -122,7 +119,9 @@ final class SearchMediaViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let vc = MediaDetailViewController(reactor: MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let reactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                vc.reactor = reactor
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -152,25 +151,5 @@ extension SearchMediaViewController {
     private func configureNavigationBar() {
         navigationItem.title = "미디어 검색"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: nil, action: nil)
-    }
-}
-
-extension UICollectionViewLayout {
-    static func threeColumnCollectionViewLayout() -> UICollectionViewCompositionalLayout {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0/3),
-            heightDimension: .fractionalHeight(1.0)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(180))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        group.interItemSpacing = .fixed(10)
-        
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 10
-        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
-        
-        return UICollectionViewCompositionalLayout(section: section)
     }
 }

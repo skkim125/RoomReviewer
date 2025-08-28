@@ -29,8 +29,8 @@ final class CustomAlertViewController: UIViewController {
     
     private let customContentView: UIView?
     
-    private lazy var confirmButton = CommonButton(title: "확인", foregroundColor: AppColor.primaryColor, backgroundColor: .systemBlue)
-    private lazy var cancelButton = CommonButton(title: "취소", foregroundColor: AppColor.primaryColor, backgroundColor: AppColor.secondaryColor)
+    private lazy var confirmButton = CommonButton(title: "확인", foregroundColor: AppColor.appPrimaryColor, backgroundColor: .systemBlue)
+    private lazy var cancelButton = CommonButton(title: "취소", foregroundColor: AppColor.appPrimaryColor, backgroundColor: AppColor.appSecondaryColor)
 
     init(title: String, subtitle: String? = nil, buttonType: AlertButtonType, contentView: UIView? = nil, confirmAction: CompletionHandler? = nil) {
         self.customContentView = contentView
@@ -104,10 +104,10 @@ final class CustomAlertViewController: UIViewController {
         
         titleLabel.font = AppFont.semiboldTitle
         titleLabel.textAlignment = .center
-        titleLabel.textColor = AppColor.primaryColor
+        titleLabel.textColor = AppColor.appPrimaryColor
         
         subtitleLabel.font = AppFont.subTitle
-        subtitleLabel.textColor = AppColor.secondaryColor
+        subtitleLabel.textColor = AppColor.appSecondaryColor
         subtitleLabel.numberOfLines = 0
         subtitleLabel.textAlignment = .center
     }

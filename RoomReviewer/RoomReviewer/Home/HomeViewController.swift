@@ -6,15 +6,13 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
+import ReactorKit
 import RxDataSources
 import SnapKit
 import Then
 
-final class HomeViewController: UIViewController {
-    private var disposeBag = DisposeBag()
-    private let homeReactor: HomeReactor
+final class HomeViewController: UIViewController, View {
+    var disposeBag = DisposeBag()
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
@@ -26,8 +24,7 @@ final class HomeViewController: UIViewController {
         $0.backgroundColor = .clear
     }
     
-    init(reactor: HomeReactor, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
-        self.homeReactor = reactor
+    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
@@ -42,9 +39,8 @@ final class HomeViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = AppColor.appBackgroundColor
         configureView()
-        bind()
         
-        homeReactor.action.onNext(.fetchData)
+        reactor?.action.onNext(.fetchData)
     }
     
     private func configureView() {
@@ -53,9 +49,9 @@ final class HomeViewController: UIViewController {
         configureNavigationBar()
     }
     
-    private func bind() {
-        bindAction(reactor: homeReactor)
-        bindState(reactor: homeReactor)
+    func bind(reactor: HomeReactor) {
+        bindAction(reactor: reactor)
+        bindState(reactor: reactor)
     }
     
     private func bindAction(reactor: HomeReactor) {
@@ -131,7 +127,8 @@ final class HomeViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
                 let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
-                let vc = MediaDetailViewController(reactor: detailReactor, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                vc.reactor = detailReactor
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -140,7 +137,8 @@ final class HomeViewController: UIViewController {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = SearchMediaViewController(searchMediaReactor: SearchMediaReactor(networkService: NetworkManager()), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = SearchMediaViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                vc.reactor = SearchMediaReactor(networkService: NetworkManager())
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 owner.navigationController?.present(nav, animated: true)
@@ -168,37 +166,5 @@ extension HomeViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: label)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .done, target: nil, action: nil)
-    }
-}
-
-extension UICollectionViewLayout {
-    static var homeCollectionViewLayout: UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { sectionIndex, layoutEnvironment in
-                
-                let itemSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalHeight(1.0)
-                )
-                let item = NSCollectionLayoutItem(layoutSize: itemSize)
-                
-                let groupSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(0.3),
-                    heightDimension: .fractionalHeight(0.25)
-                )
-                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-                
-                let section = NSCollectionLayoutSection(group: group)
-                section.orthogonalScrollingBehavior = .continuous
-                section.interGroupSpacing = 15
-                section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 15, bottom: 20, trailing: 15)
-                
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(40))
-                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
-                section.boundarySupplementaryItems = [header]
-                
-                return section
-            }
-            
-            return layout
     }
 }

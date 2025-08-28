@@ -37,6 +37,7 @@
 		044952802E082A1500D75C4A /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0449527F2E082A1500D75C4A /* RxTest */; };
 		044B8C312E60422A00EB016D /* AppColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044B8C302E60422A00EB016D /* AppColor.swift */; };
 		044B8C342E60423900EB016D /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044B8C332E60423900EB016D /* AppFont.swift */; };
+		044B8C3B2E60831300EB016D /* UICollectionViewLayout+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044B8C3A2E60831300EB016D /* UICollectionViewLayout+.swift */; };
 		0461E4D52E1A900C00EDB5D6 /* SearchMediaReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */; };
 		046E7A2E2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */; };
 		046E7A2F2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */; };
@@ -143,6 +144,7 @@
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
 		044B8C302E60422A00EB016D /* AppColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColor.swift; sourceTree = "<group>"; };
 		044B8C332E60423900EB016D /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
+		044B8C3A2E60831300EB016D /* UICollectionViewLayout+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionViewLayout+.swift"; sourceTree = "<group>"; };
 		0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaReactor.swift; sourceTree = "<group>"; };
 		046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReviewEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReviewEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -339,6 +341,14 @@
 				044B8C332E60423900EB016D /* AppFont.swift */,
 			);
 			path = Design;
+			sourceTree = "<group>";
+		};
+		044B8C392E60830500EB016D /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				044B8C3A2E60831300EB016D /* UICollectionViewLayout+.swift */,
+			);
+			path = Extension;
 			sourceTree = "<group>";
 		};
 		046285AD2E4E1F9E00365B77 /* Utils */ = {
@@ -573,8 +583,9 @@
 		04FFC7CB2DF16A840081AF7C /* RoomReviewer */ = {
 			isa = PBXGroup;
 			children = (
-				044B8C322E60422E00EB016D /* Design */,
 				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
+				044B8C392E60830500EB016D /* Extension */,
+				044B8C322E60422E00EB016D /* Design */,
 				04C97AAF2E20D8C4001EB1D4 /* App */,
 				046285AD2E4E1F9E00365B77 /* Utils */,
 				04FE6C8F2E5867D300CCB76C /* DB */,
@@ -923,6 +934,7 @@
 				04FFC7D02DF16A840081AF7C /* AppDelegate.swift in Sources */,
 				043BB04D2DFC4F2A00E5438D /* HomeReactor.swift in Sources */,
 				04FE6C812E585F6C00CCB76C /* MovieCreditsResponse.swift in Sources */,
+				044B8C3B2E60831300EB016D /* UICollectionViewLayout+.swift in Sources */,
 				040AD09A2E1F7F6900C6EBC9 /* HomeSectionHeaderView.swift in Sources */,
 				044952642E081A4A00D75C4A /* HomeSectionModel.swift in Sources */,
 				04C97AB12E224717001EB1D4 /* Media.swift in Sources */,
@@ -1207,7 +1219,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RoomReviewer/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1240,7 +1252,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RoomReviewer/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
