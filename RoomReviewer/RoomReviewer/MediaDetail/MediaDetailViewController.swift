@@ -12,7 +12,7 @@ import ReactorKit
 import SnapKit
 import Then
 
-final class MediaDetailViewController: UIViewController {
+final class MediaDetailViewController: UIViewController, View {
     private let scrollView = UIScrollView().then {
         $0.showsVerticalScrollIndicator = false
     }
@@ -48,18 +48,18 @@ final class MediaDetailViewController: UIViewController {
         $0.font = AppFont.boldLargeTitle
         $0.numberOfLines = 0
         $0.textAlignment = .center
-        $0.textColor = AppColor.primaryColor
+        $0.textColor = AppColor.appPrimaryColor
     }
     
     private let semiInfoLabel = UILabel().then {
         $0.font = AppFont.subTitle
-        $0.textColor = AppColor.secondaryColor
+        $0.textColor = AppColor.appSecondaryColor
         $0.textAlignment = .center
     }
     
     private let genreLabel = UILabel().then {
         $0.font = AppFont.subTitle
-        $0.textColor = AppColor.secondaryColor
+        $0.textColor = AppColor.appSecondaryColor
         $0.numberOfLines = 0
         $0.textAlignment = .center
     }
@@ -108,22 +108,22 @@ final class MediaDetailViewController: UIViewController {
     private let overviewLabel = UILabel().then {
         $0.font = AppFont.subTitle
         $0.numberOfLines = 0
-        $0.textColor = AppColor.bodyTextColor
+        $0.textColor = AppColor.appBodyTextColor
         $0.textAlignment = .center
     }
     
     private let creditsTitleLabel = UILabel().then {
         $0.text = "주요 출연진"
-        $0.textColor = AppColor.primaryColor
+        $0.textColor = AppColor.appPrimaryColor
         $0.font = AppFont.boldTitle
     }
     
     private let creatorLabel = UILabel().then {
         $0.font = AppFont.subTitle
-        $0.textColor = AppColor.primaryColor
+        $0.textColor = AppColor.appPrimaryColor
     }
     
-    private lazy var castCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout()).then {
+    private lazy var castCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout).then {
         $0.showsHorizontalScrollIndicator = false
         $0.register(CreditsCollectionViewCell.self, forCellWithReuseIdentifier: CreditsCollectionViewCell.cellID)
         $0.showsVerticalScrollIndicator = false
@@ -132,14 +132,12 @@ final class MediaDetailViewController: UIViewController {
         $0.backgroundColor = .clear
     }
     
-    private let reactor: MediaDetailReactor
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
-    private let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
-    init(reactor: MediaDetailReactor, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
-        self.reactor = reactor
+    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
@@ -157,12 +155,11 @@ final class MediaDetailViewController: UIViewController {
         configureHierarchy()
         configureLayout()
         setupPlaceholderState()
-        bind()
         
-        reactor.action.onNext(.viewDidLoad)
+        reactor?.action.onNext(.viewDidLoad)
     }
     
-    private func bind() {
+    func bind(reactor: MediaDetailReactor) {
         bindState(reactor: reactor)
         bindAction(reactor: reactor)
     }
@@ -267,7 +264,8 @@ final class MediaDetailViewController: UIViewController {
                 }
                 
                 let reactor = WriteReviewReactor(mediaObjectID: validObjectID, title: media.title, posterPath: media.posterPath, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
-                let vc = WriteReviewViewController(reactor: reactor)
+                let vc = WriteReviewViewController()
+                vc.reactor = reactor
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -290,19 +288,16 @@ final class MediaDetailViewController: UIViewController {
                 }
             }
             .drive(castCollectionView.rx.items(cellIdentifier: CreditsCollectionViewCell.cellID, cellType: CreditsCollectionViewCell.self)) { index, reactor, cell in
-                cell.configureCell(reactor: reactor)
+                cell.reactor = reactor
             }
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.creatorInfo }
-            .asDriver(onErrorJustReturn: (nil, nil))
+            .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, creator in
-                let (mediaType, creator) = creator
-                let creatorTypeText: String
                 if let creator = creator {
                     let creatorsText = creator.map { $0.name }.joined(separator: ", ")
-                    creatorTypeText = mediaType == .movie ? "감독" : "제작진"
-                    owner.creatorLabel.text = "\(creatorTypeText): \(creatorsText)"
+                    owner.creatorLabel.text = "크리에이터: \(creatorsText)"
                     owner.creatorLabel.isHidden = false
                 } else {
                     owner.creatorLabel.isHidden = true
@@ -342,7 +337,7 @@ final class MediaDetailViewController: UIViewController {
         } else {
             config.title = "보고 싶어요"
             config.image = UIImage(systemName: "plus.circle")
-            config.baseForegroundColor = AppColor.primaryColor
+            config.baseForegroundColor = AppColor.appPrimaryColor
         }
         
         let attr = attributedTitle(with: config.title ?? "")
@@ -364,11 +359,11 @@ final class MediaDetailViewController: UIViewController {
         if let _ = watchedDate {
             config.title = "시청 완료"
             config.image = UIImage(systemName: "eye.fill")
-            config.baseForegroundColor = AppColor.primaryColor
+            config.baseForegroundColor = AppColor.appPrimaryColor
         } else {
             config.title = "시청함"
             config.image = UIImage(systemName: "eye")
-            config.baseForegroundColor = AppColor.inactiveColor
+            config.baseForegroundColor = AppColor.appInactiveColor
         }
         
         let attr = attributedTitle(with: config.title ?? "")
@@ -395,7 +390,7 @@ final class MediaDetailViewController: UIViewController {
         } else {
             config.title = "평론하기"
             config.image = UIImage(systemName: "sunglasses")
-            config.baseForegroundColor = isEnabled ? AppColor.primaryColor : AppColor.inactiveColor
+            config.baseForegroundColor = isEnabled ? AppColor.appPrimaryColor : AppColor.appInactiveColor
         }
         
         let attr = attributedTitle(with: config.title ?? "")
@@ -474,12 +469,12 @@ extension MediaDetailViewController {
         }
         
         infoStackView.snp.makeConstraints {
-            $0.top.equalTo(shadowView.snp.bottom).offset(15)
+            $0.top.equalTo(shadowView.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
         actionButtonStackView.snp.makeConstraints {
-            $0.top.equalTo(infoStackView.snp.bottom).offset(15)
+            $0.top.equalTo(infoStackView.snp.bottom).offset(10)
             $0.centerX.equalTo(contentView)
         }
         
@@ -490,7 +485,7 @@ extension MediaDetailViewController {
         }
         
         overviewLabel.snp.makeConstraints {
-            $0.top.equalTo(actionButtonStackView.snp.bottom).offset(15)
+            $0.top.equalTo(actionButtonStackView.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
@@ -522,8 +517,9 @@ extension MediaDetailViewController {
         datePicker.maximumDate = Date()
         
         let alert = CustomAlertViewController(title: "시청한 날짜 선택", subtitle: "미디어를 시청한 날짜를 선택해주세요.", buttonType: .twoButton, contentView: datePicker) { [weak self] in
+            guard let self = self else { return }
             let selectedDate = datePicker.date
-            self?.reactor.action.onNext(.updateWatchedDate(selectedDate))
+            self.reactor?.action.onNext(.updateWatchedDate(selectedDate))
         }
         
         present(alert, animated: true)
@@ -551,38 +547,15 @@ extension MediaDetailViewController {
     }
     
     private func removePlaceholderState() {
-        [genreLabel, semiInfoLabel, creatorLabel, overviewLabel].forEach {
+        let placeholderLabels = [genreLabel, semiInfoLabel, creatorLabel, overviewLabel]
+        
+        placeholderLabels.forEach {
             $0.backgroundColor = .clear
-            $0.textColor = AppColor.primaryColor
         }
         
-        genreLabel.textColor = AppColor.secondaryColor
-        semiInfoLabel.textColor = AppColor.secondaryColor
-        overviewLabel.textColor = AppColor.secondaryColor
-        creatorLabel.textColor = AppColor.primaryColor
-    }
-}
-
-extension UICollectionViewLayout {
-    static func creditsCollectionViewLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0/3),
-            heightDimension: .fractionalHeight(1.0)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(180))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        group.interItemSpacing = .fixed(15)
-        
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 10
-        section.contentInsets = NSDirectionalEdgeInsets(top: 15, leading: 0, bottom: 15, trailing: 0)
-        
-        section.orthogonalScrollingBehavior = .continuous
-        
-        let layout = UICollectionViewCompositionalLayout(section: section)
-        
-        return layout
+        genreLabel.textColor = AppColor.appSecondaryColor
+        semiInfoLabel.textColor = AppColor.appSecondaryColor
+        overviewLabel.textColor = AppColor.appBodyTextColor
+        creatorLabel.textColor = AppColor.appPrimaryColor
     }
 }

@@ -18,7 +18,7 @@ final class MediaDetailReactor: Reactor {
     private let reviewDBManager: ReviewDBManager
     
     init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
-        self.initialState = State(media: media, title: media.title, overview: media.overview, genres: API.convertGenreString(media.genreIDS).joined(separator: " / "))
+        self.initialState = State(media: media, title: media.title)
         self.networkService = networkService
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
@@ -33,7 +33,7 @@ final class MediaDetailReactor: Reactor {
         var backDropImageData: UIImage?
         var posterImageData: UIImage?
         var casts: [Cast]?
-        var creatorInfo: (MediaType?,[Crew]?)
+        var creatorInfo: ([Crew]?)
         var mediaSemiInfo: String?
         var isLoading: Bool?
         var errorType: Error?
@@ -57,7 +57,8 @@ final class MediaDetailReactor: Reactor {
     
     enum Mutation {
         case setLoading(Bool)
-        case getMediaDetail((MediaType,MediaDetail))
+        case setInitialData(overview: String?, genres: String?)
+        case getMediaDetail(MediaDetail)
         case setBackdropImage(UIImage?)
         case setPosterImage(UIImage?)
         case showError(Error)
@@ -72,6 +73,12 @@ final class MediaDetailReactor: Reactor {
         case .viewDidLoad:
             let media = currentState.media
             print(media.id)
+            
+            let setInitialData = Observable.just(Mutation.setInitialData(
+                overview: media.overview,
+                genres: API.convertGenreString(media.genreIDS).joined(separator: " / ")
+            ))
+            
             let checkWatchlist = mediaDBManager.fetchMedia(id: media.id)
                 .asObservable()
                 .map { result -> Mutation in
@@ -91,7 +98,7 @@ final class MediaDetailReactor: Reactor {
             
             return Observable.concat([
                 .just(.setLoading(true)),
-                Observable.merge(checkWatchlist, fetchOthers).observe(on: MainScheduler.instance),
+                Observable.merge(setInitialData, checkWatchlist, fetchOthers).observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
             
@@ -175,10 +182,14 @@ final class MediaDetailReactor: Reactor {
         case .setLoading(let loading):
             newState.isLoading = loading
             
+        case .setInitialData(let overview, let genres):
+            newState.overview = overview
+            newState.genres = genres
+            
         case .getMediaDetail(let mediaInfo):
-            let (mediaType, detail) = mediaInfo
+            let detail = mediaInfo
             newState.casts = detail.cast
-            newState.creatorInfo = (mediaType, detail.creator)
+            newState.creatorInfo = detail.creator
             
             let mediaSemiInfoItems: [String?] = [
                 detail.runtimeOrEpisodeInfo,
@@ -237,7 +248,7 @@ extension MediaDetailReactor {
                 .flatMap { (result: Result<MovieDetail, Error>) -> Observable<Mutation> in
                     switch result {
                     case .success(let detail):
-                        return .just(.getMediaDetail((media.mediaType, detail.toDomain())))
+                        return .just(.getMediaDetail(detail.toDomain()))
                     case .failure(let error):
                         return .just(.showError(error))
                     }
@@ -249,7 +260,7 @@ extension MediaDetailReactor {
                 .flatMap { (result: Result<TVDetail, Error>) -> Observable<Mutation> in
                     switch result {
                     case .success(let detail):
-                        return .just(.getMediaDetail((media.mediaType, detail.toDomain())))
+                        return .just(.getMediaDetail(detail.toDomain()))
                     case .failure(let error):
                         return .just(.showError(error))
                     }
