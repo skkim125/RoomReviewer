@@ -71,19 +71,23 @@ extension TMDBTargetType: TargetType {
     var query: [URLQueryItem]? {
         switch self {
         case .movie:
+            let (nowDate, twoMonthAgo) = setDate()
+            
             return [
                 URLQueryItem(name: "language", value: "ko-KR"),
                 URLQueryItem(name: "region", value: "KR"),
                 URLQueryItem(name: "watch_region", value: "KR"),
                 URLQueryItem(name: "with_release_type", value: "3|4"),
-                URLQueryItem(name: "primary_release_date.gte", value: "2025-06-01"),
-                URLQueryItem(name: "primary_release_date.lte", value: "2025-07-12"),
-                URLQueryItem(name: "release_date.gte", value: "2025-06-01"),
-                URLQueryItem(name: "release_date.lte", value: "2025-07-12"),
+                URLQueryItem(name: "primary_release_date.gte", value: twoMonthAgo),
+                URLQueryItem(name: "primary_release_date.lte", value: nowDate),
+                URLQueryItem(name: "release_date.gte", value: twoMonthAgo),
+                URLQueryItem(name: "release_date.lte", value: nowDate),
                 URLQueryItem(name: "sort_by", value: "popularity.desc"),
                 URLQueryItem(name: "vote_count.gte", value: "50"),
             ]
         case .tv:
+            let (nowDate, twoMonthAgo) = setDate()
+            
             return [
                 URLQueryItem(name: "language", value: "ko-KR"),
                 URLQueryItem(name: "watch_region", value: "KR"),
@@ -91,10 +95,10 @@ extension TMDBTargetType: TargetType {
                 URLQueryItem(name: "with_watch_providers", value: "337|8|356|350|1796|1881|1883"),
                 URLQueryItem(name: "with_original_language", value: "ko"),
                 URLQueryItem(name: "sort_by", value: "popularity.desc"),
-                URLQueryItem(name: "first_air_date.gte", value: "2025-05-01"),
-                URLQueryItem(name: "first_air_date.lte", value: "2025-07-12"),
-                URLQueryItem(name: "air_date.gte", value: "2025-05-01"),
-                URLQueryItem(name: "air_date.lte", value: "2025-07-12"),
+                URLQueryItem(name: "first_air_date.gte", value: twoMonthAgo),
+                URLQueryItem(name: "first_air_date.lte", value: nowDate),
+                URLQueryItem(name: "air_date.gte", value: twoMonthAgo),
+                URLQueryItem(name: "air_date.lte", value: nowDate),
                 URLQueryItem(name: "vote_count.gte", value: "5"),
                 URLQueryItem(name: "without_genres", value: "10764,99")
             ]
@@ -191,5 +195,35 @@ enum MockTargetType: TargetType {
         case .movie:
             nil
         }
+    }
+}
+
+extension TMDBTargetType {
+    private func setDate() -> (String, String) {
+        let nowDate = Date()
+        let nowDateString = convertDateString(nowDate)
+        
+        let twoMonthAgo = Calendar.current.date(byAdding: .month, value: -2, to: nowDate)
+        let components = Calendar.current.dateComponents([.year, .month], from: twoMonthAgo ?? Date())
+        let firstDayOfTwoMonth = Calendar.current.date(from: components)
+        let oneMonthAgoDateString = convertDateString(firstDayOfTwoMonth)
+        
+        return (nowDateString, oneMonthAgoDateString)
+    }
+    
+    private func convertDateString(_ date: Date?) -> String {
+        guard let date = date else { return "" }
+        
+        return DateFormatter.dateFormatter.string(from: date)
+    }
+}
+
+extension DateFormatter {
+    static var dateFormatter: DateFormatter {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.locale = Locale(identifier: "ko_KR")
+        dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+        return dateFormatter
     }
 }
