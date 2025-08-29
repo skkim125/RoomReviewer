@@ -22,6 +22,7 @@ final class HomeReactor: Reactor {
     struct State {
         var isLoading: Bool = false
         var medias: [HomeSectionModel] = []
+        var trendMedias: [Int] = []
         var errorType: Error?
         @Pulse var presentWriteReviewView: Void?
         @Pulse var selectedMedia: Media?
@@ -64,6 +65,12 @@ final class HomeReactor: Reactor {
             newState.errorType = error
         case .fetchedData(let sections):
             newState.medias = sections
+            let originalTrends = Array(1...5)
+            
+            if let first = originalTrends.first, let last = originalTrends.last {
+                newState.trendMedias = [last] + originalTrends + [first]
+            }
+            
         case .setLoading(let loaded):
             newState.isLoading = loaded
         case .presentWriteReviewView:

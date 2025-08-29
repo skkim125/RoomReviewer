@@ -17,7 +17,16 @@ final class HomeViewController: UIViewController, View {
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
-    private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
+    private let scrollView = UIScrollView().then {
+        $0.showsVerticalScrollIndicator = false
+    }
+    
+    private let trendMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .trendMediaCollectionViewLayout).then {
+        $0.backgroundColor = .clear
+        $0.register(TrendMediaCollectionViewCell.self, forCellWithReuseIdentifier: TrendMediaCollectionViewCell.cellID)
+    }
+    
+    private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .hotMediaCollectionViewLayout).then {
         $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
         $0.register(HomeSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HomeSectionHeaderView.reusableID)
         $0.showsHorizontalScrollIndicator = false
@@ -144,18 +153,41 @@ final class HomeViewController: UIViewController, View {
                 owner.navigationController?.present(nav, animated: true)
             }
             .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.trendMedias }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(to: trendMediaCollectionView.rx.items(cellIdentifier: TrendMediaCollectionViewCell.cellID, cellType: TrendMediaCollectionViewCell.self)) { a, b, cell in
+                cell.imageView.backgroundColor = .systemYellow
+            }
+            .disposed(by: disposeBag)
     }
 }
 
 extension HomeViewController {
     private func configureHierarchy() {
-        view.addSubview(hotMediaCollectionView)
+        view.addSubview(scrollView)
+        
+        scrollView.addSubview(trendMediaCollectionView)
+        scrollView.addSubview(hotMediaCollectionView)
     }
     
     private func configureLayout() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(view)
+        }
+        
+        trendMediaCollectionView.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.width.equalTo(scrollView.snp.width)
+            $0.height.equalTo(trendMediaCollectionView.snp.width).multipliedBy(1.2)
+        }
+        
         hotMediaCollectionView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            $0.bottom.lessThanOrEqualTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(trendMediaCollectionView.snp.bottom)
+            $0.width.equalTo(scrollView.snp.width)
+            $0.bottom.equalToSuperview().inset(15)
+            $0.height.equalTo(480)
         }
     }
     
