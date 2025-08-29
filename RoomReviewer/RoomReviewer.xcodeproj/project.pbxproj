@@ -18,6 +18,7 @@
 		0413666B2E0139250026514E /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0413666A2E0139250026514E /* RxTest */; };
 		0413666D2E0139920026514E /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 0413666C2E0139920026514E /* RxCocoa */; };
 		042968932E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042968922E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift */; };
+		042968982E619DC700E6DFF6 /* TrendMediaResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042968972E619DC700E6DFF6 /* TrendMediaResponse.swift */; };
 		042EFE642E14040500810E02 /* SearchMediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042EFE632E14040500810E02 /* SearchMediaViewController.swift */; };
 		043BB0432DFC4D8800E5438D /* TV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0422DFC4D8800E5438D /* TV.swift */; };
 		043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0442DFC4DA700E5438D /* TMDBTarget.swift */; };
@@ -135,6 +136,7 @@
 		041366582E0136C60026514E /* HomeTVCollectionViewCellReactorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeTVCollectionViewCellReactorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		041366612E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCellReactorTests.swift; sourceTree = "<group>"; };
 		042968922E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMediaCollectionViewCell.swift; sourceTree = "<group>"; };
+		042968972E619DC700E6DFF6 /* TrendMediaResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMediaResponse.swift; sourceTree = "<group>"; };
 		042EFE632E14040500810E02 /* SearchMediaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaViewController.swift; sourceTree = "<group>"; };
 		043BB0422DFC4D8800E5438D /* TV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TV.swift; sourceTree = "<group>"; };
 		043BB0442DFC4DA700E5438D /* TMDBTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBTarget.swift; sourceTree = "<group>"; };
@@ -285,6 +287,14 @@
 				041366612E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift */,
 			);
 			path = HomeTVCollectionViewCellReactorTests;
+			sourceTree = "<group>";
+		};
+		042968942E619DAF00E6DFF6 /* Trend */ = {
+			isa = PBXGroup;
+			children = (
+				042968972E619DC700E6DFF6 /* TrendMediaResponse.swift */,
+			);
+			path = Trend;
 			sourceTree = "<group>";
 		};
 		042EFE5E2E1403C800810E02 /* Home */ = {
@@ -446,6 +456,7 @@
 		04FE6C892E58675700CCB76C /* NetworkModel */ = {
 			isa = PBXGroup;
 			children = (
+				042968942E619DAF00E6DFF6 /* Trend */,
 				04FE6C8E2E5867BB00CCB76C /* Media */,
 				04FE6C8B2E58678A00CCB76C /* Search */,
 				04FE6C932E599C2900CCB76C /* Detail */,
@@ -940,6 +951,7 @@
 				044B8C3B2E60831300EB016D /* UICollectionViewLayout+.swift in Sources */,
 				040AD09A2E1F7F6900C6EBC9 /* HomeSectionHeaderView.swift in Sources */,
 				044952642E081A4A00D75C4A /* HomeSectionModel.swift in Sources */,
+				042968982E619DC700E6DFF6 /* TrendMediaResponse.swift in Sources */,
 				04C97AB12E224717001EB1D4 /* Media.swift in Sources */,
 				043BB0492DFC4EA800E5438D /* HomeViewController.swift in Sources */,
 				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,

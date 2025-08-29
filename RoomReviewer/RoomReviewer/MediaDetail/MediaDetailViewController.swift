@@ -33,7 +33,7 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private let posterImageView = UIImageView().then {
-        $0.layer.cornerRadius = 8
+        $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
     }

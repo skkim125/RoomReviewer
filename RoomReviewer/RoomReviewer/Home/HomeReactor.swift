@@ -65,12 +65,6 @@ final class HomeReactor: Reactor {
             newState.errorType = error
         case .fetchedData(let sections):
             newState.medias = sections
-            let originalTrends = Array(1...5)
-            
-            if let first = originalTrends.first, let last = originalTrends.last {
-                newState.trendMedias = [last] + originalTrends + [first]
-            }
-            
         case .setLoading(let loaded):
             newState.isLoading = loaded
         case .presentWriteReviewView:
@@ -85,6 +79,26 @@ final class HomeReactor: Reactor {
 
 extension HomeReactor {
     private func fetchMedias() -> Observable<Mutation> {
+        let trendingRequest = networkService.callRequest(TMDBTargetType.trend)
+            .asObservable()
+            .map { (result: Result<TrendResultResponse, Error>) -> [HomeSectionItem] in
+                switch result {
+                case .success(let success):
+                    let result = success.results.map {
+                        let mediaType = MediaType(rawValue: $0.mediaType.rawValue) ?? .person
+                        let title = mediaType == .movie ? $0.title ?? "" : $0.name ?? ""
+                        let releaseDate = mediaType == .movie ? $0.releaseDate : $0.firstAirDate
+                        
+                        return HomeSectionItem.trend(item: Media(id: $0.id, mediaType: mediaType, title: title, overview: $0.overview, posterPath: $0.posterPath, backdropPath: $0.backdropPath, genreIDS: $0.genreIDS, releaseDate: releaseDate, watchedDate: nil))
+                    }
+                    
+                    return result
+                    
+                case .failure:
+                    return []
+                }
+            }
+        
         let movieRequest = networkService.callRequest(TMDBTargetType.movie)
             .asObservable()
             .map { (result: Result<MovieList, Error>) -> [HomeSectionItem] in
@@ -112,9 +126,10 @@ extension HomeReactor {
                 }
             }
         
-        return Observable.zip(movieRequest, tvRequest)
-            .map { (movies, tvs) -> Mutation in
+        return Observable.zip(trendingRequest, movieRequest, tvRequest)
+            .map { (trend, movies, tvs) -> Mutation in
                 var sections: [HomeSectionModel] = []
+                sections.append(HomeSectionModel.trend(item: trend))
                 sections.append(HomeSectionModel.movie(item: movies))
                 sections.append(HomeSectionModel.tv(item: tvs))
                 

@@ -23,11 +23,11 @@ final class SearchMediaCollectionViewCell: UICollectionViewCell, View {
         $0.layer.shadowOpacity = 0.25
         $0.layer.shadowOffset = CGSize(width: 0, height: 2)
         $0.layer.shadowRadius = 4
-        $0.layer.cornerRadius = 8
+        $0.layer.cornerRadius = 12
         $0.backgroundColor = .clear
     }
     private let posterImageView = UIImageView().then {
-        $0.layer.cornerRadius = 8
+        $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
     }

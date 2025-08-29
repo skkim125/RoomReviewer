@@ -38,7 +38,7 @@ final class HomeSectionHeaderView: UICollectionReusableView {
         }
     }
     
-    func configureUI(header: String) {
+    func configureUI(header: String?) {
         titleLabel.text = header
     }
 }

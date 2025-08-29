@@ -9,11 +9,14 @@ import Foundation
 import RxDataSources
 
 enum HomeSectionModel: Equatable {
+    case trend(item: [HomeSectionItem])
     case tv(item: [HomeSectionItem])
     case movie(item: [HomeSectionItem])
     
-    var header: String {
+    var header: String? {
         switch self {
+        case .trend:
+            return nil
         case .tv:
             return "요즘 핫한 K 드라마"
         case .movie:
@@ -27,13 +30,15 @@ extension HomeSectionModel: SectionModelType {
     
     var items: [HomeSectionItem] {
         switch self {
-        case .tv(item: let item), .movie(item: let item):
+        case .trend(item: let item), .tv(item: let item), .movie(item: let item):
             return item.map { $0 }
         }
     }
     
     init(original: HomeSectionModel, items: [Item]) {
         switch original {
+        case .trend(let items):
+            self = .trend(item: items)
         case .tv(let items):
             self = .tv(item: items)
         case .movie(let items):
@@ -43,6 +48,7 @@ extension HomeSectionModel: SectionModelType {
 }
 
 enum HomeSectionItem: Equatable {
+    case trend(item: Media)
     case tv(item: Media)
     case movie(item: Media)
 }

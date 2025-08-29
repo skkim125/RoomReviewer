@@ -17,16 +17,8 @@ final class HomeViewController: UIViewController, View {
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
-    private let scrollView = UIScrollView().then {
-        $0.showsVerticalScrollIndicator = false
-    }
-    
-    private let trendMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .trendMediaCollectionViewLayout).then {
-        $0.backgroundColor = .clear
+    private let homeCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(TrendMediaCollectionViewCell.self, forCellWithReuseIdentifier: TrendMediaCollectionViewCell.cellID)
-    }
-    
-    private let hotMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .hotMediaCollectionViewLayout).then {
         $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
         $0.register(HomeSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HomeSectionHeaderView.reusableID)
         $0.showsHorizontalScrollIndicator = false
@@ -69,9 +61,11 @@ final class HomeViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.hotMediaCollectionView.rx.modelSelected(HomeSectionModel.Item.self)
+        self.homeCollectionView.rx.modelSelected(HomeSectionModel.Item.self)
             .compactMap { item -> Media? in
                 switch item {
+                case .trend(let trend):
+                    return trend
                 case .movie(let movie):
                     return movie
                 case .tv(let tv):
@@ -93,23 +87,31 @@ final class HomeViewController: UIViewController, View {
             .disposed(by: disposeBag)
             
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSectionModel>(
-            configureCell: { [weak self] _, collectionView, indexPath, item in
+            configureCell: { [weak self] dataSource, collectionView, indexPath, item in
                 guard let self = self else { return UICollectionViewCell() }
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else {
-                    return UICollectionViewCell()
-                }
-                
-                let reactor: HomeMediaCollectionViewCellReactor
-                switch item {
-                case .movie(item: let movie):
-                    reactor = HomeMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider)
+                switch dataSource[indexPath] {
+                case .trend(let trend):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrendMediaCollectionViewCell.cellID, for: indexPath) as? TrendMediaCollectionViewCell else { return UICollectionViewCell() }
                     
-                case .tv(item: let tv):
-                    reactor = HomeMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider)
+                    imageProvider.fetchImage(from: trend.posterPath)
+                        .observe(on: MainScheduler.instance)
+                        .bind(to: cell.posterImageView.rx.image)
+                        .disposed(by: cell.disposeBag)
+                    
+                    return cell
+                    
+                case .movie(let movie):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else { return UICollectionViewCell() }
+                    let cellReactor = HomeMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider)
+                    cell.configureCell(reactor: cellReactor, imageProvider: self.imageProvider)
+                    return cell
+                    
+                case .tv(let tv):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else { return UICollectionViewCell() }
+                    let cellReactor = HomeMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider)
+                    cell.configureCell(reactor: cellReactor, imageProvider: self.imageProvider)
+                    return cell
                 }
-                
-                cell.configureCell(reactor: reactor, imageProvider: self.imageProvider)
-                return cell
             },
             configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
                 guard kind == UICollectionView.elementKindSectionHeader else {
@@ -128,7 +130,7 @@ final class HomeViewController: UIViewController, View {
         reactor.state.map { $0.medias }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(to: hotMediaCollectionView.rx.items(dataSource: dataSource))
+            .bind(to: homeCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedMedia)
@@ -153,41 +155,17 @@ final class HomeViewController: UIViewController, View {
                 owner.navigationController?.present(nav, animated: true)
             }
             .disposed(by: disposeBag)
-        
-        reactor.state.map { $0.trendMedias }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(to: trendMediaCollectionView.rx.items(cellIdentifier: TrendMediaCollectionViewCell.cellID, cellType: TrendMediaCollectionViewCell.self)) { a, b, cell in
-                cell.imageView.backgroundColor = .systemYellow
-            }
-            .disposed(by: disposeBag)
     }
 }
 
 extension HomeViewController {
     private func configureHierarchy() {
-        view.addSubview(scrollView)
-        
-        scrollView.addSubview(trendMediaCollectionView)
-        scrollView.addSubview(hotMediaCollectionView)
+        view.addSubview(homeCollectionView)
     }
     
     private func configureLayout() {
-        scrollView.snp.makeConstraints {
-            $0.edges.equalTo(view)
-        }
-        
-        trendMediaCollectionView.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.width.equalTo(scrollView.snp.width)
-            $0.height.equalTo(trendMediaCollectionView.snp.width).multipliedBy(1.2)
-        }
-        
-        hotMediaCollectionView.snp.makeConstraints {
-            $0.top.equalTo(trendMediaCollectionView.snp.bottom)
-            $0.width.equalTo(scrollView.snp.width)
-            $0.bottom.equalToSuperview().inset(15)
-            $0.height.equalTo(480)
+        homeCollectionView.snp.makeConstraints {
+            $0.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
     

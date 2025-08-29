@@ -8,6 +8,7 @@
 import Foundation
 
 enum TMDBTargetType {
+    case trend
     case movie
     case tv
     case searchMulti(String, Int)
@@ -25,6 +26,8 @@ extension TMDBTargetType: TargetType {
     
     var path: String {
         switch self {
+        case .trend:
+            "trending/all/week"
         case .movie:
             "discover/movie"
         case .tv:
@@ -43,22 +46,7 @@ extension TMDBTargetType: TargetType {
     }
     
     var method: HTTPMethod {
-        switch self {
-        case .movie:
-            return .get
-        case .tv:
-            return .get
-        case .searchMulti:
-            return .get
-        case .getMovieDetail:
-            return .get
-        case .getTVDetail:
-            return .get
-        case .movieCredits:
-            return .get
-        case .tvCredits:
-            return .get
-        }
+        return .get
     }
     
     var header: [String : String]? {
@@ -70,6 +58,12 @@ extension TMDBTargetType: TargetType {
     
     var query: [URLQueryItem]? {
         switch self {
+        case .trend:
+            return [
+                URLQueryItem(name: "language", value: "ko-KR"),
+                URLQueryItem(name: "region", value: "KR"),
+                URLQueryItem(name: "watch_region", value: "KR"),
+            ]
         case .movie:
             let (nowDate, twoMonthAgo) = setDate()
             
@@ -132,22 +126,7 @@ extension TMDBTargetType: TargetType {
     }
     
     var body: Data? {
-        switch self {
-        case .movie:
-            return nil
-        case .tv:
-            return nil
-        case .searchMulti:
-            return nil
-        case .movieCredits:
-            return nil
-        case .tvCredits:
-            return nil
-        case .getMovieDetail:
-            return nil
-        case .getTVDetail:
-            return nil
-        }
+        return nil
     }
 }
 
