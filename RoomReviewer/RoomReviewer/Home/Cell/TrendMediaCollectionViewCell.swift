@@ -14,8 +14,8 @@ import Then
 
 final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
     static let cellID = "TrendMediaCollectionViewCell"
+    
     var disposeBag = DisposeBag()
-    let imageView = UIImageView()
     
     private let shadowView = UIView().then {
         $0.layer.shadowColor = UIColor.black.cgColor
@@ -32,6 +32,8 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         $0.contentMode = .scaleAspectFill
     }
     
+    private let activityIndicator = UIActivityIndicatorView(style: .medium)
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -43,12 +45,13 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureHierarchy() {
+    private func configureHierarchy() {
         contentView.addSubview(shadowView)
         contentView.addSubview(posterImageView)
+        contentView.addSubview(activityIndicator)
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         shadowView.snp.makeConstraints {
             $0.top.horizontalEdges.equalToSuperview().inset(10)
             $0.height.equalTo(shadowView.snp.width).multipliedBy(1.5)
@@ -57,10 +60,37 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         posterImageView.snp.makeConstraints {
             $0.edges.equalTo(shadowView)
         }
+        
+        activityIndicator.snp.makeConstraints {
+            $0.center.equalTo(posterImageView)
+        }
     }
     
-    func bind(reactor: HomeReactor) {
+    func bind(reactor: TrendMediaCollectionViewCellReactor) {
+        reactor.state.map({ $0.isLoading })
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(to: activityIndicator.rx.isAnimating)
+            .disposed(by: disposeBag)
         
+        reactor.state.map { $0.imageData }
+            .bind(with: self) { owner, image in
+                if let image = image {
+                    owner.posterImageView.image = image
+                } else {
+                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.imageData }
+            .distinctUntilChanged()
+            .filter { $0 == nil }
+            .map { _ in
+                TrendMediaCollectionViewCellReactor.Action.loadImage
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  HomeTVCollectionViewCellReactor.swift
+//  HotTVCollectionViewCellReactor.swift
 //  RoomReviewer
 //
 //  Created by 김상규 on 6/16/25.
@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import ReactorKit
 
-final class HomeMediaCollectionViewCellReactor: Reactor {
+final class HotMediaCollectionViewCellReactor: Reactor {
     enum Action {
         case loadImage
     }
@@ -38,7 +38,9 @@ final class HomeMediaCollectionViewCellReactor: Reactor {
         switch action {
         case .loadImage:
             guard let url = currentState.mediaPosterURL else {
-                return .just(.setImage(nil))
+                let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .ultraLight)
+                let emptyImage = UIImage(systemName: "photo.badge.exclamationmark.fill", withConfiguration: config)
+                return .just(.setImage(emptyImage))
             }
             
             let imageStream = imageProvider.fetchImage(from: url)

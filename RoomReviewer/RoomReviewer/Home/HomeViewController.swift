@@ -19,9 +19,9 @@ final class HomeViewController: UIViewController, View {
     
     private let homeCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(TrendMediaCollectionViewCell.self, forCellWithReuseIdentifier: TrendMediaCollectionViewCell.cellID)
-        $0.register(HomeMediaCollectionViewCell.self, forCellWithReuseIdentifier: HomeMediaCollectionViewCell.cellID)
+        $0.register(HotMediaCollectionViewCell.self, forCellWithReuseIdentifier: HotMediaCollectionViewCell.cellID)
         $0.register(HomeSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HomeSectionHeaderView.reusableID)
-        $0.showsHorizontalScrollIndicator = false
+        $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
     }
     
@@ -93,22 +93,20 @@ final class HomeViewController: UIViewController, View {
                 case .trend(let trend):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrendMediaCollectionViewCell.cellID, for: indexPath) as? TrendMediaCollectionViewCell else { return UICollectionViewCell() }
                     
-                    imageProvider.fetchImage(from: trend.posterPath)
-                        .observe(on: MainScheduler.instance)
-                        .bind(to: cell.posterImageView.rx.image)
-                        .disposed(by: cell.disposeBag)
+                    let reactor = TrendMediaCollectionViewCellReactor(media: trend, imageProvider: self.imageProvider)
+                    cell.reactor = reactor
                     
                     return cell
                     
                 case .movie(let movie):
-                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else { return UICollectionViewCell() }
-                    let cellReactor = HomeMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider)
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
+                    let cellReactor = HotMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider)
                     cell.configureCell(reactor: cellReactor, imageProvider: self.imageProvider)
                     return cell
                     
                 case .tv(let tv):
-                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMediaCollectionViewCell.cellID, for: indexPath) as? HomeMediaCollectionViewCell else { return UICollectionViewCell() }
-                    let cellReactor = HomeMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider)
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
+                    let cellReactor = HotMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider)
                     cell.configureCell(reactor: cellReactor, imageProvider: self.imageProvider)
                     return cell
                 }
