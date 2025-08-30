@@ -24,6 +24,13 @@ final class SearchMediaViewController: UIViewController, View {
         $0.placeholder = "검색어를 입력하세요"
     }
     
+    private let dismissButton = UIBarButtonItem().then {
+        $0.image = UIImage(systemName: "xmark")
+        $0.style = .done
+        $0.target = nil
+        $0.action = nil
+    }
+    
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
@@ -66,7 +73,7 @@ final class SearchMediaViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.navigationItem.leftBarButtonItem?.rx.tap
+        dismissButton.rx.tap
             .map { SearchMediaReactor.Action.dismissWriteReview }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -150,6 +157,6 @@ extension SearchMediaViewController {
     
     private func configureNavigationBar() {
         navigationItem.title = "미디어 검색"
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: nil, action: nil)
+        navigationItem.leftBarButtonItem = dismissButton
     }
 }

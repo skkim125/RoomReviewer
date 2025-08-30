@@ -25,6 +25,13 @@ final class HomeViewController: UIViewController, View {
         $0.backgroundColor = .clear
     }
     
+    private let writeReviewButton = UIBarButtonItem().then {
+        $0.image = UIImage(systemName: "pencil")
+        $0.style = .done
+        $0.target = nil
+        $0.action = nil
+    }
+    
     init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
@@ -56,7 +63,7 @@ final class HomeViewController: UIViewController, View {
     }
     
     private func bindAction(reactor: HomeReactor) {
-        self.navigationItem.rightBarButtonItem?.rx.tap
+        writeReviewButton.rx.tap
             .compactMap { HomeReactor.Action.writeButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -172,7 +179,6 @@ extension HomeViewController {
         label.font = AppFont.appIconTitle
         label.text = "방구석 평론가"
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: label)
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .done, target: nil, action: nil)
+        navigationItem.rightBarButtonItem = writeReviewButton
     }
 }
