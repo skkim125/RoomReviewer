@@ -205,6 +205,11 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
+                    if image == AppImage.emptyPosterImage {
+                        owner.backDropImageView.contentMode = .scaleAspectFit
+                        owner.backDropImageView.backgroundColor = .appSecondary
+                        owner.backDropImageView.tintColor = .appPrimary
+                    }
                     owner.backDropImageView.image = image
                 } else {
                     owner.backDropImageView.backgroundColor = AppColor.secondaryBackgroundColor
@@ -217,6 +222,11 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
+                    if image == AppImage.emptyPosterImage {
+                        owner.posterImageView.contentMode = .scaleAspectFit
+                        owner.posterImageView.backgroundColor = .appSecondary
+                        owner.posterImageView.tintColor = .appPrimary
+                    }
                     owner.posterImageView.image = image
                 } else {
                     owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
