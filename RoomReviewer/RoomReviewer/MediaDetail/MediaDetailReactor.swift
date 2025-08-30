@@ -47,8 +47,6 @@ final class MediaDetailReactor: Reactor {
     
     enum Action {
         case viewDidLoad
-        case loadBackdropImage(String?)
-        case loadPosterImage(String?)
         case watchlistButtonTapped
         case watchedButtonTapped
         case writeReviewButtonTapped
@@ -91,9 +89,8 @@ final class MediaDetailReactor: Reactor {
             
             let fetchOthers = Observable.merge(
                 self.fetchMediaCredits(),
-                media.backdropPath?.isEmpty == false ? self.loadBackdropImage(media.backdropPath!) :
-                    (media.posterPath.map { self.loadBackdropImage($0) } ?? .empty()),
-                (media.posterPath.map { self.loadPosterImage($0) } ?? .empty())
+                self.loadBackdropImage(media.backdropPath ?? ""),
+                self.loadPosterImage(media.posterPath ?? "")
             )
             
             return Observable.concat([
@@ -101,14 +98,6 @@ final class MediaDetailReactor: Reactor {
                 Observable.merge(setInitialData, checkWatchlist, fetchOthers).observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
-            
-        case .loadBackdropImage(let backDropURL):
-            guard let url = backDropURL else { return .empty() }
-            return loadBackdropImage(url)
-            
-        case .loadPosterImage(let posterURL):
-            guard let url = posterURL else { return .empty() }
-            return loadPosterImage(url)
             
         case .watchlistButtonTapped:
             let media = currentState.media
@@ -271,16 +260,24 @@ extension MediaDetailReactor {
     }
     
     private func loadBackdropImage(_ imagePath: String) -> Observable<Mutation> {
-        return imageProvider.fetchImage(from: imagePath)
-            .map { image in
-                return .setBackdropImage(image)
-            }
+        if imagePath.isEmpty {
+            return .just(.setBackdropImage(AppImage.emptyPosterImage))
+        } else {
+            return imageProvider.fetchImage(from: imagePath)
+                .map { image in
+                    return .setBackdropImage(image)
+                }
+        }
     }
     
     private func loadPosterImage(_ imagePath: String) -> Observable<Mutation> {
-        return imageProvider.fetchImage(from: imagePath)
-            .map { image in
-                return .setPosterImage(image)
-            }
+        if imagePath.isEmpty {
+            return .just(.setPosterImage(AppImage.emptyPosterImage))
+        } else {
+            return imageProvider.fetchImage(from: imagePath)
+                .map { image in
+                    return .setPosterImage(image)
+                }
+        }
     }
 }

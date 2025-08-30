@@ -76,6 +76,11 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         reactor.state.map { $0.imageData }
             .bind(with: self) { owner, image in
                 if let image = image {
+                    if image == AppImage.emptyPosterImage {
+                        owner.posterImageView.contentMode = .scaleAspectFit
+                        owner.posterImageView.backgroundColor = .appSecondary
+                        owner.posterImageView.tintColor = .appPrimary
+                    }
                     owner.posterImageView.image = image
                 } else {
                     owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor

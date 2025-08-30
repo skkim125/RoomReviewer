@@ -39,7 +39,7 @@ final class SearchMediaCollectionViewCellReactor: Reactor {
         switch action {
         case .loadImage:
             guard let url = currentState.mediaPosterURL else {
-                return .just(.setImageData(nil))
+                return .just(.setImageData(AppImage.emptyPosterImage))
             }
             let imageStream = imageLoader.fetchImage(from: url)
                 .observe(on: MainScheduler.instance)

@@ -37,9 +37,7 @@ final class TrendMediaCollectionViewCellReactor: Reactor {
         switch action {
         case .loadImage:
             guard let url = currentState.mediaPosterURL else {
-                let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .ultraLight)
-                let emptyImage = UIImage(systemName: "photo.badge.exclamationmark.fill", withConfiguration: config)
-                return .just(.setImage(emptyImage))
+                return .just(.setImage(AppImage.emptyPosterImage))
             }
             
             let imageStream = imageProvider.fetchImage(from: url)
