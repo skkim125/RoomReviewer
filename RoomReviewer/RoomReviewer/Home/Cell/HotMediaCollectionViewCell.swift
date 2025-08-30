@@ -12,7 +12,7 @@ import ReactorKit
 import SnapKit
 import Then
 
-final class HomeMediaCollectionViewCell: UICollectionViewCell, View {
+final class HotMediaCollectionViewCell: UICollectionViewCell, View {
     static let cellID = "HomeMediaCollectionViewCell"
     private var imageProvider: ImageProviding?
     var disposeBag = DisposeBag()
@@ -44,7 +44,7 @@ final class HomeMediaCollectionViewCell: UICollectionViewCell, View {
         configureLayout()
     }
     
-    func configureCell(reactor: HomeMediaCollectionViewCellReactor, imageProvider: ImageProviding) {
+    func configureCell(reactor: HotMediaCollectionViewCellReactor, imageProvider: ImageProviding) {
         self.reactor = reactor
         self.imageProvider = imageProvider
     }
@@ -54,8 +54,8 @@ final class HomeMediaCollectionViewCell: UICollectionViewCell, View {
     }
 }
 
-extension HomeMediaCollectionViewCell {
-    func bind(reactor: HomeMediaCollectionViewCellReactor) {
+extension HotMediaCollectionViewCell {
+    func bind(reactor: HotMediaCollectionViewCellReactor) {
         reactor.state.map({ $0.isLoading })
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
@@ -87,7 +87,7 @@ extension HomeMediaCollectionViewCell {
             .distinctUntilChanged()
             .filter { $0 == nil }
             .map { _ in
-                HomeMediaCollectionViewCellReactor.Action.loadImage
+                HotMediaCollectionViewCellReactor.Action.loadImage
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

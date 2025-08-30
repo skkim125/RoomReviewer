@@ -48,11 +48,13 @@
 		046EFB482E56E0A200E2736B /* RoomReviewerEntity.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 046EFB462E56E0A200E2736B /* RoomReviewerEntity.xcdatamodeld */; };
 		046EFB552E56E5E200E2736B /* MediaEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046EFB532E56E5E200E2736B /* MediaEntity+CoreDataClass.swift */; };
 		046EFB562E56E5E200E2736B /* MediaEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046EFB542E56E5E200E2736B /* MediaEntity+CoreDataProperties.swift */; };
-		0478296C2DFFFA3F008CBE67 /* HomeMediaCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0478296B2DFFFA3F008CBE67 /* HomeMediaCollectionViewCellReactor.swift */; };
+		0478296C2DFFFA3F008CBE67 /* HotMediaCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0478296B2DFFFA3F008CBE67 /* HotMediaCollectionViewCellReactor.swift */; };
 		0480964E2E5DC118002033A0 /* MediaDatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0480964D2E5DC118002033A0 /* MediaDatabaseManager.swift */; };
 		048096522E5DC437002033A0 /* ReviewDatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048096512E5DC437002033A0 /* ReviewDatabaseManager.swift */; };
 		048096622E5DC6C5002033A0 /* ReviewDatabaseManagerUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048096602E5DC6C5002033A0 /* ReviewDatabaseManagerUnitTests.swift */; };
 		048096642E5DC9CB002033A0 /* MockDatastack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048096632E5DC9CB002033A0 /* MockDatastack.swift */; };
+		048E5E1D2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048E5E1C2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift */; };
+		048E5E1F2E62D92D00189765 /* AppImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048E5E1E2E62D92D00189765 /* AppImage.swift */; };
 		04A722DD2E549F3600797731 /* CustomAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A722DC2E549F3600797731 /* CustomAlertViewController.swift */; };
 		04A722DF2E54A1A200797731 /* CommonButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A722DE2E54A1A200797731 /* CommonButton.swift */; };
 		04B3790A2E51D74E00C2F3EA /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B379092E51D74E00C2F3EA /* CoreDataStack.swift */; };
@@ -60,7 +62,7 @@
 		04B379472E51EB0000C2F3EA /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 04B379462E51EB0000C2F3EA /* RxBlocking */; };
 		04B379492E51EB0000C2F3EA /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 04B379482E51EB0000C2F3EA /* RxCocoa */; };
 		04B3794D2E51EB0000C2F3EA /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 04B3794C2E51EB0000C2F3EA /* RxSwift */; };
-		04B9CBC02DFEAA8A00E84E78 /* HomeMediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B9CBBF2DFEAA8A00E84E78 /* HomeMediaCollectionViewCell.swift */; };
+		04B9CBC02DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B9CBBF2DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift */; };
 		04C97AB12E224717001EB1D4 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB02E224717001EB1D4 /* Media.swift */; };
 		04C97AB42E2286C3001EB1D4 /* SearchMediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB32E2286C3001EB1D4 /* SearchMediaCollectionViewCell.swift */; };
 		04C97ABA2E236D29001EB1D4 /* SearchMediaCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB92E236D29001EB1D4 /* SearchMediaCollectionViewCellReactor.swift */; };
@@ -157,17 +159,19 @@
 		046EFB472E56E0A200E2736B /* RoomReviewerEntity.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = RoomReviewerEntity.xcdatamodel; sourceTree = "<group>"; };
 		046EFB532E56E5E200E2736B /* MediaEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MediaEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		046EFB542E56E5E200E2736B /* MediaEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MediaEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		0478296B2DFFFA3F008CBE67 /* HomeMediaCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMediaCollectionViewCellReactor.swift; sourceTree = "<group>"; };
+		0478296B2DFFFA3F008CBE67 /* HotMediaCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotMediaCollectionViewCellReactor.swift; sourceTree = "<group>"; };
 		0480964D2E5DC118002033A0 /* MediaDatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDatabaseManager.swift; sourceTree = "<group>"; };
 		048096512E5DC437002033A0 /* ReviewDatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewDatabaseManager.swift; sourceTree = "<group>"; };
 		048096572E5DC6BD002033A0 /* ReviewDatabaseManagerUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReviewDatabaseManagerUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		048096602E5DC6C5002033A0 /* ReviewDatabaseManagerUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewDatabaseManagerUnitTests.swift; sourceTree = "<group>"; };
 		048096632E5DC9CB002033A0 /* MockDatastack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDatastack.swift; sourceTree = "<group>"; };
+		048E5E1C2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMediaCollectionViewCellReactor.swift; sourceTree = "<group>"; };
+		048E5E1E2E62D92D00189765 /* AppImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImage.swift; sourceTree = "<group>"; };
 		04A722DC2E549F3600797731 /* CustomAlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlertViewController.swift; sourceTree = "<group>"; };
 		04A722DE2E54A1A200797731 /* CommonButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonButton.swift; sourceTree = "<group>"; };
 		04B379092E51D74E00C2F3EA /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		04B3792F2E51EA3E00C2F3EA /* MediaDatabaseManagerUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MediaDatabaseManagerUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		04B9CBBF2DFEAA8A00E84E78 /* HomeMediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMediaCollectionViewCell.swift; sourceTree = "<group>"; };
+		04B9CBBF2DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotMediaCollectionViewCell.swift; sourceTree = "<group>"; };
 		04C97AB02E224717001EB1D4 /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		04C97AB32E2286C3001EB1D4 /* SearchMediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaCollectionViewCell.swift; sourceTree = "<group>"; };
 		04C97AB92E236D29001EB1D4 /* SearchMediaCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaCollectionViewCellReactor.swift; sourceTree = "<group>"; };
@@ -312,9 +316,10 @@
 			isa = PBXGroup;
 			children = (
 				040AD09B2E1F874200C6EBC9 /* Header */,
-				04B9CBBF2DFEAA8A00E84E78 /* HomeMediaCollectionViewCell.swift */,
-				0478296B2DFFFA3F008CBE67 /* HomeMediaCollectionViewCellReactor.swift */,
+				04B9CBBF2DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift */,
+				0478296B2DFFFA3F008CBE67 /* HotMediaCollectionViewCellReactor.swift */,
 				042968922E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift */,
+				048E5E1C2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -352,6 +357,7 @@
 			children = (
 				044B8C302E60422A00EB016D /* AppColor.swift */,
 				044B8C332E60423900EB016D /* AppFont.swift */,
+				048E5E1E2E62D92D00189765 /* AppImage.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
@@ -937,9 +943,10 @@
 				04C97ABE2E23784C001EB1D4 /* MediaDetailViewController.swift in Sources */,
 				04FE6C972E599C4100CCB76C /* TVDetail.swift in Sources */,
 				0480964E2E5DC118002033A0 /* MediaDatabaseManager.swift in Sources */,
-				0478296C2DFFFA3F008CBE67 /* HomeMediaCollectionViewCellReactor.swift in Sources */,
+				0478296C2DFFFA3F008CBE67 /* HotMediaCollectionViewCellReactor.swift in Sources */,
 				043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */,
 				04FE6C832E585F7200CCB76C /* TVCreditsResponse.swift in Sources */,
+				048E5E1D2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift in Sources */,
 				040AD09F2E1F892A00C6EBC9 /* SearchMedia.swift in Sources */,
 				0410D7932E4F2CBD009D38EE /* ImageProvider.swift in Sources */,
 				046EFB482E56E0A200E2736B /* RoomReviewerEntity.xcdatamodeld in Sources */,
@@ -953,11 +960,12 @@
 				044952642E081A4A00D75C4A /* HomeSectionModel.swift in Sources */,
 				042968982E619DC700E6DFF6 /* TrendMediaResponse.swift in Sources */,
 				04C97AB12E224717001EB1D4 /* Media.swift in Sources */,
+				048E5E1F2E62D92D00189765 /* AppImage.swift in Sources */,
 				043BB0492DFC4EA800E5438D /* HomeViewController.swift in Sources */,
 				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,
 				04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */,
 				044B8C342E60423900EB016D /* AppFont.swift in Sources */,
-				04B9CBC02DFEAA8A00E84E78 /* HomeMediaCollectionViewCell.swift in Sources */,
+				04B9CBC02DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift in Sources */,
 				04FE6C9C2E599E3000CCB76C /* MediaDetail.swift in Sources */,
 				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,
 				042968932E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift in Sources */,

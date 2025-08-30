@@ -1,0 +1,67 @@
+//
+//  TrendMediaCollectionViewCellReactor.swift
+//  RoomReviewer
+//
+//  Created by 김상규 on 8/30/25.
+//
+
+import UIKit
+import ReactorKit
+
+final class TrendMediaCollectionViewCellReactor: Reactor {
+    enum Action {
+        case loadImage
+    }
+
+    enum Mutation {
+        case setLoading(Bool)
+        case setImage(UIImage?)
+    }
+
+    struct State {
+        var mediaName: String?
+        var mediaPosterURL: String?
+        var imageData: UIImage?
+        var isLoading: Bool = false
+    }
+
+    var initialState: State
+    private let imageProvider: ImageProviding
+
+    init(media: Media, imageProvider: ImageProviding) {
+        self.initialState = State(mediaName: media.title, mediaPosterURL: media.posterPath)
+        self.imageProvider = imageProvider
+    }
+
+    func mutate(action: Action) -> Observable<Mutation> {
+        switch action {
+        case .loadImage:
+            guard let url = currentState.mediaPosterURL else {
+                let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .ultraLight)
+                let emptyImage = UIImage(systemName: "photo.badge.exclamationmark.fill", withConfiguration: config)
+                return .just(.setImage(emptyImage))
+            }
+            
+            let imageStream = imageProvider.fetchImage(from: url)
+                .observe(on: MainScheduler.instance)
+                .map { Mutation.setImage($0) }
+            
+            return Observable.concat([
+                .just(.setLoading(true)),
+                imageStream,
+                .just(.setLoading(false)),
+                ])
+        }
+    }
+
+    func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
+        switch mutation {
+        case .setImage(let image):
+            newState.imageData = image
+        case .setLoading(let isLoading):
+            newState.isLoading = isLoading
+        }
+        return newState
+    }
+}

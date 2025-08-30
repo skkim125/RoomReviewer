@@ -43,9 +43,7 @@ final class CreditsCollectionViewCellReactor: Reactor {
         switch action {
         case .loadImage:
             guard let path = currentState.profilePath else {
-                let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .ultraLight)
-                let emptyImage = UIImage(systemName: "person", withConfiguration: config)
-                return .just(.setImage(emptyImage))
+                return .just(.setImage(AppImage.personImage))
             }
             
             let imageStream = imageLoader.fetchImage(from: path)
