@@ -18,7 +18,7 @@ struct MediaDetail {
     let releaseYear: String
     let runtimeOrEpisodeInfo: String
     let cast: [Cast]
-    let creator: [Crew]?
+    let creator: [Crew]
 //    let watchProviders: [Provider]
 }
 
@@ -32,5 +32,6 @@ struct Cast: Decodable, Equatable {
 struct Crew: Decodable, Equatable {
     let id: Int
     let name: String
+    let department: String?
     let profilePath: String?
 }

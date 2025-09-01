@@ -33,7 +33,7 @@ struct TVDetail: Decodable {
     }
 }
 
-struct Creator: Decodable {
+struct Creator: Decodable, Equatable {
     let id: Int
     let name: String
     let profilePath: String?
@@ -73,11 +73,11 @@ extension TVDetail {
         
         let creators: [Crew]
         
-        if createdBy.isEmpty {
-            creators = aggregateCredits.crew.filter { $0.department == "Directing" || $0.department == "Writing" }.map { Crew(id: $0.id, name: $0.name, profilePath: $0.profilePath) }
-        } else {
-            creators = createdBy.map { Crew(id: $0.id, name: $0.name, profilePath: $0.profilePath) }
-        }
+//        if createdBy.isEmpty {
+            creators = aggregateCredits.crew.filter { $0.department == "Directing" || $0.department == "Writing" }.map { Crew(id: $0.id, name: $0.name, department: $0.department, profilePath: $0.profilePath) }
+//        } else {
+//            creators = createdBy.map { Crew(id: $0.id, name: $0.name, department: $0.department, profilePath: $0.profilePath) }
+//        }
         
         let cast = aggregateCredits.cast.map {
             Cast(id: $0.id, name: $0.name, profilePath: $0.profilePath, character: $0.roles?[0].character ?? "")

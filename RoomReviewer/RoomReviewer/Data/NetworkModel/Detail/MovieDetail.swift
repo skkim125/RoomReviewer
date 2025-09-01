@@ -141,7 +141,7 @@ extension MovieDetail {
         }
         let runtimeInfo = "\(runtime ?? 0)분"
         
-        let directors = credits.crew.filter { $0.job == "Director" }.map { Crew(id: $0.id, name: $0.name, profilePath: $0.profilePath) }
+        let directors = credits.crew.filter { $0.department == "Directing" || $0.department == "Writing" }.map { Crew(id: $0.id, name: $0.name, department: $0.department, profilePath: $0.profilePath) }
         
         let cast = credits.cast.map {
             Cast(id: $0.id, name: $0.name, profilePath: $0.profilePath, character: $0.character)
