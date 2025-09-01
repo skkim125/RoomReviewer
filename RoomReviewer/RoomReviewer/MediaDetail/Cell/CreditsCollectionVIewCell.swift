@@ -57,7 +57,7 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
     private func configureLayout() {
         profileImageView.snp.makeConstraints {
             $0.top.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(profileImageView.snp.width).multipliedBy(1.2)
+            $0.height.equalTo(profileImageView.snp.width)
         }
         
         nameLabel.snp.makeConstraints {

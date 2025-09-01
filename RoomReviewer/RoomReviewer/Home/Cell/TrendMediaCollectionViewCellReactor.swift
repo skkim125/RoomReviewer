@@ -19,7 +19,7 @@ final class TrendMediaCollectionViewCellReactor: Reactor {
     }
 
     struct State {
-        var mediaName: String?
+        var mediaName: String = ""
         var mediaPosterURL: String?
         var imageData: UIImage?
         var isLoading: Bool = false

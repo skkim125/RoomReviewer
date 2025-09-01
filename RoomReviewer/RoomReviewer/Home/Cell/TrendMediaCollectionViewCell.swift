@@ -26,12 +26,18 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         $0.backgroundColor = .clear
     }
     
-    let posterImageView = UIImageView().then {
+    private let posterImageView = UIImageView().then {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
         $0.layer.borderWidth = 0.3
         $0.layer.borderColor = AppColor.appPrimaryColor.withAlphaComponent(0.3).cgColor
+    }
+    
+    private let titleLabel = UILabel().then {
+        $0.font = AppFont.semiboldSubTitle
+        $0.numberOfLines = 0
+        $0.textAlignment = .center
     }
     
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
@@ -51,6 +57,7 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         contentView.addSubview(shadowView)
         contentView.addSubview(posterImageView)
         contentView.addSubview(activityIndicator)
+        contentView.addSubview(titleLabel)
     }
     
     private func configureLayout() {
@@ -66,6 +73,12 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         activityIndicator.snp.makeConstraints {
             $0.center.equalTo(posterImageView)
         }
+        
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(shadowView.snp.bottom).offset(5)
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(5)
+        }
     }
     
     func bind(reactor: TrendMediaCollectionViewCellReactor) {
@@ -73,6 +86,12 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: activityIndicator.rx.isAnimating)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.mediaName }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: nil)
+            .drive(titleLabel.rx.text)
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.imageData }

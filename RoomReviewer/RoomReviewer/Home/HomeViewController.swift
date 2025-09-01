@@ -107,14 +107,14 @@ final class HomeViewController: UIViewController, View {
                     
                 case .movie(let movie):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
-                    let cellReactor = HotMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider)
-                    cell.configureCell(reactor: cellReactor, imageProvider: self.imageProvider)
+                    let reactor = HotMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider)
+                    cell.reactor = reactor
                     return cell
                     
                 case .tv(let tv):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
-                    let cellReactor = HotMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider)
-                    cell.configureCell(reactor: cellReactor, imageProvider: self.imageProvider)
+                    let reactor = HotMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider)
+                    cell.reactor = reactor
                     return cell
                 }
             },
