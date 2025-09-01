@@ -132,6 +132,7 @@ final class MediaDetailViewController: UIViewController, View {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 12
         $0.backgroundColor = .clear
+        $0.isScrollEnabled = false
     }
     
     private let imageProvider: ImageProviding
@@ -156,9 +157,14 @@ final class MediaDetailViewController: UIViewController, View {
         view.backgroundColor = AppColor.appBackgroundColor
         configureHierarchy()
         configureLayout()
+        configureNavigationBar()
         setupPlaceholderState()
         
         reactor?.action.onNext(.viewDidLoad)
+    }
+    
+    private func configureNavigationBar() {
+        navigationItem.title = "상세 정보"
     }
     
     func bind(reactor: MediaDetailReactor) {
@@ -512,9 +518,9 @@ extension MediaDetailViewController {
         }
         
         castCollectionView.snp.makeConstraints {
-            $0.top.equalTo(creatorLabel.snp.bottom).offset(5)
+            $0.top.equalTo(creatorLabel.snp.bottom)
             $0.horizontalEdges.equalTo(contentView).inset(20)
-            $0.height.equalTo(205)
+            $0.height.equalTo(180)
             $0.bottom.equalTo(contentView).inset(10)
         }
     }
