@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 import ReactorKit
 import SnapKit
 import Then
@@ -114,20 +115,10 @@ final class MediaDetailViewController: UIViewController, View {
         $0.textAlignment = .center
     }
     
-    private let creditsTitleLabel = UILabel().then {
-        $0.text = "주요 출연진"
-        $0.textColor = AppColor.appPrimaryColor
-        $0.font = AppFont.boldTitle
-    }
-    
-    private let creatorLabel = UILabel().then {
-        $0.font = AppFont.subTitle
-        $0.textColor = AppColor.appPrimaryColor
-    }
-    
-    private lazy var castCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout).then {
+    private lazy var creditsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout).then {
         $0.showsHorizontalScrollIndicator = false
         $0.register(CreditsCollectionViewCell.self, forCellWithReuseIdentifier: CreditsCollectionViewCell.cellID)
+        $0.register(CreditsSectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CreditsSectionHeader.reusableID)
         $0.showsVerticalScrollIndicator = false
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 12
@@ -297,28 +288,57 @@ final class MediaDetailViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
 
-        reactor.state.compactMap { $0.casts }
-            .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: [])
-            .map { casts in
-                return casts.map { cast in
-                    CreditsCollectionViewCellReactor(cast: cast, imageLoader: self.imageProvider)
+        let dataSource = RxCollectionViewSectionedReloadDataSource<CreditsSectionModel>(
+            configureCell: { [weak self] dataSource, collectionView, indexPath, item in
+                guard let self = self, let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CreditsCollectionViewCell.cellID, for: indexPath) as? CreditsCollectionViewCell else { return UICollectionViewCell() }
+                
+                switch dataSource[indexPath] {
+                case .casts(item: let cast):
+                    let reactor = CreditsCollectionViewCellReactor(name: cast.name, role: cast.character, profilePath: cast.profilePath, imageLoader: self.imageProvider)
+                    
+                    cell.reactor = reactor
+                    
+                case .creators(item: let creator):
+                    let reactor = CreditsCollectionViewCellReactor(name: creator.name, role: creator.department, profilePath: creator.profilePath, imageLoader: self.imageProvider)
+                    
+                    cell.reactor = reactor
                 }
+                
+                return cell
+            },
+            configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+                guard kind == UICollectionView.elementKindSectionHeader else {
+                    return UICollectionReusableView()
+                }
+                
+                guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: CreditsSectionHeader.reusableID, for: indexPath) as? CreditsSectionHeader else { return UICollectionReusableView() }
+                
+                let section = dataSource.sectionModels[indexPath.section]
+                headerView.configureUI(header: section.header)
+                
+                return headerView
             }
-            .drive(castCollectionView.rx.items(cellIdentifier: CreditsCollectionViewCell.cellID, cellType: CreditsCollectionViewCell.self)) { index, reactor, cell in
-                cell.reactor = reactor
-            }
+        )
+        
+        let creditsStream = reactor.state.map { $0.credits }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .share()
+        
+        
+        creditsStream
+            .bind(to: creditsCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.creatorInfo }
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self) { owner, creator in
-                if let creator = creator {
-                    let creatorsText = creator.map { $0.name }.joined(separator: ", ")
-                    owner.creatorLabel.text = "크리에이터: \(creatorsText)"
-                    owner.creatorLabel.isHidden = false
-                } else {
-                    owner.creatorLabel.isHidden = true
+        creditsStream
+            .bind(with: self) { owner, sectionModels in
+                if sectionModels.count == 1 {
+                    owner.creditsCollectionView.snp.remakeConstraints {
+                        $0.top.equalTo(owner.overviewLabel.snp.bottom).offset(10)
+                        $0.horizontalEdges.equalTo(owner.contentView).inset(20)
+                        $0.height.equalTo(200)
+                        $0.bottom.equalToSuperview().inset(10)
+                    }
                 }
             }
             .disposed(by: disposeBag)
@@ -452,9 +472,7 @@ extension MediaDetailViewController {
         }
         
         contentView.addSubview(overviewLabel)
-        contentView.addSubview(creditsTitleLabel)
-        contentView.addSubview(creatorLabel)
-        contentView.addSubview(castCollectionView)
+        contentView.addSubview(creditsCollectionView)
     }
     
     private func configureLayout() {
@@ -507,21 +525,11 @@ extension MediaDetailViewController {
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
-        creditsTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(overviewLabel.snp.bottom).offset(20)
-            $0.leading.equalTo(contentView).inset(20)
-        }
-        
-        creatorLabel.snp.makeConstraints {
-            $0.top.equalTo(creditsTitleLabel.snp.bottom).offset(5)
+        creditsCollectionView.snp.makeConstraints {
+            $0.top.equalTo(overviewLabel.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(contentView).inset(20)
-        }
-        
-        castCollectionView.snp.makeConstraints {
-            $0.top.equalTo(creatorLabel.snp.bottom)
-            $0.horizontalEdges.equalTo(contentView).inset(20)
-            $0.height.equalTo(180)
-            $0.bottom.equalTo(contentView).inset(10)
+            $0.height.equalTo(400)
+            $0.bottom.equalToSuperview().inset(10)
         }
     }
 }
@@ -549,7 +557,7 @@ extension MediaDetailViewController {
         
         let placeholderColor = AppColor.placeholderTextColor
         
-        [genreLabel, semiInfoLabel, creatorLabel].forEach {
+        [genreLabel, semiInfoLabel].forEach {
             $0.text = "\n"
             $0.backgroundColor = placeholderColor
             $0.textColor = .clear
@@ -565,7 +573,7 @@ extension MediaDetailViewController {
     }
     
     private func removePlaceholderState() {
-        let placeholderLabels = [genreLabel, semiInfoLabel, creatorLabel, overviewLabel]
+        let placeholderLabels = [genreLabel, semiInfoLabel, overviewLabel]
         
         placeholderLabels.forEach {
             $0.backgroundColor = .clear
@@ -574,6 +582,5 @@ extension MediaDetailViewController {
         genreLabel.textColor = AppColor.appSecondaryColor
         semiInfoLabel.textColor = AppColor.appSecondaryColor
         overviewLabel.textColor = AppColor.appBodyTextColor
-        creatorLabel.textColor = AppColor.appPrimaryColor
     }
 }

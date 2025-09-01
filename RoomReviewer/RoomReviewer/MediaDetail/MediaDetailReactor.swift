@@ -32,8 +32,7 @@ final class MediaDetailReactor: Reactor {
         var genres: String?
         var backDropImageData: UIImage?
         var posterImageData: UIImage?
-        var casts: [Cast]?
-        var creatorInfo: ([Crew]?)
+        var credits: [CreditsSectionModel] = []
         var mediaSemiInfo: String?
         var isLoading: Bool?
         var errorType: Error?
@@ -177,8 +176,17 @@ final class MediaDetailReactor: Reactor {
             
         case .getMediaDetail(let mediaInfo):
             let detail = mediaInfo
-            newState.casts = detail.cast
-            newState.creatorInfo = detail.creator
+            
+            var sectionModels: [CreditsSectionModel] = []
+            let creators = detail.creator.sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ CreditsSectionItem.creators(item: $0) })
+            let creatorsSectionModel = CreditsSectionModel.creators(item: creators)
+            let casts = detail.cast.map({ CreditsSectionItem.casts(item: $0) })
+            let castsSectionModel = CreditsSectionModel.casts(item: casts)
+            sectionModels.append(creatorsSectionModel)
+            if !casts.isEmpty {
+                sectionModels.append(castsSectionModel)
+            }
+            newState.credits = sectionModels
             
             let mediaSemiInfoItems: [String?] = [
                 detail.runtimeOrEpisodeInfo,

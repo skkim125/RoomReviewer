@@ -21,7 +21,7 @@ final class CreditsCollectionViewCellReactor: Reactor {
     
     struct State {
         let name: String
-        let character: String
+        let character: String?
         let profilePath: String?
         var profileImage: UIImage?
         var isLoading: Bool = false
@@ -30,11 +30,11 @@ final class CreditsCollectionViewCellReactor: Reactor {
     var initialState: State
     private let imageLoader: ImageProviding
     
-    init(cast: Cast, imageLoader: ImageProviding) {
+    init(name: String, role: String?, profilePath: String?, imageLoader: ImageProviding) {
         self.initialState = State(
-            name: cast.name,
-            character: cast.character ?? "",
-            profilePath: cast.profilePath
+            name: name,
+            character: role,
+            profilePath: profilePath
         )
         self.imageLoader = imageLoader
     }

@@ -30,12 +30,12 @@ struct MovieCrewResponse: Decodable, Equatable {
     let id: Int
     let name: String
     let profilePath: String?
-    let job: String
+    let department: String?
     
     enum CodingKeys: String, CodingKey {
         case id
         case name
         case profilePath = "profile_path"
-        case job
+        case department
     }
 }

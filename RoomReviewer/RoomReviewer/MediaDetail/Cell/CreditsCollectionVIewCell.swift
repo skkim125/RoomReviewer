@@ -23,7 +23,7 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
     }
     
     private let nameLabel = UILabel().then {
-        $0.font = AppFont.semiboldSubTitle
+        $0.font = AppFont.semiboldCallout
         $0.textColor = AppColor.appPrimaryColor
         $0.textAlignment = .center
     }
@@ -62,12 +62,12 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
         
         nameLabel.snp.makeConstraints {
             $0.top.equalTo(profileImageView.snp.bottom).offset(10)
-            $0.leading.trailing.equalToSuperview().inset(5)
+            $0.leading.trailing.equalToSuperview()
         }
         
         characterLabel.snp.makeConstraints {
             $0.top.equalTo(nameLabel.snp.bottom).offset(2)
-            $0.leading.trailing.equalTo(nameLabel)
+            $0.leading.trailing.equalToSuperview().inset(5)
         }
         
         activityIndicator.snp.makeConstraints {

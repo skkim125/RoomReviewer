@@ -20,6 +20,8 @@
 		042968932E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042968922E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift */; };
 		042968982E619DC700E6DFF6 /* TrendMediaResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042968972E619DC700E6DFF6 /* TrendMediaResponse.swift */; };
 		042EFE642E14040500810E02 /* SearchMediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042EFE632E14040500810E02 /* SearchMediaViewController.swift */; };
+		042F7EB52E658471003272EC /* CreditsSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EB42E658471003272EC /* CreditsSectionHeader.swift */; };
+		042F7EB92E6584AA003272EC /* CreditsSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EB82E6584AA003272EC /* CreditsSectionModel.swift */; };
 		043BB0432DFC4D8800E5438D /* TV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0422DFC4D8800E5438D /* TV.swift */; };
 		043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0442DFC4DA700E5438D /* TMDBTarget.swift */; };
 		043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0462DFC4DDA00E5438D /* NetworkManager.swift */; };
@@ -140,6 +142,8 @@
 		042968922E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMediaCollectionViewCell.swift; sourceTree = "<group>"; };
 		042968972E619DC700E6DFF6 /* TrendMediaResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMediaResponse.swift; sourceTree = "<group>"; };
 		042EFE632E14040500810E02 /* SearchMediaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaViewController.swift; sourceTree = "<group>"; };
+		042F7EB42E658471003272EC /* CreditsSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsSectionHeader.swift; sourceTree = "<group>"; };
+		042F7EB82E6584AA003272EC /* CreditsSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsSectionModel.swift; sourceTree = "<group>"; };
 		043BB0422DFC4D8800E5438D /* TV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TV.swift; sourceTree = "<group>"; };
 		043BB0442DFC4DA700E5438D /* TMDBTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBTarget.swift; sourceTree = "<group>"; };
 		043BB0462DFC4DDA00E5438D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
@@ -327,11 +331,28 @@
 		042EFE602E1403DD00810E02 /* MediaDetail */ = {
 			isa = PBXGroup;
 			children = (
+				042F7EB72E6584A2003272EC /* SectionModel */,
 				04C97ABD2E23784C001EB1D4 /* MediaDetailViewController.swift */,
 				04C97ADB2E23B595001EB1D4 /* MediaDetailReactor.swift */,
 				04FE6C922E5887C200CCB76C /* Cell */,
 			);
 			path = MediaDetail;
+			sourceTree = "<group>";
+		};
+		042F7EB62E65848B003272EC /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				042F7EB42E658471003272EC /* CreditsSectionHeader.swift */,
+			);
+			path = Header;
+			sourceTree = "<group>";
+		};
+		042F7EB72E6584A2003272EC /* SectionModel */ = {
+			isa = PBXGroup;
+			children = (
+				042F7EB82E6584AA003272EC /* CreditsSectionModel.swift */,
+			);
+			path = SectionModel;
 			sourceTree = "<group>";
 		};
 		0449525C2E08174000D75C4A /* Data */ = {
@@ -541,6 +562,7 @@
 		04FE6C922E5887C200CCB76C /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+				042F7EB62E65848B003272EC /* Header */,
 				046E7A342E574D1000FAF58A /* CreditsCollectionVIewCell.swift */,
 				046E7A362E574D2B00FAF58A /* CreditsCollectionViewCellReactor.swift */,
 			);
@@ -936,6 +958,7 @@
 				046EFB562E56E5E200E2736B /* MediaEntity+CoreDataProperties.swift in Sources */,
 				04C97AB42E2286C3001EB1D4 /* SearchMediaCollectionViewCell.swift in Sources */,
 				04FE6C952E599C3A00CCB76C /* MovieDetail.swift in Sources */,
+				042F7EB92E6584AA003272EC /* CreditsSectionModel.swift in Sources */,
 				048096642E5DC9CB002033A0 /* MockDatastack.swift in Sources */,
 				043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */,
 				044B8C312E60422A00EB016D /* AppColor.swift in Sources */,
@@ -965,6 +988,7 @@
 				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,
 				04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */,
 				044B8C342E60423900EB016D /* AppFont.swift in Sources */,
+				042F7EB52E658471003272EC /* CreditsSectionHeader.swift in Sources */,
 				04B9CBC02DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift in Sources */,
 				04FE6C9C2E599E3000CCB76C /* MediaDetail.swift in Sources */,
 				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,
