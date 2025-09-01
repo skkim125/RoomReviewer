@@ -110,9 +110,31 @@ final class MediaDetailViewController: UIViewController, View {
     
     private let overviewLabel = UILabel().then {
         $0.font = AppFont.subTitle
-        $0.numberOfLines = 0
+        $0.numberOfLines = 4
         $0.textColor = AppColor.appBodyTextColor
-        $0.textAlignment = .center
+        $0.textAlignment = .left
+    }
+    
+    private let moreOverviewButton = UIButton().then {
+        var config = UIButton.Configuration.plain()
+        let symbolConfig = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
+        
+        config.preferredSymbolConfigurationForImage = symbolConfig
+        config.image = UIImage(systemName: "chevron.down")
+        config.title = "더보기"
+        config.imagePlacement = .trailing
+        config.imagePadding = 2
+        config.baseForegroundColor = AppColor.appSecondaryColor
+        
+        let attr = NSAttributedString(
+            string: "더보기",
+            attributes: [.font: AppFont.semiboldCallout]
+        )
+        if let attributed = try? AttributedString(attr, including: \.uiKit) {
+            config.attributedTitle = attributed
+        }
+        
+        $0.configuration = config
     }
     
     private lazy var creditsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout).then {
@@ -181,9 +203,20 @@ final class MediaDetailViewController: UIViewController, View {
             .drive(genreLabel.rx.text)
             .disposed(by: disposeBag)
         
+        reactor.state.map { !$0.isOverviewButtonVisible }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: true)
+            .drive(moreOverviewButton.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         reactor.state.map { $0.overview }
             .distinctUntilChanged()
+            .compactMap { $0 }
             .asDriver(onErrorJustReturn: "")
+            .do { [weak self] overviewText in
+                guard let self = self else { return }
+                self.checkOverviewButtonVisible(text: overviewText)
+            }
             .drive(overviewLabel.rx.text)
             .disposed(by: disposeBag)
         
@@ -325,7 +358,6 @@ final class MediaDetailViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .share()
         
-        
         creditsStream
             .bind(to: creditsCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
@@ -340,6 +372,14 @@ final class MediaDetailViewController: UIViewController, View {
                         $0.bottom.equalToSuperview().inset(10)
                     }
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.isOverviewExpanded }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self) { owner, isExpanded in
+                owner.expandOverview(isExpanded: isExpanded)
             }
             .disposed(by: disposeBag)
     }
@@ -357,6 +397,11 @@ final class MediaDetailViewController: UIViewController, View {
         
         reviewButton.rx.tap
             .map { MediaDetailReactor.Action.writeReviewButtonTapped }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        moreOverviewButton.rx.tap
+            .map { MediaDetailReactor.Action.moreOverviewButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -378,7 +423,7 @@ final class MediaDetailViewController: UIViewController, View {
             config.baseForegroundColor = AppColor.appPrimaryColor
         }
         
-        let attr = attributedTitle(with: config.title ?? "")
+        let attr = attributedTitle(text: config.title ?? "", alignment: .center)
         if let attr = try? AttributedString(attr, including: \.uiKit) {
             config.attributedTitle = attr
         }
@@ -404,7 +449,7 @@ final class MediaDetailViewController: UIViewController, View {
             config.baseForegroundColor = AppColor.appInactiveColor
         }
         
-        let attr = attributedTitle(with: config.title ?? "")
+        let attr = attributedTitle(text: config.title ?? "", alignment: .center)
         if let attr = try? AttributedString(attr, including: \.uiKit) {
             config.attributedTitle = attr
         }
@@ -431,7 +476,7 @@ final class MediaDetailViewController: UIViewController, View {
             config.baseForegroundColor = isEnabled ? AppColor.appPrimaryColor : AppColor.appInactiveColor
         }
         
-        let attr = attributedTitle(with: config.title ?? "")
+        let attr = attributedTitle(text: config.title ?? "", alignment: .center)
         if let attr = try? AttributedString(attr, including: \.uiKit) {
             config.attributedTitle = attr
         }
@@ -439,9 +484,9 @@ final class MediaDetailViewController: UIViewController, View {
         reviewButton.configuration = config
     }
     
-    private func attributedTitle(with text: String) -> NSAttributedString {
+    private func attributedTitle(text: String, alignment: NSTextAlignment) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
+        paragraphStyle.alignment = alignment
         
         return NSAttributedString(
             string: text,
@@ -450,6 +495,55 @@ final class MediaDetailViewController: UIViewController, View {
                 .paragraphStyle: paragraphStyle
             ]
         )
+    }
+    
+    private func expandOverview(isExpanded: Bool) {
+        UIView.transition(with: moreOverviewButton, duration: 0.05, options: .transitionCrossDissolve, animations: {
+            var config = self.moreOverviewButton.configuration ?? UIButton.Configuration.plain()
+            let title = isExpanded ? "접기" : "더보기"
+            let image = isExpanded ? UIImage(systemName: "chevron.up") : UIImage(systemName: "chevron.down")
+            let symbolConfig = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
+            
+            config.image = image
+            config.preferredSymbolConfigurationForImage = symbolConfig
+            
+            let attr = NSAttributedString(
+                string: title,
+                attributes: [.font: AppFont.subTitle]
+            )
+            if let attributed = try? AttributedString(attr, including: \.uiKit) {
+                config.attributedTitle = attributed
+            }
+            
+            self.moreOverviewButton.configuration = config
+        })
+        
+        UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseInOut, animations: {
+            self.overviewLabel.numberOfLines = isExpanded ? 0 : 4
+        })
+    }
+    
+    private func checkOverviewButtonVisible(text: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, let reactor = self.reactor else { return }
+            
+            let maxHeight = self.overviewLabel.font.lineHeight * 4.1
+            
+            let fullHeight = text.height(width: self.overviewLabel.bounds.width, font: self.overviewLabel.font)
+            
+            let isVisible = fullHeight > maxHeight
+            
+            if !isVisible {
+                self.creditsCollectionView.snp.remakeConstraints {
+                    $0.top.equalTo(self.overviewLabel.snp.bottom).offset(10)
+                    $0.horizontalEdges.equalTo(self.contentView).inset(20)
+                    $0.height.equalTo(400)
+                    $0.bottom.equalToSuperview().inset(10)
+                }
+            }
+            
+            reactor.action.onNext(.setOverviewButtonVisible(isVisible))
+        }
     }
 }
 
@@ -472,6 +566,7 @@ extension MediaDetailViewController {
         }
         
         contentView.addSubview(overviewLabel)
+        contentView.addSubview(moreOverviewButton)
         contentView.addSubview(creditsCollectionView)
     }
     
@@ -525,8 +620,13 @@ extension MediaDetailViewController {
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
+        moreOverviewButton.snp.makeConstraints {
+            $0.top.equalTo(overviewLabel.snp.bottom)
+            $0.trailing.equalTo(overviewLabel.snp.trailing)
+        }
+        
         creditsCollectionView.snp.makeConstraints {
-            $0.top.equalTo(overviewLabel.snp.bottom).offset(10)
+            $0.top.equalTo(moreOverviewButton.snp.bottom)
             $0.horizontalEdges.equalTo(contentView).inset(20)
             $0.height.equalTo(400)
             $0.bottom.equalToSuperview().inset(10)

@@ -22,6 +22,7 @@
 		042EFE642E14040500810E02 /* SearchMediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042EFE632E14040500810E02 /* SearchMediaViewController.swift */; };
 		042F7EB52E658471003272EC /* CreditsSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EB42E658471003272EC /* CreditsSectionHeader.swift */; };
 		042F7EB92E6584AA003272EC /* CreditsSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EB82E6584AA003272EC /* CreditsSectionModel.swift */; };
+		042F7EBB2E65CA40003272EC /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EBA2E65CA40003272EC /* String+.swift */; };
 		043BB0432DFC4D8800E5438D /* TV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0422DFC4D8800E5438D /* TV.swift */; };
 		043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0442DFC4DA700E5438D /* TMDBTarget.swift */; };
 		043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0462DFC4DDA00E5438D /* NetworkManager.swift */; };
@@ -144,6 +145,7 @@
 		042EFE632E14040500810E02 /* SearchMediaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaViewController.swift; sourceTree = "<group>"; };
 		042F7EB42E658471003272EC /* CreditsSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsSectionHeader.swift; sourceTree = "<group>"; };
 		042F7EB82E6584AA003272EC /* CreditsSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsSectionModel.swift; sourceTree = "<group>"; };
+		042F7EBA2E65CA40003272EC /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		043BB0422DFC4D8800E5438D /* TV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TV.swift; sourceTree = "<group>"; };
 		043BB0442DFC4DA700E5438D /* TMDBTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBTarget.swift; sourceTree = "<group>"; };
 		043BB0462DFC4DDA00E5438D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
@@ -387,6 +389,7 @@
 			isa = PBXGroup;
 			children = (
 				044B8C3A2E60831300EB016D /* UICollectionViewLayout+.swift */,
+				042F7EBA2E65CA40003272EC /* String+.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -960,6 +963,7 @@
 				04FE6C952E599C3A00CCB76C /* MovieDetail.swift in Sources */,
 				042F7EB92E6584AA003272EC /* CreditsSectionModel.swift in Sources */,
 				048096642E5DC9CB002033A0 /* MockDatastack.swift in Sources */,
+				042F7EBB2E65CA40003272EC /* String+.swift in Sources */,
 				043BB0472DFC4DDA00E5438D /* NetworkManager.swift in Sources */,
 				044B8C312E60422A00EB016D /* AppColor.swift in Sources */,
 				04DCA8A52DF2DBFC00695361 /* TargetType.swift in Sources */,
