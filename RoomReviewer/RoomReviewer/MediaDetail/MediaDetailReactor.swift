@@ -34,6 +34,8 @@ final class MediaDetailReactor: Reactor {
         var posterImageData: UIImage?
         var credits: [CreditsSectionModel] = []
         var mediaSemiInfo: String?
+        var isOverviewButtonVisible: Bool = false
+        var isOverviewExpanded: Bool = false
         var isLoading: Bool?
         var errorType: Error?
         var isWatchlisted: Bool = false
@@ -50,6 +52,8 @@ final class MediaDetailReactor: Reactor {
         case watchedButtonTapped
         case writeReviewButtonTapped
         case updateWatchedDate(Date)
+        case moreOverviewButtonTapped
+        case setOverviewButtonVisible(Bool)
     }
     
     enum Mutation {
@@ -63,6 +67,8 @@ final class MediaDetailReactor: Reactor {
         case showSetWatchedDateAlert
         case setWatchedDate(Date)
         case pushWriteReviewView
+        case toggleOverviewExpanded
+        case setOverviewTruncatable(Bool)
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -160,6 +166,12 @@ final class MediaDetailReactor: Reactor {
                     return .just(.setWatchedDate(date))
                 }
                 .catch { .just(.showError($0)) }
+            
+        case .moreOverviewButtonTapped:
+            return .just(.toggleOverviewExpanded)
+            
+        case .setOverviewButtonVisible(let isTruncatable):
+            return .just(.setOverviewTruncatable(isTruncatable))
         }
     }
     
@@ -219,6 +231,12 @@ final class MediaDetailReactor: Reactor {
             
         case .showSetWatchedDateAlert:
             newState.showSetWatchedDateAlert = ()
+            
+        case .toggleOverviewExpanded:
+            newState.isOverviewExpanded.toggle()
+            
+        case .setOverviewTruncatable(let isTruncatable):
+            newState.isOverviewButtonVisible = isTruncatable
         }
         
         return newState
