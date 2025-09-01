@@ -30,6 +30,8 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
+        $0.layer.borderWidth = 0.3
+        $0.layer.borderColor = AppColor.appPrimaryColor.withAlphaComponent(0.3).cgColor
     }
     
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
@@ -53,7 +55,7 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
     
     private func configureLayout() {
         shadowView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview().inset(10)
+            $0.top.horizontalEdges.equalToSuperview()
             $0.height.equalTo(shadowView.snp.width).multipliedBy(1.5)
         }
 

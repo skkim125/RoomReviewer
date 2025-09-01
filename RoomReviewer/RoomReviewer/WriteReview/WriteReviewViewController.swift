@@ -25,6 +25,8 @@ final class WriteReviewViewController: UIViewController, View {
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = AppColor.secondaryBackgroundColor
+        $0.layer.borderWidth = 0.3
+        $0.layer.borderColor = AppColor.appPrimaryColor.withAlphaComponent(0.3).cgColor
     }
     
     private let titleLabel = UILabel().then {

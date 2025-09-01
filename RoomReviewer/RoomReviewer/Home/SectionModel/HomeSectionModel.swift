@@ -16,7 +16,7 @@ enum HomeSectionModel: Equatable {
     var header: String? {
         switch self {
         case .trend:
-            return nil
+            return "모두가 주목하는 콘텐츠"
         case .tv:
             return "요즘 핫한 K 드라마"
         case .movie:
