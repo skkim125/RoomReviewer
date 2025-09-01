@@ -29,6 +29,8 @@ final class HotMediaCollectionViewCell: UICollectionViewCell, View {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
+        $0.layer.borderWidth = 0.3
+        $0.layer.borderColor = AppColor.appPrimaryColor.withAlphaComponent(0.3).cgColor
     }
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
     private let tvNameLabel = UILabel().then {

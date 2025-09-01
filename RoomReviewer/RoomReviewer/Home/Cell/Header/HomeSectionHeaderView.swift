@@ -34,7 +34,7 @@ final class HomeSectionHeaderView: UICollectionReusableView {
     
     private func configureLayout() {
         titleLabel.snp.makeConstraints {
-            $0.edges.equalTo(self.safeAreaLayoutGuide)
+            $0.edges.equalTo(self)
         }
     }
     

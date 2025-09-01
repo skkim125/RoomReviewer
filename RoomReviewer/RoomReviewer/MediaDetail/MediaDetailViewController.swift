@@ -36,6 +36,8 @@ final class MediaDetailViewController: UIViewController, View {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
+        $0.layer.borderWidth = 0.3
+        $0.layer.borderColor = AppColor.appPrimaryColor.withAlphaComponent(0.3).cgColor
     }
     
     private let infoStackView = UIStackView().then {
@@ -471,7 +473,7 @@ extension MediaDetailViewController {
             $0.centerY.equalTo(backDropImageView.snp.bottom).inset(20)
             $0.centerX.equalTo(contentView)
             $0.width.equalTo(view.bounds.width/3)
-            $0.height.equalTo(180)
+            $0.height.equalTo(shadowView.snp.width).multipliedBy(1.5)
         }
         
         posterImageView.snp.makeConstraints {
