@@ -24,22 +24,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func setupVC() -> UITabBarController {
         let tabBarController = UITabBarController()
         let dataStack = CoreDataStack(modelName: "RoomReviewerEntity")
+        let imageProvider = ImageProvider()
+        let mediaDatabaseManager = MediaDatabaseManager(stack: dataStack)
+        let reviewDatabaseManager = ReviewDatabaseManager(stack: dataStack)
+        
         let homeReactor = HomeReactor(networkService: NetworkManager())
-        let homeVC = HomeViewController(imageProvider: ImageProvider(), mediaDBManager: MediaDatabaseManager(stack: dataStack), reviewDBManager: ReviewDatabaseManager(stack: dataStack))
+        let homeVC = HomeViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
         homeVC.tabBarItem.image = UIImage(systemName: "house")
         homeVC.tabBarItem.title = "홈"
         
-        let searchVC = UIViewController()
+        let searchVC = SearchMediaViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         let searchNav = UINavigationController(rootViewController: searchVC)
         searchNav.tabBarItem.image = UIImage(systemName: "magnifyingglass")
         searchNav.tabBarItem.title = "검색"
         
-        let tierVC = UIViewController()
-        let tierNav = UINavigationController(rootViewController: tierVC)
-        tierNav.tabBarItem.image = UIImage(systemName: "list.triangle")
-        tierNav.tabBarItem.title = "티어표"
+//        let tierVC = UIViewController()
+//        let tierNav = UINavigationController(rootViewController: tierVC)
+//        tierNav.tabBarItem.image = UIImage(systemName: "list.triangle")
+//        tierNav.tabBarItem.title = "티어표"
         
         let settingVC = UIViewController()
         let settingNav = UINavigationController(rootViewController: settingVC)
@@ -49,7 +53,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         tabBarController.viewControllers = [
             homeNav,
             searchNav,
-            tierNav,
+//            tierNav,
             settingNav
         ]
 
