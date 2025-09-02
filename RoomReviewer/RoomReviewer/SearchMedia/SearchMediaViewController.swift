@@ -31,15 +31,18 @@ final class SearchMediaViewController: UIViewController, View {
         $0.action = nil
     }
     
+    private let showsDismissButton: Bool
+    
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     var disposeBag = DisposeBag()
     
-    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, showsDismissButton: Bool = false) {
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
+        self.showsDismissButton = showsDismissButton
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -157,6 +160,8 @@ extension SearchMediaViewController {
     
     private func configureNavigationBar() {
         navigationItem.title = "미디어 검색"
-        navigationItem.leftBarButtonItem = dismissButton
+        if showsDismissButton {
+            navigationItem.leftBarButtonItem = dismissButton
+        }
     }
 }
