@@ -76,6 +76,8 @@ final class HomeViewController: UIViewController, View {
                 switch item {
                 case .trend(let trend):
                     return trend
+                case .watchlist(item: let watchlist):
+                    return watchlist
                 case .movie(let movie):
                     return movie
                 case .tv(let tv):
@@ -106,6 +108,12 @@ final class HomeViewController: UIViewController, View {
                     let reactor = TrendMediaCollectionViewCellReactor(media: trend, imageProvider: self.imageProvider)
                     cell.reactor = reactor
                     
+                    return cell
+                    
+                case .watchlist(item: let watchList):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
+                    let reactor = HotMediaCollectionViewCellReactor(media: watchList, imageProvider: self.imageProvider)
+                    cell.reactor = reactor
                     return cell
                     
                 case .movie(let movie):

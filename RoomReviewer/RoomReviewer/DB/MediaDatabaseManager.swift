@@ -10,9 +10,9 @@ import CoreData
 import RxSwift
 
 protocol MediaDBManager {
-    func createMedia(id: Int, title: String, overview: String?, type: String, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID>
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID>
     
-    func fetchAllMedia() -> Single<[Media]>
+    func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: Int) -> Single<Void?>
     func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, media: Media, watchedDate: Date?, isReviewed: Bool)?>
     func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?>
@@ -26,7 +26,7 @@ final class MediaDatabaseManager: MediaDBManager {
     }
 
     // 보고 싶은 or 리뷰 작성을 위한 Media 생성 & 저장
-    func createMedia(id: Int, title: String, overview: String?, type: String, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID> {
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID> {
         
         return Single.create { [weak self] observer in
             guard let self = self else {
@@ -42,6 +42,8 @@ final class MediaDatabaseManager: MediaDBManager {
                 entity.isStar = false
                 entity.title = title
                 entity.type = type
+                entity.posterURL = posterURL
+                entity.backdropURL = backdropURL
                 entity.releaseDate = releaseDate
                 entity.watchedDate = watchedDate
                 entity.addedDate = Date()
@@ -63,7 +65,7 @@ final class MediaDatabaseManager: MediaDBManager {
     }
     
     // 보고싶은 모든 미디어 불러오기
-    func fetchAllMedia() -> Single<[Media]> {
+    func fetchAllMedia() -> Single<[MediaEntity]> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
@@ -75,7 +77,7 @@ final class MediaDatabaseManager: MediaDBManager {
             request.sortDescriptors = [sortDescriptor]
             
             do {
-                let results = try stack.viewContext.fetch(request).map { $0.toDomain() }
+                let results = try stack.viewContext.fetch(request)
                 observer(.success(results))
                 
             } catch {
@@ -117,10 +119,6 @@ final class MediaDatabaseManager: MediaDBManager {
                     print("미디어 삭제 실패: \(error.localizedDescription)")
                     observer(.failure(error))
                 }
-                
-            } catch {
-                print("Failed to fetch media: \(error)")
-                observer(.success(nil))
             }
             
             return Disposables.create()

@@ -29,7 +29,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let mediaDatabaseManager = MediaDatabaseManager(stack: dataStack)
         let reviewDatabaseManager = ReviewDatabaseManager(stack: dataStack)
         
-        let homeReactor = HomeReactor(networkService: networkManager)
+        let homeReactor = HomeReactor(networkService: networkManager, mediaDBManager: mediaDatabaseManager)
         let homeVC = HomeViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
