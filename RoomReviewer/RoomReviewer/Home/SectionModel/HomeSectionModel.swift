@@ -10,6 +10,7 @@ import RxDataSources
 
 enum HomeSectionModel: Equatable {
     case trend(item: [HomeSectionItem])
+    case watchlist(item: [HomeSectionItem])
     case tv(item: [HomeSectionItem])
     case movie(item: [HomeSectionItem])
     
@@ -17,6 +18,8 @@ enum HomeSectionModel: Equatable {
         switch self {
         case .trend:
             return "모두가 주목하는 콘텐츠"
+        case .watchlist:
+            return "평론을 기다리고 있어요"
         case .tv:
             return "요즘 핫한 K 드라마"
         case .movie:
@@ -30,7 +33,7 @@ extension HomeSectionModel: SectionModelType {
     
     var items: [HomeSectionItem] {
         switch self {
-        case .trend(item: let item), .tv(item: let item), .movie(item: let item):
+        case .trend(item: let item), .watchlist(item: let item), .tv(item: let item), .movie(item: let item):
             return item.map { $0 }
         }
     }
@@ -39,6 +42,8 @@ extension HomeSectionModel: SectionModelType {
         switch original {
         case .trend(let items):
             self = .trend(item: items)
+        case .watchlist(item: let items):
+            self = .watchlist(item: items)
         case .tv(let items):
             self = .tv(item: items)
         case .movie(let items):
@@ -49,6 +54,7 @@ extension HomeSectionModel: SectionModelType {
 
 enum HomeSectionItem: Equatable {
     case trend(item: Media)
+    case watchlist(item: Media)
     case tv(item: Media)
     case movie(item: Media)
 }

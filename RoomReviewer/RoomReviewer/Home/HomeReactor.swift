@@ -13,10 +13,12 @@ import ReactorKit
 final class HomeReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
+    private let mediaDBManager: MediaDBManager
     
-    init(networkService: NetworkService) {
+    init(networkService: NetworkService, mediaDBManager: MediaDBManager) {
         initialState = State()
         self.networkService = networkService
+        self.mediaDBManager = mediaDBManager
     }
     
     struct State {
@@ -99,6 +101,20 @@ extension HomeReactor {
                 }
             }
         
+        let watchlistRequest = mediaDBManager.fetchAllMedia()
+            .asObservable()
+            .map { medias -> [HomeSectionItem] in
+                let result = medias.filter {
+                    $0.review == nil
+                }.map {
+                    return $0.toDomain()
+                }.map {
+                    HomeSectionItem.watchlist(item: $0)
+                }
+                
+                return result
+            }
+        
         let movieRequest = networkService.callRequest(TMDBTargetType.movie)
             .asObservable()
             .map { (result: Result<MovieList, Error>) -> [HomeSectionItem] in
@@ -126,10 +142,13 @@ extension HomeReactor {
                 }
             }
         
-        return Observable.zip(trendingRequest, movieRequest, tvRequest)
-            .map { (trend, movies, tvs) -> Mutation in
+        return Observable.zip(trendingRequest, watchlistRequest, movieRequest, tvRequest)
+            .map { (trend, watchlists, movies, tvs) -> Mutation in
                 var sections: [HomeSectionModel] = []
                 sections.append(HomeSectionModel.trend(item: trend))
+                if !watchlists.isEmpty {
+                    sections.append(HomeSectionModel.watchlist(item: watchlists))
+                }
                 sections.append(HomeSectionModel.movie(item: movies))
                 sections.append(HomeSectionModel.tv(item: tvs))
                 

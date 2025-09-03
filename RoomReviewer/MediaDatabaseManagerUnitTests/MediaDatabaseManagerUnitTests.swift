@@ -36,7 +36,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
         let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", genres: [], releaseDate: "", watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil)
             .observe(on: MainScheduler.instance)
             .subscribe { objectID in
                 XCTAssertNotNil(objectID)
@@ -64,8 +64,8 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
         let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", genres: [], releaseDate: "", watchedDate: nil)
-            .flatMap { [weak self] createdObjectID -> Single<[Media]> in
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil)
+            .flatMap { [weak self] createdObjectID -> Single<[MediaEntity]> in
                 XCTAssertNotNil(createdObjectID)
                 
                 guard let self = self else {
@@ -75,6 +75,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
                 
                 return self.sut.fetchAllMedia()
             }
+            .map { $0.map { $0.toDomain() } }
             .observe(on: MainScheduler.instance)
             .subscribe { list in
                 XCTAssertEqual(list.count, 1)
@@ -103,7 +104,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
         let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", genres: [], releaseDate: "", watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil)
             .flatMap { [weak self] createdObjectID -> Single<Void?> in
                 XCTAssertNotNil(createdObjectID)
                 
@@ -114,7 +115,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
                 
                 return self.sut.deleteMedia(id: testId)
             }
-            .flatMap { [weak self] result -> Single<[Media]> in
+            .flatMap { [weak self] result -> Single<[MediaEntity]> in
                 guard let self = self else {
                     XCTFail("실패")
                     return .just([])
@@ -123,6 +124,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
                 return self.sut.fetchAllMedia()
             }
             .observe(on: MainScheduler.instance)
+            .map { $0.map { $0.toDomain() } }
             .subscribe { list in
                 XCTAssertEqual(list.count, 0)
                 expectation.fulfill()
@@ -142,8 +144,8 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
         let testTitle = "Test Movie"
         let watchedDate = Date()
         
-        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", genres: [], releaseDate: "", watchedDate: nil)
-            .flatMap { [weak self] createdObjectID -> Single<Void?> in
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil)
+            .flatMap { [weak self] createdObjectID -> Single<NSManagedObjectID?> in
                 XCTAssertNotNil(createdObjectID)
                 
                 guard let self = self else {
@@ -153,7 +155,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
                 
                 return self.sut.updateWatchedDate(id: testId, watchedDate: watchedDate)
             }
-            .flatMap { [weak self] _ -> Single<[Media]> in
+            .flatMap { [weak self] _ -> Single<[MediaEntity]> in
                 guard let self = self else {
                     XCTFail("실패")
                     return .just([])
@@ -161,6 +163,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
                 
                 return self.sut.fetchAllMedia()
             }
+            .map { $0.map { $0.toDomain() } }
             .observe(on: MainScheduler.instance)
             .subscribe { list in
                 XCTAssertEqual(list.count, 1)

@@ -106,6 +106,7 @@ final class MediaDetailReactor: Reactor {
             
         case .watchlistButtonTapped:
             let media = currentState.media
+            let overview = currentState.overview
             let isCurrentlyWatchlisted = currentState.isWatchlisted
             let isReviewed = currentState.isReviewed
             
@@ -124,8 +125,10 @@ final class MediaDetailReactor: Reactor {
                     return mediaDBManager.createMedia(
                         id: media.id,
                         title: media.title,
-                        overview: media.overview,
+                        overview: overview,
                         type: media.mediaType.rawValue,
+                        posterURL: media.posterPath,
+                        backdropURL: media.backdropPath,
                         genres: media.genreIDS,
                         releaseDate: media.releaseDate,
                         watchedDate: nil
