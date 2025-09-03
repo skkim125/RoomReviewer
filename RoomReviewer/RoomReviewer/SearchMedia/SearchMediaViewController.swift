@@ -26,23 +26,24 @@ final class SearchMediaViewController: UIViewController, View {
     
     private let dismissButton = UIBarButtonItem().then {
         $0.image = UIImage(systemName: "xmark")
+        $0.tintColor = AppColor.appWhite
         $0.style = .done
         $0.target = nil
         $0.action = nil
     }
     
-    private let showsDismissButton: Bool
+    private let isSheetView: Bool
     
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     var disposeBag = DisposeBag()
     
-    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, showsDismissButton: Bool = false) {
+    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, isSheetView: Bool = false) {
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
-        self.showsDismissButton = showsDismissButton
+        self.isSheetView = isSheetView
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -154,7 +155,7 @@ extension SearchMediaViewController {
         searchMediaCollectionView.snp.makeConstraints {
             $0.top.equalTo(searchTextField.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(10)
-            if self.showsDismissButton {
+            if self.isSheetView {
                 $0.bottom.equalToSuperview()
             } else {
                 $0.bottom.equalTo(view.safeAreaLayoutGuide)
@@ -163,8 +164,8 @@ extension SearchMediaViewController {
     }
     
     private func configureNavigationBar() {
-        navigationItem.title = "미디어 검색"
-        if showsDismissButton {
+        navigationItem.title = "콘텐츠 검색"
+        if isSheetView {
             navigationItem.leftBarButtonItem = dismissButton
         }
     }

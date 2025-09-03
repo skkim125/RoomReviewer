@@ -26,7 +26,10 @@ final class HomeViewController: UIViewController, View {
     }
     
     private let writeReviewButton = UIBarButtonItem().then {
-        $0.image = UIImage(systemName: "pencil")
+        let config = UIImage.SymbolConfiguration(weight: .heavy)
+        let image = UIImage(systemName: "plus", withConfiguration: config)
+        $0.image = image
+        $0.tintColor = AppColor.appWhite
         $0.style = .done
         $0.target = nil
         $0.action = nil
@@ -153,7 +156,7 @@ final class HomeViewController: UIViewController, View {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = SearchMediaViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, showsDismissButton: true)
+                let vc = SearchMediaViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, isSheetView: true)
                 vc.reactor = SearchMediaReactor(networkService: NetworkManager())
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
@@ -178,6 +181,7 @@ extension HomeViewController {
         let label = UILabel()
         label.font = AppFont.appIconTitle
         label.text = "방구석 평론가"
+        label.textColor = AppColor.appWhite
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: label)
         navigationItem.rightBarButtonItem = writeReviewButton
     }

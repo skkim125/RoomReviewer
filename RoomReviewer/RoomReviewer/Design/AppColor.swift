@@ -9,10 +9,9 @@ import UIKit
 
 enum AppColor {
     static let appBackgroundColor = UIColor(named: "AppBackgroundColor")!
-    static let secondaryBackgroundColor = UIColor(named: "AppSecondaryBackgroundColor")!
-    static let appPrimaryColor = UIColor(named: "AppPrimaryColor")!
-    static let appSecondaryColor = UIColor(named: "AppSecondaryColor")!
-    static let appBodyTextColor = UIColor(named: "AppBodyTextColor")!
-    static let appInactiveColor = UIColor(named: "AppInactiveColor")!
-    static let placeholderTextColor = UIColor.placeholderText
+    static let appWhite = UIColor(named: "appWhite")!
+    static let appLightGray = UIColor(named: "AppLightGray")!
+    static let appGray = UIColor(named: "AppGray")!
+    static let appDarkGray = UIColor(named: "AppDarkGray")!
+    static let appPlaceholder = UIColor.placeholderText
 }

@@ -8,7 +8,7 @@
 import UIKit
 
 enum AppFont {
-    static let appIconTitle = UIFont.systemFont(ofSize: 28, weight: .bold)
+    static let appIconTitle = UIFont.systemFont(ofSize: 24, weight: .bold)
     static let largeTitle = UIFont.systemFont(ofSize: 20)
     static let boldLargeTitle = UIFont.systemFont(ofSize: 20, weight: .bold)
     static let title = UIFont.systemFont(ofSize: 18)
