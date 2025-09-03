@@ -63,12 +63,12 @@ extension SearchMediaCollectionViewCell {
                 if let image = image {
                     if image == AppImage.emptyPosterImage {
                         owner.posterImageView.contentMode = .scaleAspectFit
-                        owner.posterImageView.backgroundColor = .appSecondary
-                        owner.posterImageView.tintColor = .appPrimary
+                        owner.posterImageView.backgroundColor = AppColor.appLightGray
+                        owner.posterImageView.tintColor = AppColor.appWhite
                     }
                     owner.posterImageView.image = image
                 } else {
-                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
+                    owner.posterImageView.backgroundColor = AppColor.appDarkGray
                 }
             }
             .disposed(by: disposeBag)

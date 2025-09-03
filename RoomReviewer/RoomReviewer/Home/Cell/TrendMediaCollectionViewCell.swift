@@ -31,7 +31,7 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
         $0.layer.borderWidth = 0.3
-        $0.layer.borderColor = AppColor.appPrimaryColor.withAlphaComponent(0.3).cgColor
+        $0.layer.borderColor = AppColor.appWhite.withAlphaComponent(0.3).cgColor
     }
     
     private let titleLabel = UILabel().then {
@@ -99,12 +99,12 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
                 if let image = image {
                     if image == AppImage.emptyPosterImage {
                         owner.posterImageView.contentMode = .scaleAspectFit
-                        owner.posterImageView.backgroundColor = .appSecondary
-                        owner.posterImageView.tintColor = .appPrimary
+                        owner.posterImageView.backgroundColor = AppColor.appLightGray
+                        owner.posterImageView.tintColor = AppColor.appWhite
                     }
                     owner.posterImageView.image = image
                 } else {
-                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
+                    owner.posterImageView.backgroundColor = AppColor.appDarkGray
                 }
             }
             .disposed(by: disposeBag)

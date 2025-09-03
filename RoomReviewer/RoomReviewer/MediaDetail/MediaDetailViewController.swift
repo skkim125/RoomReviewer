@@ -38,7 +38,7 @@ final class MediaDetailViewController: UIViewController, View {
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
         $0.layer.borderWidth = 0.3
-        $0.layer.borderColor = AppColor.appPrimaryColor.withAlphaComponent(0.3).cgColor
+        $0.layer.borderColor = AppColor.appWhite.withAlphaComponent(0.3).cgColor
     }
     
     private let infoStackView = UIStackView().then {
@@ -51,18 +51,18 @@ final class MediaDetailViewController: UIViewController, View {
         $0.font = AppFont.boldLargeTitle
         $0.numberOfLines = 0
         $0.textAlignment = .center
-        $0.textColor = AppColor.appPrimaryColor
+        $0.textColor = AppColor.appWhite
     }
     
     private let semiInfoLabel = UILabel().then {
         $0.font = AppFont.subTitle
-        $0.textColor = AppColor.appSecondaryColor
+        $0.textColor = AppColor.appLightGray
         $0.textAlignment = .center
     }
     
     private let genreLabel = UILabel().then {
         $0.font = AppFont.subTitle
-        $0.textColor = AppColor.appSecondaryColor
+        $0.textColor = AppColor.appLightGray
         $0.numberOfLines = 0
         $0.textAlignment = .center
     }
@@ -111,7 +111,7 @@ final class MediaDetailViewController: UIViewController, View {
     private let overviewLabel = UILabel().then {
         $0.font = AppFont.subTitle
         $0.numberOfLines = 4
-        $0.textColor = AppColor.appBodyTextColor
+        $0.textColor = AppColor.appWhite
         $0.textAlignment = .left
     }
     
@@ -124,7 +124,7 @@ final class MediaDetailViewController: UIViewController, View {
         config.title = "더보기"
         config.imagePlacement = .trailing
         config.imagePadding = 2
-        config.baseForegroundColor = AppColor.appSecondaryColor
+        config.baseForegroundColor = AppColor.appLightGray
         
         let attr = NSAttributedString(
             string: "더보기",
@@ -238,13 +238,13 @@ final class MediaDetailViewController: UIViewController, View {
             .drive(with: self) { owner, image in
                 if let image = image {
                     if image == AppImage.emptyPosterImage {
-                        owner.backDropImageView.contentMode = .scaleAspectFit
-                        owner.backDropImageView.backgroundColor = .appSecondary
-                        owner.backDropImageView.tintColor = .appPrimary
+                        owner.posterImageView.contentMode = .scaleAspectFit
+                        owner.posterImageView.backgroundColor = AppColor.appLightGray
+                        owner.posterImageView.tintColor = AppColor.appWhite
                     }
                     owner.backDropImageView.image = image
                 } else {
-                    owner.backDropImageView.backgroundColor = AppColor.secondaryBackgroundColor
+                    owner.backDropImageView.backgroundColor = AppColor.appDarkGray
                 }
             }
             .disposed(by: disposeBag)
@@ -256,12 +256,12 @@ final class MediaDetailViewController: UIViewController, View {
                 if let image = image {
                     if image == AppImage.emptyPosterImage {
                         owner.posterImageView.contentMode = .scaleAspectFit
-                        owner.posterImageView.backgroundColor = .appSecondary
-                        owner.posterImageView.tintColor = .appPrimary
+                        owner.posterImageView.backgroundColor = AppColor.appLightGray
+                        owner.posterImageView.tintColor = AppColor.appWhite
                     }
                     owner.posterImageView.image = image
                 } else {
-                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
+                    owner.posterImageView.backgroundColor = AppColor.appDarkGray
                 }
             }
             .disposed(by: disposeBag)
@@ -420,7 +420,7 @@ final class MediaDetailViewController: UIViewController, View {
         } else {
             config.title = "보고 싶어요"
             config.image = UIImage(systemName: "plus.circle")
-            config.baseForegroundColor = AppColor.appPrimaryColor
+            config.baseForegroundColor = AppColor.appWhite
         }
         
         let attr = attributedTitle(text: config.title ?? "", alignment: .center)
@@ -442,11 +442,11 @@ final class MediaDetailViewController: UIViewController, View {
         if let _ = watchedDate {
             config.title = "시청 완료"
             config.image = UIImage(systemName: "eye.fill")
-            config.baseForegroundColor = AppColor.appPrimaryColor
+            config.baseForegroundColor = AppColor.appWhite
         } else {
             config.title = "시청함"
             config.image = UIImage(systemName: "eye")
-            config.baseForegroundColor = AppColor.appInactiveColor
+            config.baseForegroundColor = AppColor.appGray
         }
         
         let attr = attributedTitle(text: config.title ?? "", alignment: .center)
@@ -473,7 +473,7 @@ final class MediaDetailViewController: UIViewController, View {
         } else {
             config.title = "평론하기"
             config.image = UIImage(systemName: "sunglasses")
-            config.baseForegroundColor = isEnabled ? AppColor.appPrimaryColor : AppColor.appInactiveColor
+            config.baseForegroundColor = isEnabled ? AppColor.appWhite : AppColor.appGray
         }
         
         let attr = attributedTitle(text: config.title ?? "", alignment: .center)
@@ -652,10 +652,10 @@ extension MediaDetailViewController {
     }
     
     private func setupPlaceholderState() {
-        backDropImageView.backgroundColor = AppColor.secondaryBackgroundColor
-        posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
+        backDropImageView.backgroundColor = AppColor.appDarkGray
+        posterImageView.backgroundColor = AppColor.appDarkGray
         
-        let placeholderColor = AppColor.placeholderTextColor
+        let placeholderColor = AppColor.appPlaceholder
         
         [genreLabel, semiInfoLabel].forEach {
             $0.text = "\n"
@@ -679,8 +679,8 @@ extension MediaDetailViewController {
             $0.backgroundColor = .clear
         }
         
-        genreLabel.textColor = AppColor.appSecondaryColor
-        semiInfoLabel.textColor = AppColor.appSecondaryColor
-        overviewLabel.textColor = AppColor.appBodyTextColor
+        genreLabel.textColor = AppColor.appLightGray
+        semiInfoLabel.textColor = AppColor.appLightGray
+        overviewLabel.textColor = AppColor.appWhite
     }
 }

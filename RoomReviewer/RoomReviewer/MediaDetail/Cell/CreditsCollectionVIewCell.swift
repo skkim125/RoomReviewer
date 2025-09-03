@@ -18,19 +18,19 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = AppColor.appSecondaryColor
-        $0.tintColor = AppColor.appPrimaryColor
+        $0.backgroundColor = AppColor.appLightGray
+        $0.tintColor = AppColor.appWhite
     }
     
     private let nameLabel = UILabel().then {
         $0.font = AppFont.semiboldCallout
-        $0.textColor = AppColor.appPrimaryColor
+        $0.textColor = AppColor.appWhite
         $0.textAlignment = .center
     }
     
     private let characterLabel = UILabel().then {
         $0.font = AppFont.callout
-        $0.textColor = AppColor.appSecondaryColor
+        $0.textColor = AppColor.appLightGray
         $0.textAlignment = .center
         $0.numberOfLines = 1
     }

@@ -24,9 +24,9 @@ final class WriteReviewViewController: UIViewController, View {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = AppColor.secondaryBackgroundColor
+        $0.backgroundColor = AppColor.appDarkGray
         $0.layer.borderWidth = 0.3
-        $0.layer.borderColor = AppColor.appPrimaryColor.withAlphaComponent(0.3).cgColor
+        $0.layer.borderColor = AppColor.appWhite.withAlphaComponent(0.3).cgColor
     }
     
     private let titleLabel = UILabel().then {
@@ -111,8 +111,8 @@ final class WriteReviewViewController: UIViewController, View {
         $0.setTitle("내 서재에 저장", for: .normal)
         $0.titleLabel?.font = AppFont.boldTitle
         $0.backgroundColor = .systemRed
-        $0.setTitleColor(AppColor.appPrimaryColor, for: .normal)
-        $0.setTitleColor(AppColor.appInactiveColor, for: .disabled)
+        $0.setTitleColor(AppColor.appWhite, for: .normal)
+        $0.setTitleColor(AppColor.appGray, for: .disabled)
         $0.layer.cornerRadius = 12
         $0.isEnabled = false
     }
@@ -151,7 +151,7 @@ final class WriteReviewViewController: UIViewController, View {
                 if let image = image {
                     owner.posterImageView.image = image
                 } else {
-                    owner.posterImageView.backgroundColor = AppColor.secondaryBackgroundColor
+                    owner.posterImageView.backgroundColor = AppColor.appDarkGray
                 }
             }
             .disposed(by: disposeBag)
@@ -161,7 +161,7 @@ final class WriteReviewViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, canSave in
                 owner.saveButton.isEnabled = canSave
-                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.appSecondaryColor
+                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.appLightGray
             }
             .disposed(by: disposeBag)
         
@@ -186,7 +186,7 @@ final class WriteReviewViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, canSave in
                 owner.saveButton.isEnabled = canSave
-                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.appSecondaryColor
+                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.appLightGray
             }
             .disposed(by: disposeBag)
     }
