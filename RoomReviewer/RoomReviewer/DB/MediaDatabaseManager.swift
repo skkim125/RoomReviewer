@@ -95,14 +95,27 @@ final class MediaDatabaseManager: MediaDBManager {
                 return Disposables.create()
             }
             
-            do {
-                if let deleteObject = try stack.viewContext.fetch(MediaEntity.fetchRequest()).first(where: { $0.id == id }) {
-                    let object = deleteObject
-                    stack.viewContext.delete(deleteObject)
-                    print("\(object.title) 삭제 완료")
-                    observer(.success(()))
-                } else {
-                    observer(.failure(NetworkError.commonError))
+            let backgroundContext = self.stack.newBackgroundContext()
+            backgroundContext.perform {
+                do {
+                    let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                    request.predicate = NSPredicate(format: "id == %d", id)
+                    
+                    if let deleteObject = try backgroundContext.fetch(request).first {
+                        let title = deleteObject.title
+                        
+                        backgroundContext.delete(deleteObject)
+                        
+                        try backgroundContext.save()
+                        
+                        print("\(title) 삭제 완료")
+                        observer(.success(()))
+                    } else {
+                        observer(.failure(NetworkError.commonError))
+                    }
+                } catch {
+                    print("미디어 삭제 실패: \(error.localizedDescription)")
+                    observer(.failure(error))
                 }
                 
             } catch {
