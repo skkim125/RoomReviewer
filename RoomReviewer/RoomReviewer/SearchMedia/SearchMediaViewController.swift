@@ -154,7 +154,11 @@ extension SearchMediaViewController {
         searchMediaCollectionView.snp.makeConstraints {
             $0.top.equalTo(searchTextField.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(10)
-            $0.bottom.equalToSuperview()
+            if self.showsDismissButton {
+                $0.bottom.equalToSuperview()
+            } else {
+                $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            }
         }
     }
     
