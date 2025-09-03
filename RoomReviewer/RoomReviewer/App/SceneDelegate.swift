@@ -23,19 +23,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func setupVC() -> UITabBarController {
         let tabBarController = UITabBarController()
-        let dataStack = CoreDataStack(modelName: "RoomReviewerEntity")
+        let networkManager = NetworkManager()
         let imageProvider = ImageProvider()
+        let dataStack = CoreDataStack(modelName: "RoomReviewerEntity")
         let mediaDatabaseManager = MediaDatabaseManager(stack: dataStack)
         let reviewDatabaseManager = ReviewDatabaseManager(stack: dataStack)
         
-        let homeReactor = HomeReactor(networkService: NetworkManager())
+        let homeReactor = HomeReactor(networkService: networkManager)
         let homeVC = HomeViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
         homeVC.tabBarItem.image = UIImage(systemName: "house")
         homeVC.tabBarItem.title = "홈"
         
+        let reactor = SearchMediaReactor(networkService: networkManager)
         let searchVC = SearchMediaViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
+        searchVC.reactor = reactor
         let searchNav = UINavigationController(rootViewController: searchVC)
         searchNav.tabBarItem.image = UIImage(systemName: "magnifyingglass")
         searchNav.tabBarItem.title = "검색"
