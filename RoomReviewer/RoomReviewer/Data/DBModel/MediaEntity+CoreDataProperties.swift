@@ -28,7 +28,44 @@ extension MediaEntity {
     @NSManaged public var type: String
     @NSManaged public var watchedDate: Date?
     @NSManaged public var review: ReviewEntity?
+    @NSManaged public var crews: NSOrderedSet
+    @NSManaged public var casts: NSOrderedSet
+}
 
+extension MediaEntity {
+    public var crewArray: [CrewEntity] {
+        return self.crews.array as? [CrewEntity] ?? []
+    }
+    
+    @objc(addCrewsObject:)
+    @NSManaged public func addToCrews(_ value: CrewEntity)
+
+    @objc(removeCrewsObject:)
+    @NSManaged public func removeFromCrews(_ value: CrewEntity)
+
+    @objc(addCrews:)
+    @NSManaged public func addToCrews(_ values: NSOrderedSet)
+
+    @objc(removeCrews:)
+    @NSManaged public func removeFromCrews(_ values: NSOrderedSet)
+}
+
+extension MediaEntity {
+    public var castArray: [CastEntity] {
+        return self.casts.array as? [CastEntity] ?? []
+    }
+    
+    @objc(addCastsObject:)
+    @NSManaged public func addToCasts(_ value: CastEntity)
+    
+    @objc(removeCastsObject:)
+    @NSManaged public func removeFromCasts(_ value: CastEntity)
+    
+    @objc(addCasts:)
+    @NSManaged public func addToCasts(_ values: NSOrderedSet)
+    
+    @objc(removeCasts:)
+    @NSManaged public func removeFromCasts(_ values: NSOrderedSet)
 }
 
 extension MediaEntity : Identifiable {
