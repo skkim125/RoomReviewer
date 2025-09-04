@@ -41,6 +41,7 @@ final class MediaDatabaseManager: MediaDBManager {
                 entity.id = Int64(id)
                 entity.isStar = false
                 entity.title = title
+                entity.overview = overview
                 entity.type = type
                 entity.posterURL = posterURL
                 entity.backdropURL = backdropURL
