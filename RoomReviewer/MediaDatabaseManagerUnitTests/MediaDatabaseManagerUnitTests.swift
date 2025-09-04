@@ -36,7 +36,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
         let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil, creators: [], casts: [])
             .observe(on: MainScheduler.instance)
             .subscribe { objectID in
                 XCTAssertNotNil(objectID)
@@ -64,7 +64,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
         let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil, creators: [], casts: [])
             .flatMap { [weak self] createdObjectID -> Single<[MediaEntity]> in
                 XCTAssertNotNil(createdObjectID)
                 
@@ -104,7 +104,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
         let testId = 123
         let testTitle = "Test Movie"
         
-        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil, creators: [], casts: [])
             .flatMap { [weak self] createdObjectID -> Single<Void?> in
                 XCTAssertNotNil(createdObjectID)
                 
@@ -144,7 +144,7 @@ final class MediaDatabaseManagerUnitTests: XCTestCase {
         let testTitle = "Test Movie"
         let watchedDate = Date()
         
-        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil)
+        sut.createMedia(id: testId, title: testTitle, overview: "", type: "movie", posterURL: nil, backdropURL: nil, genres: [], releaseDate: "", watchedDate: nil, creators: [], casts: [])
             .flatMap { [weak self] createdObjectID -> Single<NSManagedObjectID?> in
                 XCTAssertNotNil(createdObjectID)
                 
