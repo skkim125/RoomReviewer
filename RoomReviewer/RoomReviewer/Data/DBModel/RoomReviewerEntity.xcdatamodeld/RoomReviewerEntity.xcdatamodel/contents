@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G90" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Cast" representedClassName="CastEntity" syncable="YES">
+        <attribute name="character" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="profileURL" optional="YES" attributeType="String"/>
+        <relationship name="media" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Media" inverseName="casts" inverseEntity="Media"/>
+    </entity>
+    <entity name="Crew" representedClassName="CrewEntity" syncable="YES">
+        <attribute name="department" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="profileURL" optional="YES" attributeType="String"/>
+        <relationship name="media" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Media" inverseName="crews" inverseEntity="Media"/>
+    </entity>
     <entity name="Media" representedClassName="MediaEntity" syncable="YES">
         <attribute name="addedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="backdropURL" optional="YES" attributeType="String"/>
@@ -12,6 +26,8 @@
         <attribute name="title" attributeType="String"/>
         <attribute name="type" attributeType="String"/>
         <attribute name="watchedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="casts" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Cast" inverseName="media" inverseEntity="Cast"/>
+        <relationship name="crews" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Crew" inverseName="media" inverseEntity="Crew"/>
         <relationship name="review" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Review" inverseName="media" inverseEntity="Review"/>
     </entity>
     <entity name="Review" representedClassName="ReviewEntity" syncable="YES">
