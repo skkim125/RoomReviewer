@@ -10,7 +10,7 @@ import CoreData
 import RxSwift
 
 protocol MediaDBManager {
-    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID>
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast]) -> Single<NSManagedObjectID>
     
     func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: Int) -> Single<Void?>
@@ -26,7 +26,7 @@ final class MediaDatabaseManager: MediaDBManager {
     }
 
     // 보고 싶은 or 리뷰 작성을 위한 Media 생성 & 저장
-    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?) -> Single<NSManagedObjectID> {
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast]) -> Single<NSManagedObjectID> {
         
         return Single.create { [weak self] observer in
             guard let self = self else {
@@ -37,23 +37,46 @@ final class MediaDatabaseManager: MediaDBManager {
             let backgroundContext = self.stack.newBackgroundContext()
             
             backgroundContext.perform {
-                let entity = MediaEntity(context: backgroundContext)
-                entity.id = Int64(id)
-                entity.isStar = false
-                entity.title = title
-                entity.overview = overview
-                entity.type = type
-                entity.posterURL = posterURL
-                entity.backdropURL = backdropURL
-                entity.releaseDate = releaseDate
-                entity.watchedDate = watchedDate
-                entity.addedDate = Date()
-                entity.genres = genres
+                let mediaEntity = MediaEntity(context: backgroundContext)
+                mediaEntity.id = Int64(id)
+                mediaEntity.isStar = false
+                mediaEntity.title = title
+                mediaEntity.overview = overview
+                mediaEntity.type = type
+                mediaEntity.posterURL = posterURL
+                mediaEntity.backdropURL = backdropURL
+                mediaEntity.releaseDate = releaseDate
+                mediaEntity.watchedDate = watchedDate
+                mediaEntity.addedDate = Date()
+                mediaEntity.genres = genres
+                
+                for cast in casts {
+                    let castEntity = CastEntity(context: backgroundContext)
+                    
+                    castEntity.id = Int64(cast.id)
+                    castEntity.name = cast.name
+                    castEntity.character = cast.character
+                    castEntity.profileURL = cast.profilePath
+                    
+                    mediaEntity.addToCasts(castEntity)
+                }
+                
+                for crew in creators {
+                    let crewEntity = CrewEntity(context: backgroundContext)
+                    
+                    crewEntity.id = Int64(crew.id)
+                    crewEntity.name = crew.name
+                    crewEntity.department = crew.department
+                    crewEntity.profileURL = crew.profilePath
+                    
+                    mediaEntity.addToCrews(crewEntity)
+                }
+                
                 do {
                     try backgroundContext.save()
-                    print("\(entity.title) 저장 완료")
+                    print("\(mediaEntity.title) 저장 완료")
                     
-                    observer(.success(entity.objectID))
+                    observer(.success(mediaEntity.objectID))
                 } catch {
                     print("저장 실패: \(error.localizedDescription)")
                     

@@ -32,6 +32,8 @@ final class MediaDetailReactor: Reactor {
         var genres: String?
         var backDropImageData: UIImage?
         var posterImageData: UIImage?
+        var casts: [Cast] = []
+        var creators: [Crew] = []
         var credits: [CreditsSectionModel] = []
         var mediaSemiInfo: String?
         var isOverviewButtonVisible: Bool = false
@@ -108,7 +110,8 @@ final class MediaDetailReactor: Reactor {
             
         case .watchlistButtonTapped:
             let media = currentState.media
-            let overview = currentState.overview
+            let casts = currentState.casts
+            let creators = currentState.creators
             let isCurrentlyWatchlisted = currentState.isWatchlisted
             let isReviewed = currentState.isReviewed
             
@@ -124,17 +127,7 @@ final class MediaDetailReactor: Reactor {
                         }
                         .catch { .just(.showError($0)) }
                 } else {
-                    return mediaDBManager.createMedia(
-                        id: media.id,
-                        title: media.title,
-                        overview: overview,
-                        type: media.mediaType.rawValue,
-                        posterURL: media.posterPath,
-                        backdropURL: media.backdropPath,
-                        genres: media.genreIDS,
-                        releaseDate: media.releaseDate,
-                        watchedDate: nil
-                    )
+                    return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts)
                     .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }
                     .asObservable()
                     .observe(on: MainScheduler.instance)
@@ -193,7 +186,8 @@ final class MediaDetailReactor: Reactor {
             
         case .getMediaDetail(let mediaInfo):
             let detail = mediaInfo
-            
+            newState.casts = detail.cast
+            newState.creators = detail.creator
             var sectionModels: [CreditsSectionModel] = []
             let creators = detail.creator.sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ CreditsSectionItem.creators(item: $0) })
             let creatorsSectionModel = CreditsSectionModel.creators(item: creators)
