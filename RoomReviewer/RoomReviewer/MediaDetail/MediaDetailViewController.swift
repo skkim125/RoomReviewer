@@ -151,6 +151,8 @@ final class MediaDetailViewController: UIViewController, View {
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
+    
+    var updateWatchlist: (() -> Void)?
     var disposeBag = DisposeBag()
     
     init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
@@ -380,6 +382,14 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, isExpanded in
                 owner.expandOverview(isExpanded: isExpanded)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$didUpdateWatchlist)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self) { owner, _ in
+                owner.updateWatchlist?()
             }
             .disposed(by: disposeBag)
     }

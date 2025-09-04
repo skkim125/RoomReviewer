@@ -114,6 +114,7 @@ final class HomeViewController: UIViewController, View {
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
                     let reactor = HotMediaCollectionViewCellReactor(media: watchList, imageProvider: self.imageProvider)
                     cell.reactor = reactor
+                    
                     return cell
                     
                 case .movie(let movie):
@@ -156,6 +157,12 @@ final class HomeViewController: UIViewController, View {
                 let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
+                
+                vc.updateWatchlist = { [weak self] in
+                    guard let self = self else { return }
+                    self.reactor?.action.onNext(.updateWatchlist)
+                }
+                
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)

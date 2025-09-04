@@ -42,6 +42,7 @@ final class MediaDetailReactor: Reactor {
         var watchedDate: Date?
         var mediaObjectID: NSManagedObjectID?
         var isReviewed: Bool = false
+        @Pulse var didUpdateWatchlist: Void?
         @Pulse var showSetWatchedDateAlert: Void?
         @Pulse var pushWriteReviewView: (Media, NSManagedObjectID?)?
     }
@@ -69,6 +70,7 @@ final class MediaDetailReactor: Reactor {
         case pushWriteReviewView
         case toggleOverviewExpanded
         case setOverviewTruncatable(Bool)
+        case signalWatchlistUpdate
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -118,7 +120,7 @@ final class MediaDetailReactor: Reactor {
                         .asObservable()
                         .observe(on: MainScheduler.instance)
                         .flatMap { _ -> Observable<Mutation> in
-                            return .just(.setWatchlistStatus(isWatchlisted: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false))
+                            return .concat(.just(.setWatchlistStatus(isWatchlisted: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)), .just(.signalWatchlistUpdate))
                         }
                         .catch { .just(.showError($0)) }
                 } else {
@@ -138,7 +140,7 @@ final class MediaDetailReactor: Reactor {
                     .observe(on: MainScheduler.instance)
                     .flatMap { result -> Observable<Mutation> in
                         if let (objectID, _, watchedDate, isReviewed) = result {
-                            return .just(.setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed))
+                            return .concat(.just(.setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed)), .just(.signalWatchlistUpdate))
                         }
                         return .empty()
                     }
@@ -240,6 +242,9 @@ final class MediaDetailReactor: Reactor {
             
         case .setOverviewTruncatable(let isTruncatable):
             newState.isOverviewButtonVisible = isTruncatable
+            
+        case .signalWatchlistUpdate:
+            newState.didUpdateWatchlist = ()
         }
         
         return newState

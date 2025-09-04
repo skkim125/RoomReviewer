@@ -34,6 +34,7 @@ final class HomeReactor: Reactor {
         case fetchData
         case writeButtonTapped
         case mediaSelected(Media)
+        case updateWatchlist
     }
     
     enum Mutation {
@@ -42,6 +43,7 @@ final class HomeReactor: Reactor {
         case presentWriteReviewView
         case presentMediaDetail(Media)
         case showError(Error)
+        case updateWatchlist([HomeSectionItem])
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -56,6 +58,8 @@ final class HomeReactor: Reactor {
             return .just(.presentWriteReviewView)
         case .mediaSelected(let media):
             return .just(.presentMediaDetail(media))
+        case .updateWatchlist:
+            return updateWatchlist()
         }
     }
     
@@ -73,6 +77,30 @@ final class HomeReactor: Reactor {
             newState.presentWriteReviewView = ()
         case .presentMediaDetail(let media):
             newState.selectedMedia = media
+            
+        case .updateWatchlist(let items):
+            var newSections = newState.medias
+            
+            if let index = newSections.firstIndex(where: {
+                if case .watchlist = $0 { return true }
+                return false
+            }) {
+                if !items.isEmpty {
+                    newSections[index] = HomeSectionModel.watchlist(item: items)
+                } else {
+                    newSections.remove(at: index)
+                }
+            } else if !items.isEmpty {
+                let trendSection = newSections.first(where: { if case .trend = $0 { return true }; return false })
+                let newWatchlistSection = HomeSectionModel.watchlist(item: items)
+                
+                if trendSection != nil, let trendIndex = newSections.firstIndex(where: { $0 == trendSection }) {
+                    newSections.insert(newWatchlistSection, at: trendIndex + 1)
+                } else {
+                    newSections.insert(newWatchlistSection, at: 0)
+                }
+            }
+            newState.medias = newSections
         }
         
         return newState
@@ -81,6 +109,41 @@ final class HomeReactor: Reactor {
 
 extension HomeReactor {
     private func fetchMedias() -> Observable<Mutation> {
+        let trendingMedias = fetchTrending()
+        let watchlist = fetchWatchlist()
+        let movies = fetchMovie()
+        let tvs = fetchTV()
+        
+        return Observable.zip(trendingMedias, watchlist, movies, tvs)
+            .map { (trend, watchlists, movies, tvs) -> Mutation in
+                var sections: [HomeSectionModel] = []
+                sections.append(HomeSectionModel.trend(item: trend))
+                if !watchlists.isEmpty {
+                    sections.append(HomeSectionModel.watchlist(item: watchlists))
+                }
+                sections.append(HomeSectionModel.movie(item: movies))
+                sections.append(HomeSectionModel.tv(item: tvs))
+                
+                return .fetchedData(sections)
+            }
+            .catch { error in
+                return .just(.showError(error))
+            }
+    }
+    
+    private func updateWatchlist() -> Observable<Mutation> {
+        return mediaDBManager.fetchAllMedia()
+            .asObservable()
+            .map { medias -> [HomeSectionItem] in
+                return medias.filter { $0.review == nil }
+                    .map { $0.toDomain() }
+                    .map { HomeSectionItem.watchlist(item: $0) }
+            }
+            .map { .updateWatchlist($0) }
+            .catch { .just(.showError($0)) }
+    }
+    
+    private func fetchTrending() -> Observable<[HomeSectionItem]> {
         let trendingRequest = networkService.callRequest(TMDBTargetType.trend)
             .asObservable()
             .map { (result: Result<TrendResultResponse, Error>) -> [HomeSectionItem] in
@@ -101,6 +164,10 @@ extension HomeReactor {
                 }
             }
         
+        return trendingRequest
+    }
+    
+    private func fetchWatchlist() -> Observable<[HomeSectionItem]> {
         let watchlistRequest = mediaDBManager.fetchAllMedia()
             .asObservable()
             .map { medias -> [HomeSectionItem] in
@@ -115,6 +182,10 @@ extension HomeReactor {
                 return result
             }
         
+        return watchlistRequest
+    }
+    
+    private func fetchMovie() -> Observable<[HomeSectionItem]> {
         let movieRequest = networkService.callRequest(TMDBTargetType.movie)
             .asObservable()
             .map { (result: Result<MovieList, Error>) -> [HomeSectionItem] in
@@ -128,7 +199,10 @@ extension HomeReactor {
                 }
             }
         
-        
+        return movieRequest
+    }
+    
+    private func fetchTV() -> Observable<[HomeSectionItem]> {
         let tvRequest = networkService.callRequest(TMDBTargetType.tv)
             .asObservable()
             .map { (result: Result<TVList, Error>) -> [HomeSectionItem] in
@@ -142,20 +216,6 @@ extension HomeReactor {
                 }
             }
         
-        return Observable.zip(trendingRequest, watchlistRequest, movieRequest, tvRequest)
-            .map { (trend, watchlists, movies, tvs) -> Mutation in
-                var sections: [HomeSectionModel] = []
-                sections.append(HomeSectionModel.trend(item: trend))
-                if !watchlists.isEmpty {
-                    sections.append(HomeSectionModel.watchlist(item: watchlists))
-                }
-                sections.append(HomeSectionModel.movie(item: movies))
-                sections.append(HomeSectionModel.tv(item: tvs))
-                
-                return .fetchedData(sections)
-            }
-            .catch { error in
-                return .just(.showError(error))
-            }
+        return tvRequest
     }
 }
