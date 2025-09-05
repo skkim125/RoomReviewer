@@ -26,27 +26,21 @@ final class MyPageReactor: Reactor {
         @Pulse var selectedMyPageSection: MyPageSectionItem?
     }
     
-    let initialState: State = State()
+    private let mediaDBManager: MediaDBManager
+    let initialState: State
+    
+    init(mediaDBManager: MediaDBManager) {
+        self.initialState = State()
+        self.mediaDBManager = mediaDBManager
+    }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad:
-            let sections: [MyPageSectionModel] = [
-                .myActivity(items: [
-                    .reviews(count: 15),
-                    .watchlist(count: 8),
-                    .watchHistory(count: 42)
-                ]),
-                .management(items: [
-                    .appInfo
-                ])
-            ]
-            return Observable.just(Mutation.setSections(sections))
+            return getSavedMediaCount()
             
         case .itemSelected(let indexPath):
-            guard let selectedItem = currentState.sections[safe: indexPath.section]?.items[safe: indexPath.row] else {
-                return .empty()
-            }
+            let selectedItem = currentState.sections[indexPath.section].items[indexPath.row]
             return .just(.moveMyPageSection(selectedItem))
         }
     }
@@ -63,10 +57,24 @@ final class MyPageReactor: Reactor {
         
         return newState
     }
-}
-
-extension Collection {
-    subscript(safe index: Index) -> Element? {
-        return indices.contains(index) ? self[index] : nil
+    
+    private func getSavedMediaCount() -> Observable<Mutation> {
+        let sectionModel = mediaDBManager.fetchAllMedia()
+            .asObservable()
+            .map { mediaEntities -> [MyPageSectionModel] in
+                let watchlistCount = mediaEntities.filter { $0.watchedDate == nil }.count
+                let watchHistoryCount = mediaEntities.filter { $0.watchedDate != nil }.count
+                let reviewCount = mediaEntities.filter { $0.review != nil }.count
+                
+                let activitySectionModel: MyPageSectionModel = .myActivity(items: [.watchlist(count: watchlistCount), .watchHistory(count: watchHistoryCount), .reviews(count: reviewCount)])
+                
+                let sectionModels: [MyPageSectionModel] = [activitySectionModel, .management(items: [
+                    .appInfo
+                ])]
+                
+                return sectionModels
+            }
+        
+        return sectionModel.map { .setSections($0) }
     }
 }

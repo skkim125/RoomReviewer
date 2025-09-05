@@ -21,6 +21,24 @@ final class MyPageViewController: UIViewController, View {
     
     var disposeBag = DisposeBag()
     
+    private let networkService: NetworkService
+    private let imageProvider: ImageProviding
+    private let mediaDBManager: MediaDBManager
+    private let reviewDBManager: ReviewDBManager
+    
+    init(networkService: NetworkService, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+        self.networkService = networkService
+        self.imageProvider = imageProvider
+        self.mediaDBManager = mediaDBManager
+        self.reviewDBManager = reviewDBManager
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureHierarchy()
@@ -119,11 +137,20 @@ final class MyPageViewController: UIViewController, View {
     private func moveSection(_ item: MyPageSectionItem) {
         switch item {
         case .reviews:
-            print("나의 평론 화면으로 이동")
+            let reactor = SavedMediaReactor(.reviewed, mediaDBManager: self.mediaDBManager)
+            let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
+            vc.reactor = reactor
+            self.navigationController?.pushViewController(vc, animated: true)
         case .watchlist:
-            print("보고싶어요 화면으로 이동")
+            let reactor = SavedMediaReactor(.watchlist, mediaDBManager: self.mediaDBManager)
+            let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
+            vc.reactor = reactor
+            self.navigationController?.pushViewController(vc, animated: true)
         case .watchHistory:
-            print("내가 본 작품 화면으로 이동")
+            let reactor = SavedMediaReactor(.watched, mediaDBManager: self.mediaDBManager)
+            let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
+            vc.reactor = reactor
+            self.navigationController?.pushViewController(vc, animated: true)
         case .appInfo:
             print("앱 정보 화면으로 이동")
         }

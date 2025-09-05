@@ -18,6 +18,8 @@
 		04100D292E6ABCEB008BF76C /* MyPageReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04100D282E6ABCEB008BF76C /* MyPageReactor.swift */; };
 		04100D2B2E6ABD38008BF76C /* MyPageSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04100D2A2E6ABD38008BF76C /* MyPageSectionModel.swift */; };
 		04100D2E2E6AC2C2008BF76C /* MyPageHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04100D2D2E6AC2C2008BF76C /* MyPageHeaderView.swift */; };
+		04100D362E6AF699008BF76C /* SavedMediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04100D352E6AF699008BF76C /* SavedMediaViewController.swift */; };
+		04100D382E6AF6BB008BF76C /* SavedMediaReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04100D372E6AF6BB008BF76C /* SavedMediaReactor.swift */; };
 		0410D7932E4F2CBD009D38EE /* ImageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0410D7922E4F2CBD009D38EE /* ImageProvider.swift */; };
 		041366632E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041366612E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift */; };
 		041366652E0138D40026514E /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 041366642E0138D40026514E /* ReactorKit */; };
@@ -153,6 +155,8 @@
 		04100D282E6ABCEB008BF76C /* MyPageReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageReactor.swift; sourceTree = "<group>"; };
 		04100D2A2E6ABD38008BF76C /* MyPageSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageSectionModel.swift; sourceTree = "<group>"; };
 		04100D2D2E6AC2C2008BF76C /* MyPageHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageHeaderView.swift; sourceTree = "<group>"; };
+		04100D352E6AF699008BF76C /* SavedMediaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedMediaViewController.swift; sourceTree = "<group>"; };
+		04100D372E6AF6BB008BF76C /* SavedMediaReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedMediaReactor.swift; sourceTree = "<group>"; };
 		0410D7922E4F2CBD009D38EE /* ImageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProvider.swift; sourceTree = "<group>"; };
 		041366582E0136C60026514E /* HomeTVCollectionViewCellReactorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeTVCollectionViewCellReactorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		041366612E0136CB0026514E /* HomeTVCollectionViewCellReactorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTVCollectionViewCellReactorTests.swift; sourceTree = "<group>"; };
@@ -303,6 +307,7 @@
 		04100D212E6AB11C008BF76C /* MyPage */ = {
 			isa = PBXGroup;
 			children = (
+				04100D342E6AF67A008BF76C /* SavedMedia */,
 				04100D262E6ABCE4008BF76C /* MyPageViewController.swift */,
 				04100D282E6ABCEB008BF76C /* MyPageReactor.swift */,
 				04100D2F2E6AC7F9008BF76C /* Header */,
@@ -325,6 +330,15 @@
 				04100D2D2E6AC2C2008BF76C /* MyPageHeaderView.swift */,
 			);
 			path = Header;
+			sourceTree = "<group>";
+		};
+		04100D342E6AF67A008BF76C /* SavedMedia */ = {
+			isa = PBXGroup;
+			children = (
+				04100D352E6AF699008BF76C /* SavedMediaViewController.swift */,
+				04100D372E6AF6BB008BF76C /* SavedMediaReactor.swift */,
+			);
+			path = SavedMedia;
 			sourceTree = "<group>";
 		};
 		041366472E0135E30026514E /* Frameworks */ = {
@@ -1022,8 +1036,10 @@
 				044B8C312E60422A00EB016D /* AppColor.swift in Sources */,
 				04DCA8A52DF2DBFC00695361 /* TargetType.swift in Sources */,
 				04C97ABE2E23784C001EB1D4 /* MediaDetailViewController.swift in Sources */,
+				04100D382E6AF6BB008BF76C /* SavedMediaReactor.swift in Sources */,
 				04FE6C972E599C4100CCB76C /* TVDetail.swift in Sources */,
 				0480964E2E5DC118002033A0 /* MediaDatabaseManager.swift in Sources */,
+				04100D362E6AF699008BF76C /* SavedMediaViewController.swift in Sources */,
 				04100D292E6ABCEB008BF76C /* MyPageReactor.swift in Sources */,
 				0478296C2DFFFA3F008CBE67 /* HotMediaCollectionViewCellReactor.swift in Sources */,
 				043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */,
