@@ -46,8 +46,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        tierNav.tabBarItem.image = UIImage(systemName: "list.triangle")
 //        tierNav.tabBarItem.title = "티어표"
         
-        let mypageReactor = MyPageReactor()
-        let myPageVC = MyPageViewController()
+        let mypageReactor = MyPageReactor(mediaDBManager: mediaDatabaseManager)
+        let myPageVC = MyPageViewController(networkService: networkManager,imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         myPageVC.reactor = mypageReactor
         let myPageNav = UINavigationController(rootViewController: myPageVC)
         myPageNav.tabBarItem.image = UIImage(systemName: "ellipsis")
