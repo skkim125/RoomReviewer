@@ -15,7 +15,6 @@ import ImageIO
 
 final class SearchMediaCollectionViewCell: UICollectionViewCell, View {
     static let cellID = "SearchMediaCollectionViewCell"
-    private var imageProvider: ImageProviding?
     var disposeBag = DisposeBag()
     
     private let shadowView = UIView().then {
@@ -41,11 +40,6 @@ final class SearchMediaCollectionViewCell: UICollectionViewCell, View {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func configureCell(reactor: SearchMediaCollectionViewCellReactor, imageProvider: ImageProviding) {
-        self.reactor = reactor
-        self.imageProvider = imageProvider
     }
 }
 

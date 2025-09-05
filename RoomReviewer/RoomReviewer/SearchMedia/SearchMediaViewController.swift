@@ -97,7 +97,7 @@ final class SearchMediaViewController: UIViewController, View {
             .bind(to: searchMediaCollectionView.rx.items(cellIdentifier: SearchMediaCollectionViewCell.cellID, cellType: SearchMediaCollectionViewCell.self)) { [weak self] index, item, cell in
                 guard let self = self else { return }
                 let reactor = SearchMediaCollectionViewCellReactor(media: item, imageLoader: self.imageProvider)
-                cell.configureCell(reactor: reactor, imageProvider: self.imageProvider)
+                cell.reactor = reactor
             }
             .disposed(by: disposeBag)
         

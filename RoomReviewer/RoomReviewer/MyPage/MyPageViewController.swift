@@ -151,6 +151,12 @@ final class MyPageViewController: UIViewController, View {
             let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
             vc.reactor = reactor
             self.navigationController?.pushViewController(vc, animated: true)
+            
+        case .isStared:
+            let reactor = SavedMediaReactor(.isStared, mediaDBManager: self.mediaDBManager)
+            let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
+            vc.reactor = reactor
+            self.navigationController?.pushViewController(vc, animated: true)
         case .appInfo:
             print("앱 정보 화면으로 이동")
         }

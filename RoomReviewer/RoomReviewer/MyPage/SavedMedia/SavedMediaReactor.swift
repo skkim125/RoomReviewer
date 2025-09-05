@@ -13,6 +13,7 @@ enum SectionType {
     case watchlist
     case watched
     case reviewed
+    case isStared
     
     var navigationbarTitle: String {
         switch self {
@@ -22,6 +23,8 @@ enum SectionType {
             return "내가 본 컨텐츠"
         case .reviewed:
             return "평론한 컨텐츠"
+        case .isStared:
+            return "즐겨찾기"
         }
     }
 }
@@ -99,6 +102,8 @@ final class SavedMediaReactor: Reactor {
                     medias = mediaEntities.filter { $0.watchedDate != nil && $0.review == nil }
                 case .reviewed:
                     medias = mediaEntities.filter { $0.review != nil }
+                case .isStared:
+                    medias = mediaEntities.filter { $0.isStar }
                 }
                 
                 return medias.map { $0.toDomain() }
