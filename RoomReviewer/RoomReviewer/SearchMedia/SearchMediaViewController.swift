@@ -12,7 +12,7 @@ import SnapKit
 import Then
 
 final class SearchMediaViewController: UIViewController, View {
-    private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnCollectionViewLayout).then {
+    private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .searchMediaCollectionViewLayout).then {
         $0.register(SearchMediaCollectionViewCell.self, forCellWithReuseIdentifier: SearchMediaCollectionViewCell.cellID)
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = false

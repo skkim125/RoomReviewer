@@ -137,13 +137,19 @@ final class MediaDetailViewController: UIViewController, View {
         $0.configuration = config
     }
     
+    private let backButton = UIBarButtonItem().then {
+        $0.image = UIImage(systemName: "chevron.left")
+        $0.tintColor = AppColor.appWhite
+        $0.style = .done
+        $0.target = nil
+        $0.action = nil
+    }
+    
     private lazy var creditsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout).then {
         $0.showsHorizontalScrollIndicator = false
         $0.register(CreditsCollectionViewCell.self, forCellWithReuseIdentifier: CreditsCollectionViewCell.cellID)
         $0.register(CreditsSectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CreditsSectionHeader.reusableID)
         $0.showsVerticalScrollIndicator = false
-        $0.clipsToBounds = true
-        $0.layer.cornerRadius = 12
         $0.backgroundColor = .clear
         $0.isScrollEnabled = false
     }
@@ -180,6 +186,8 @@ final class MediaDetailViewController: UIViewController, View {
     
     private func configureNavigationBar() {
         navigationItem.title = "상세 정보"
+        self.navigationItem.hidesBackButton = true
+        self.navigationItem.leftBarButtonItem = backButton
     }
     
     func bind(reactor: MediaDetailReactor) {
@@ -369,7 +377,7 @@ final class MediaDetailViewController: UIViewController, View {
                 if sectionModels.count == 1 {
                     owner.creditsCollectionView.snp.remakeConstraints {
                         $0.top.equalTo(owner.overviewLabel.snp.bottom).offset(10)
-                        $0.horizontalEdges.equalTo(owner.contentView).inset(20)
+                        $0.horizontalEdges.equalTo(owner.contentView).inset(10)
                         $0.height.equalTo(200)
                         $0.bottom.equalToSuperview().inset(10)
                     }
@@ -413,6 +421,13 @@ final class MediaDetailViewController: UIViewController, View {
         moreOverviewButton.rx.tap
             .map { MediaDetailReactor.Action.moreOverviewButtonTapped }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        backButton.rx.tap
+            .asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }
             .disposed(by: disposeBag)
     }
     
@@ -546,7 +561,7 @@ final class MediaDetailViewController: UIViewController, View {
             if !isVisible {
                 self.creditsCollectionView.snp.remakeConstraints {
                     $0.top.equalTo(self.overviewLabel.snp.bottom).offset(10)
-                    $0.horizontalEdges.equalTo(self.contentView).inset(20)
+                    $0.horizontalEdges.equalTo(self.contentView).inset(10)
                     $0.height.equalTo(400)
                     $0.bottom.equalToSuperview().inset(10)
                 }
@@ -637,7 +652,7 @@ extension MediaDetailViewController {
         
         creditsCollectionView.snp.makeConstraints {
             $0.top.equalTo(moreOverviewButton.snp.bottom)
-            $0.horizontalEdges.equalTo(contentView).inset(20)
+            $0.horizontalEdges.equalTo(contentView).inset(10)
             $0.height.equalTo(400)
             $0.bottom.equalToSuperview().inset(10)
         }
