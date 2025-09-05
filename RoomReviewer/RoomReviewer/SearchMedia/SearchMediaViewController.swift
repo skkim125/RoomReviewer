@@ -25,7 +25,7 @@ final class SearchMediaViewController: UIViewController, View {
     }
     
     private let dismissButton = UIBarButtonItem().then {
-        $0.image = UIImage(systemName: "xmark")
+        $0.image = UIImage(systemName: "chevron.left")
         $0.tintColor = AppColor.appWhite
         $0.style = .done
         $0.target = nil
@@ -122,7 +122,7 @@ final class SearchMediaViewController: UIViewController, View {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                owner.navigationController?.dismiss(animated: true)
+                owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
         
