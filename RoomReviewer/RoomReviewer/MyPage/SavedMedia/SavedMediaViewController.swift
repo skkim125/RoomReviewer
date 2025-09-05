@@ -76,7 +76,7 @@ final class SavedMediaViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .bind(to: savedMediaCollectionView.rx.items(cellIdentifier: SearchMediaCollectionViewCell.cellID, cellType: SearchMediaCollectionViewCell.self)) { [weak self] index, item, cell in
                 guard let self = self else { return }
-                let reactor = SearchMediaCollectionViewCellReactor(media: item, imageLoader: self.imageProvider, isSearchView: false)
+                let reactor = SearchMediaCollectionViewCellReactor(media: item, imageLoader: self.imageProvider)
                 cell.reactor = reactor
             }
             .disposed(by: disposeBag)

@@ -48,17 +48,20 @@ enum MyPageSectionItem {
     case reviews(count: Int)
     case watchlist(count: Int)
     case watchHistory(count: Int)
+    case isStared(count: Int)
     
     case appInfo
     
     var title: String {
         switch self {
         case .reviews:
-            return "나의 평론"
+            return "평론한 컨텐츠"
         case .watchlist:
             return "보고싶어요"
         case .watchHistory:
-            return "내가 본 작품"
+            return "내가 본 컨텐츠"
+        case .isStared:
+            return "즐겨찾기"
         case .appInfo:
             return "앱 정보"
         }
@@ -67,19 +70,21 @@ enum MyPageSectionItem {
     var iconName: String {
         switch self {
         case .reviews:
-            return "star.fill"
+            return "sunglasses.fill"
         case .watchlist:
             return "bookmark.fill"
         case .watchHistory:
             return "eye.fill"
         case .appInfo:
             return "info.circle.fill"
+        case .isStared:
+            return "star.fill"
         }
     }
     
     var detailText: String? {
         switch self {
-        case .reviews(let count), .watchlist(let count), .watchHistory(let count):
+        case .reviews(let count), .watchlist(let count), .watchHistory(let count), .isStared(count: let count):
             return "\(count)개"
         default:
             return nil

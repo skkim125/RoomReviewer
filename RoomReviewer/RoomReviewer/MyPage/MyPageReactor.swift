@@ -65,8 +65,9 @@ final class MyPageReactor: Reactor {
                 let watchlistCount = mediaEntities.filter { $0.watchedDate == nil }.count
                 let watchHistoryCount = mediaEntities.filter { $0.watchedDate != nil }.count
                 let reviewCount = mediaEntities.filter { $0.review != nil }.count
+                let isStarCount = mediaEntities.filter { $0.isStar }.count
                 
-                let activitySectionModel: MyPageSectionModel = .myActivity(items: [.watchlist(count: watchlistCount), .watchHistory(count: watchHistoryCount), .reviews(count: reviewCount)])
+                let activitySectionModel: MyPageSectionModel = .myActivity(items: [.watchlist(count: watchlistCount), .watchHistory(count: watchHistoryCount), .reviews(count: reviewCount), .isStared(count: isStarCount)])
                 
                 let sectionModels: [MyPageSectionModel] = [activitySectionModel, .management(items: [
                     .appInfo
