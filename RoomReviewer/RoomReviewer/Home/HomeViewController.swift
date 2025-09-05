@@ -173,9 +173,9 @@ final class HomeViewController: UIViewController, View {
             .bind(with: self) { owner, _ in
                 let vc = SearchMediaViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, isSheetView: true)
                 vc.reactor = SearchMediaReactor(networkService: NetworkManager())
-                let nav = UINavigationController(rootViewController: vc)
-                nav.modalPresentationStyle = .fullScreen
-                owner.navigationController?.present(nav, animated: true)
+//                let nav = UINavigationController(rootViewController: vc)
+//                nav.modalPresentationStyle = .fullScreen
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
     }
