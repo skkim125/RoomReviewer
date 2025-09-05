@@ -35,9 +35,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let homeNav = UINavigationController(rootViewController: homeVC)
         homeVC.tabBarItem.image = UIImage(systemName: "house")
         
-        let reactor = SearchMediaReactor(networkService: networkManager)
+        let searchReactor = SearchMediaReactor(networkService: networkManager)
         let searchVC = SearchMediaViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
-        searchVC.reactor = reactor
+        searchVC.reactor = searchReactor
         let searchNav = UINavigationController(rootViewController: searchVC)
         searchNav.tabBarItem.image = UIImage(systemName: "magnifyingglass")
         
@@ -46,15 +46,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        tierNav.tabBarItem.image = UIImage(systemName: "list.triangle")
 //        tierNav.tabBarItem.title = "티어표"
         
-        let settingVC = UIViewController()
-        let settingNav = UINavigationController(rootViewController: settingVC)
-        settingNav.tabBarItem.image = UIImage(systemName: "ellipsis")
+        let mypageReactor = MyPageReactor()
+        let myPageVC = MyPageViewController()
+        myPageVC.reactor = mypageReactor
+        let myPageNav = UINavigationController(rootViewController: myPageVC)
+        myPageNav.tabBarItem.image = UIImage(systemName: "ellipsis")
         
         tabBarController.viewControllers = [
             homeNav,
             searchNav,
 //            tierNav,
-            settingNav
+            myPageNav
         ]
         
         tabBarController.tabBar.tintColor = AppColor.appWhite

@@ -106,4 +106,13 @@ extension UICollectionViewLayout {
         
         return section
     }
+    
+    static var myPageCollectionViewLayout: UICollectionViewLayout {
+        var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+        config.headerMode = .supplementary
+        
+        let layout = UICollectionViewCompositionalLayout.list(using: config)
+        
+        return layout
+    }
 }
