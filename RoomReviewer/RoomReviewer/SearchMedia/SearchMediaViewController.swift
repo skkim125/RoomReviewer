@@ -164,9 +164,37 @@ extension SearchMediaViewController {
     }
     
     private func configureNavigationBar() {
-        navigationItem.title = "콘텐츠 검색"
         if isSheetView {
             navigationItem.leftBarButtonItem = dismissButton
+            navigationItem.title = "컨텐츠 검색"
+        } else {
+            let appIconView = UIView()
+            let label = UILabel()
+            label.font = AppFont.boldLargeTitle
+            label.text = "컨텐츠 검색"
+            label.textColor = AppColor.appWhite
+            
+            let image = UIImage(systemName: "sunglasses")
+            let imageView = UIImageView(image: image)
+            imageView.tintColor = .systemRed
+            imageView.contentMode = .scaleAspectFill
+            
+            appIconView.addSubview(label)
+            appIconView.addSubview(imageView)
+            
+            imageView.snp.makeConstraints {
+                $0.leading.equalTo(appIconView).offset(2)
+                $0.width.equalTo(50)
+                $0.height.equalTo(20)
+                $0.centerY.equalTo(appIconView)
+            }
+            
+            label.snp.makeConstraints {
+                $0.leading.equalTo(imageView.snp.trailing).offset(5)
+                $0.centerY.equalTo(appIconView)
+            }
+            
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
         }
     }
 }

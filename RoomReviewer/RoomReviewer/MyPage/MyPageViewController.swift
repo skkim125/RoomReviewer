@@ -59,11 +59,33 @@ final class MyPageViewController: UIViewController, View {
     }
     
     private func configureNavigationBar() {
+        let appIconView = UIView()
         let label = UILabel()
-        label.font = AppFont.appIconTitle
-        label.text = "마이 페이지"
+        label.font = AppFont.boldLargeTitle
+        label.text = "더보기"
         label.textColor = AppColor.appWhite
-        navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: label)
+        
+        let image = UIImage(systemName: "sunglasses")
+        let imageView = UIImageView(image: image)
+        imageView.tintColor = .systemRed
+        imageView.contentMode = .scaleAspectFill
+        
+        appIconView.addSubview(label)
+        appIconView.addSubview(imageView)
+        
+        imageView.snp.makeConstraints {
+            $0.leading.equalTo(appIconView).offset(2)
+            $0.width.equalTo(50)
+            $0.height.equalTo(20)
+            $0.centerY.equalTo(appIconView)
+        }
+        
+        label.snp.makeConstraints {
+            $0.leading.equalTo(imageView.snp.trailing).offset(5)
+            $0.centerY.equalTo(appIconView)
+        }
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
     }
     
     func bind(reactor: MyPageReactor) {
