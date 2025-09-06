@@ -33,14 +33,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let homeVC = HomeViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
-        homeVC.tabBarItem.image = UIImage(systemName: "house")
+        homeNav.tabBarItem.image = UIImage(systemName: "house")
+        homeNav.title = "홈"
         
         let searchReactor = SearchMediaReactor(networkService: networkManager)
         let searchVC = SearchMediaViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         searchVC.reactor = searchReactor
         let searchNav = UINavigationController(rootViewController: searchVC)
         searchNav.tabBarItem.image = UIImage(systemName: "magnifyingglass")
-        
+        searchNav.title = "검색"
 //        let tierVC = UIViewController()
 //        let tierNav = UINavigationController(rootViewController: tierVC)
 //        tierNav.tabBarItem.image = UIImage(systemName: "list.triangle")
@@ -51,6 +52,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         myPageVC.reactor = mypageReactor
         let myPageNav = UINavigationController(rootViewController: myPageVC)
         myPageNav.tabBarItem.image = UIImage(systemName: "ellipsis")
+        myPageNav.title = "더보기"
         
         tabBarController.viewControllers = [
             homeNav,
