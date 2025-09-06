@@ -14,8 +14,8 @@ import SnapKit
 import Then
 
 final class SavedMediaViewController: UIViewController, View {
-    private var savedMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .searchMediaCollectionViewLayout).then {
-        $0.register(SearchMediaCollectionViewCell.self, forCellWithReuseIdentifier: SearchMediaCollectionViewCell.cellID)
+    private var savedMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnPosterCollectionViewLayout).then {
+        $0.register(ThreeColumnPosterCollectionViewCell.self, forCellWithReuseIdentifier: ThreeColumnPosterCollectionViewCell.cellID)
         $0.backgroundColor = .clear
     }
     
@@ -74,9 +74,9 @@ final class SavedMediaViewController: UIViewController, View {
         reactor.state.map { $0.savedMedia }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(to: savedMediaCollectionView.rx.items(cellIdentifier: SearchMediaCollectionViewCell.cellID, cellType: SearchMediaCollectionViewCell.self)) { [weak self] index, item, cell in
+            .bind(to: savedMediaCollectionView.rx.items(cellIdentifier: ThreeColumnPosterCollectionViewCell.cellID, cellType: ThreeColumnPosterCollectionViewCell.self)) { [weak self] index, item, cell in
                 guard let self = self else { return }
-                let reactor = SearchMediaCollectionViewCellReactor(media: item, imageLoader: self.imageProvider)
+                let reactor = ThreeColumnPosterCollectionViewCellReactor(media: item, imageLoader: self.imageProvider)
                 cell.reactor = reactor
             }
             .disposed(by: disposeBag)
