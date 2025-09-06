@@ -42,14 +42,14 @@ final class SavedMediaReactor: Reactor {
     
     enum Action {
         case viewDidLoad
-        case dismissWriteReview
+        case dismissSavedMediaView
         case selectedMedia(Media)
     }
     
     enum Mutation {
         case setSavedMedias([Media])
         case moveMediaDetail(Media)
-        case dismissWriteReview
+        case dismissSavedMediaView
     }
     
     let initialState: State
@@ -63,8 +63,8 @@ final class SavedMediaReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .dismissWriteReview:
-            return .just(.dismissWriteReview)
+        case .dismissSavedMediaView:
+            return .just(.dismissSavedMediaView)
         case .viewDidLoad:
             return getSavedMedia()
             
@@ -81,7 +81,7 @@ final class SavedMediaReactor: Reactor {
             newState.savedMedia = medias
         case .moveMediaDetail(let media):
             newState.selectedMedia = media
-        case .dismissWriteReview:
+        case .dismissSavedMediaView:
             newState.dismissAction = ()
         }
         
