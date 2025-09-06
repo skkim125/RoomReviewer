@@ -35,7 +35,7 @@ extension UICollectionViewLayout {
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuous
         section.interGroupSpacing = 15
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 17, bottom: 20, trailing: 17)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 20, trailing: 20)
         
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(40))
         let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
@@ -44,7 +44,7 @@ extension UICollectionViewLayout {
         return section
     }
     
-    static var searchMediaCollectionViewLayout: UICollectionViewCompositionalLayout {
+    static var threeColumnPosterCollectionViewLayout: UICollectionViewCompositionalLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0/3),
             heightDimension: .fractionalHeight(1.0)
@@ -95,8 +95,8 @@ extension UICollectionViewLayout {
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 17, bottom: 5, trailing: 17)
-        section.interGroupSpacing = 15
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20)
+        section.interGroupSpacing = 20
         section.orthogonalScrollingBehavior = .groupPaging
         
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(40))
@@ -110,6 +110,7 @@ extension UICollectionViewLayout {
     static var myPageCollectionViewLayout: UICollectionViewLayout {
         var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
         config.headerMode = .supplementary
+        config.backgroundColor = .clear
         
         let layout = UICollectionViewCompositionalLayout.list(using: config)
         

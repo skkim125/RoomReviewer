@@ -51,18 +51,24 @@ final class SavedMediaViewController: UIViewController, View {
         super.viewDidLoad()
         configureHierarchy()
         configureLayout()
+        configureNavigationBar()
         
         view.backgroundColor = AppColor.appBackgroundColor
     }
     
-    func configureHierarchy() {
+    private func configureHierarchy() {
         view.addSubview(savedMediaCollectionView)
     }
     
     private func configureLayout() {
         savedMediaCollectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(10)
+            $0.verticalEdges.equalToSuperview()
         }
+    }
+    
+    private func configureNavigationBar() {
+        navigationItem.leftBarButtonItem = dismissButton
     }
     
     func bind(reactor: SavedMediaReactor) {
@@ -95,6 +101,13 @@ final class SavedMediaViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: "")
             .drive(self.navigationItem.rx.title)
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$dismissAction)
+            .compactMap { $0 }
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
     
     private func bindAction(_ reactor: SavedMediaReactor) {
@@ -106,7 +119,7 @@ final class SavedMediaViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         dismissButton.rx.tap
-            .map { Reactor.Action.dismissWriteReview }
+            .map { Reactor.Action.dismissSavedMediaView }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
