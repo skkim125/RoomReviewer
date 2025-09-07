@@ -45,7 +45,6 @@ final class MediaDetailReactor: Reactor {
         var mediaObjectID: NSManagedObjectID?
         var isReviewed: Bool = false
         var isStared: Bool = false
-        @Pulse var didUpdateWatchlist: Void?
         @Pulse var showSetWatchedDateAlert: Void?
         @Pulse var pushWriteReviewView: (Media, NSManagedObjectID?)?
     }
@@ -74,7 +73,6 @@ final class MediaDetailReactor: Reactor {
         case pushWriteReviewView
         case toggleOverviewExpanded
         case setOverviewTruncatable(Bool)
-        case signalWatchlistUpdate
         case updateStarButton(Bool)
     }
     
@@ -272,9 +270,6 @@ final class MediaDetailReactor: Reactor {
             
         case .setOverviewTruncatable(let isTruncatable):
             newState.isOverviewButtonVisible = isTruncatable
-            
-        case .signalWatchlistUpdate:
-            newState.didUpdateWatchlist = ()
             
         case .updateStarButton(let isStar):
             newState.isStared = isStar
