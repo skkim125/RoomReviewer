@@ -145,6 +145,14 @@ final class MediaDetailViewController: UIViewController, View {
         $0.action = nil
     }
     
+    private let starToggleButton = UIBarButtonItem().then {
+        $0.image = UIImage(systemName: "star")
+        $0.tintColor = .systemYellow
+        $0.style = .done
+        $0.target = nil
+        $0.action = nil
+    }
+    
     private lazy var creditsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout).then {
         $0.showsHorizontalScrollIndicator = false
         $0.register(CreditsCollectionViewCell.self, forCellWithReuseIdentifier: CreditsCollectionViewCell.cellID)
@@ -188,6 +196,7 @@ final class MediaDetailViewController: UIViewController, View {
         navigationItem.title = "상세 정보"
         self.navigationItem.hidesBackButton = true
         self.navigationItem.leftBarButtonItem = backButton
+        self.navigationItem.rightBarButtonItem = starToggleButton
     }
     
     func bind(reactor: MediaDetailReactor) {
@@ -400,6 +409,13 @@ final class MediaDetailViewController: UIViewController, View {
                 owner.updateWatchlist?()
             }
             .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.isStared }
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self) { owner, isStar in
+                owner.starToggleButton.image = isStar ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+            }
+            .disposed(by: disposeBag)
     }
     
     private func bindAction(reactor: MediaDetailReactor) {
@@ -428,6 +444,11 @@ final class MediaDetailViewController: UIViewController, View {
             .drive(with: self) { owner, _ in
                 owner.navigationController?.popViewController(animated: true)
             }
+            .disposed(by: disposeBag)
+        
+        starToggleButton.rx.tap
+            .map { MediaDetailReactor.Action.starButtonTapped }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     

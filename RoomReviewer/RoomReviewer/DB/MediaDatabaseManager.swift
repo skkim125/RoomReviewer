@@ -14,8 +14,9 @@ protocol MediaDBManager {
     
     func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: Int) -> Single<Void?>
-    func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, media: Media, watchedDate: Date?, isReviewed: Bool)?>
+    func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?>
     func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?>
+    func updateIsStared(id: Int, isStar: Bool) -> Single<Bool>
 }
 
 final class MediaDatabaseManager: MediaDBManager {
@@ -149,7 +150,7 @@ final class MediaDatabaseManager: MediaDBManager {
         }
     }
     
-    func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, media: Media, watchedDate: Date?, isReviewed: Bool)?> {
+    func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
@@ -164,7 +165,7 @@ final class MediaDatabaseManager: MediaDBManager {
                 do {
                     if let entity = try context.fetch(request).first {
                         let isReviewed = !(entity.review == nil)
-                        observer(.success((entity.objectID, entity.toDomain(), entity.watchedDate, isReviewed)))
+                        observer(.success((entity.objectID, entity.isStar, entity.watchedDate, isReviewed)))
                     } else {
                         observer(.success(nil))
                     }
@@ -196,6 +197,38 @@ final class MediaDatabaseManager: MediaDBManager {
                         try backgroundContext.save()
                         print("\(mediaToUpdate.title) 시청 날짜 업데이트 완료")
                         observer(.success((mediaToUpdate.objectID)))
+                    } else {
+                        observer(.failure(NetworkError.commonError))
+                    }
+                } catch {
+                    print("업데이트 실패: \(error.localizedDescription)")
+                    observer(.failure(error))
+                }
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
+    func updateIsStared(id: Int, isStar: Bool) -> Single<Bool> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.failure(NetworkError.commonError))
+                return Disposables.create()
+            }
+            
+            let backgroundContext = self.stack.newBackgroundContext()
+            
+            backgroundContext.perform {
+                let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %d", id)
+                
+                do {
+                    if let mediaToUpdate = try backgroundContext.fetch(request).first {
+                        mediaToUpdate.isStar = isStar
+                        try backgroundContext.save()
+                        print("\(mediaToUpdate.title) 즐겨찾기 업데이트 완료 = \(isStar)")
+                        observer(.success((mediaToUpdate.isStar)))
                     } else {
                         observer(.failure(NetworkError.commonError))
                     }

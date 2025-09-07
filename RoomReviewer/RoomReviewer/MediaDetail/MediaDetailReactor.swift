@@ -44,6 +44,7 @@ final class MediaDetailReactor: Reactor {
         var watchedDate: Date?
         var mediaObjectID: NSManagedObjectID?
         var isReviewed: Bool = false
+        var isStared: Bool = false
         @Pulse var didUpdateWatchlist: Void?
         @Pulse var showSetWatchedDateAlert: Void?
         @Pulse var pushWriteReviewView: (Media, NSManagedObjectID?)?
@@ -56,6 +57,7 @@ final class MediaDetailReactor: Reactor {
         case writeReviewButtonTapped
         case updateWatchedDate(Date)
         case moreOverviewButtonTapped
+        case starButtonTapped
         case setOverviewButtonVisible(Bool)
     }
     
@@ -73,6 +75,7 @@ final class MediaDetailReactor: Reactor {
         case toggleOverviewExpanded
         case setOverviewTruncatable(Bool)
         case signalWatchlistUpdate
+        case updateStarButton(Bool)
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -86,15 +89,24 @@ final class MediaDetailReactor: Reactor {
                 genres: API.convertGenreString(media.genreIDS).joined(separator: " / ")
             ))
             
-            let checkWatchlist = mediaDBManager.fetchMedia(id: media.id)
+            let dbResultStream = mediaDBManager.fetchMedia(id: media.id)
                 .asObservable()
-                .map { result -> Mutation in
-                    if let (objectID, _, watchedDate, isReviewed) = result {
-                        return .setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed)
-                    } else {
-                        return .setWatchlistStatus(isWatchlisted: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)
-                    }
+                .share()
+            
+            let watchlistStatusStream = dbResultStream.map { result -> Mutation in
+                if let (objectID, isStared, watchedDate, isReviewed) = result {
+                    return .setWatchlistStatus(isWatchlisted: true, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed)
+                } else {
+                    return .setWatchlistStatus(isWatchlisted: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)
                 }
+            }
+            
+            let starStatusStream = dbResultStream.map { result -> Mutation in
+                let isStared = result?.isStar ?? false
+                return .updateStarButton(isStared)
+            }
+            
+            let checkWatchlist = Observable.merge(watchlistStatusStream, starStatusStream)
             
             let fetchOthers = Observable.merge(
                 self.fetchMediaCredits(),
@@ -170,6 +182,16 @@ final class MediaDetailReactor: Reactor {
             
         case .setOverviewButtonVisible(let isTruncatable):
             return .just(.setOverviewTruncatable(isTruncatable))
+            
+        case .starButtonTapped:
+            let id = currentState.media.id
+            let starToggle = currentState.isStared ? false : true
+            return mediaDBManager.updateIsStared(id: id, isStar: starToggle)
+                .asObservable()
+                .flatMap { isStar -> Observable<Mutation> in
+                    return .just(.updateStarButton(isStar))
+                }
+                .catch { .just(.showError($0)) }
         }
     }
     
@@ -239,6 +261,9 @@ final class MediaDetailReactor: Reactor {
             
         case .signalWatchlistUpdate:
             newState.didUpdateWatchlist = ()
+            
+        case .updateStarButton(let isStar):
+            newState.isStared = isStar
         }
         
         return newState
