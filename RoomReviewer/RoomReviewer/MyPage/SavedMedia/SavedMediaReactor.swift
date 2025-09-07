@@ -38,18 +38,21 @@ final class SavedMediaReactor: Reactor {
         }
         @Pulse var selectedMedia: Media?
         @Pulse var dismissAction: Void?
+        @Pulse var updateSavedMedias: Void?
     }
     
     enum Action {
         case viewDidLoad
         case dismissSavedMediaView
         case selectedMedia(Media)
+        case updateSavedMedias
     }
     
     enum Mutation {
         case setSavedMedias([Media])
         case moveMediaDetail(Media)
         case dismissSavedMediaView
+        case updateSavedMedias
     }
     
     let initialState: State
@@ -70,6 +73,9 @@ final class SavedMediaReactor: Reactor {
             
         case .selectedMedia(let media):
             return .just(.moveMediaDetail(media))
+            
+        case .updateSavedMedias:
+            return .concat(getSavedMedia(), .just(.updateSavedMedias))
         }
     }
     
@@ -83,6 +89,9 @@ final class SavedMediaReactor: Reactor {
             newState.selectedMedia = media
         case .dismissSavedMediaView:
             newState.dismissAction = ()
+            
+        case .updateSavedMedias:
+            newState.updateSavedMedias = ()
         }
         
         return newState

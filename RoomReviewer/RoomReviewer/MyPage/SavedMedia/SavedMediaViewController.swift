@@ -90,9 +90,15 @@ final class SavedMediaViewController: UIViewController, View {
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
             .bind(with: self) { owner, media in
-                let reactor = MediaDetailReactor(media: media, networkService: owner.networkService, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let detailReactor = MediaDetailReactor(media: media, networkService: owner.networkService, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
-                vc.reactor = reactor
+                vc.reactor = detailReactor
+                
+                vc.updateAction = { [weak self]  in
+                    guard let self = self else { return }
+                    self.reactor?.action.onNext(.updateSavedMedias)
+                }
+                
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -105,7 +111,15 @@ final class SavedMediaViewController: UIViewController, View {
         reactor.pulse(\.$dismissAction)
             .compactMap { $0 }
             .bind(with: self) { owner, _ in
+                owner.updateSections?()
                 owner.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$updateSavedMedias)
+            .compactMap { $0 }
+            .bind(with: self) { owner, _ in
+                owner.savedMediaCollectionView.reloadData()
             }
             .disposed(by: disposeBag)
     }
