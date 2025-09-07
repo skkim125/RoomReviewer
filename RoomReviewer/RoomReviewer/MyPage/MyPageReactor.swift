@@ -14,16 +14,19 @@ final class MyPageReactor: Reactor {
     enum Action {
         case viewDidLoad
         case itemSelected(IndexPath)
+        case updateSections
     }
     
     enum Mutation {
         case setSections([MyPageSectionModel])
         case moveMyPageSection(MyPageSectionItem?)
+        case updateSections
     }
     
     struct State {
         var sections: [MyPageSectionModel] = []
         @Pulse var selectedMyPageSection: MyPageSectionItem?
+        @Pulse var updateSection: Void?
     }
     
     private let mediaDBManager: MediaDBManager
@@ -42,6 +45,9 @@ final class MyPageReactor: Reactor {
         case .itemSelected(let indexPath):
             let selectedItem = currentState.sections[indexPath.section].items[indexPath.row]
             return .just(.moveMyPageSection(selectedItem))
+            
+        case .updateSections:
+            return .concat(getSavedMediaCount(), .just(.updateSections))
         }
     }
     
@@ -53,6 +59,8 @@ final class MyPageReactor: Reactor {
             newState.sections = sections
         case .moveMyPageSection(let item):
             newState.selectedMyPageSection = item
+        case .updateSections:
+            newState.updateSection = ()
         }
         
         return newState
