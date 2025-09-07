@@ -52,6 +52,21 @@ enum MyPageSectionItem {
     
     case appInfo
     
+    var sectionType: SectionType {
+        switch self {
+        case .reviews:
+            return .reviewed
+        case .watchlist:
+            return .watchlist
+        case .watchHistory:
+            return .watched
+        case .isStared:
+            return .isStared
+        default:
+            return .none
+        }
+    }
+    
     var title: String {
         switch self {
         case .reviews:

@@ -136,8 +136,7 @@ final class MyPageViewController: UIViewController, View {
             }
         )
         
-        reactor.state
-            .map { $0.sections }
+        reactor.state.map { $0.sections }
             .bind(to: myPageCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
@@ -145,6 +144,13 @@ final class MyPageViewController: UIViewController, View {
             .compactMap { $0 }
             .bind(with: self) { owner, section in
                 owner.moveSection(section)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$updateSection)
+            .compactMap { $0 }
+            .bind(with: self) { owner, _ in
+                owner.myPageCollectionView.reloadData()
             }
             .disposed(by: disposeBag)
     }
@@ -165,27 +171,17 @@ final class MyPageViewController: UIViewController, View {
     
     private func moveSection(_ item: MyPageSectionItem) {
         switch item {
-        case .reviews:
-            let reactor = SavedMediaReactor(.reviewed, mediaDBManager: self.mediaDBManager)
+        case .reviews, .watchlist, .watchHistory, .isStared:
+            let reactor = SavedMediaReactor(item.sectionType, mediaDBManager: self.mediaDBManager)
             let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
             vc.reactor = reactor
-            self.navigationController?.pushViewController(vc, animated: true)
-        case .watchlist:
-            let reactor = SavedMediaReactor(.watchlist, mediaDBManager: self.mediaDBManager)
-            let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
-            vc.reactor = reactor
-            self.navigationController?.pushViewController(vc, animated: true)
-        case .watchHistory:
-            let reactor = SavedMediaReactor(.watched, mediaDBManager: self.mediaDBManager)
-            let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
-            vc.reactor = reactor
+            vc.updateSections = { [weak self] in
+                guard let self = self else { return }
+                self.reactor?.action.onNext(.updateSections)
+            }
+            
             self.navigationController?.pushViewController(vc, animated: true)
             
-        case .isStared:
-            let reactor = SavedMediaReactor(.isStared, mediaDBManager: self.mediaDBManager)
-            let vc = SavedMediaViewController(networkService: self.networkService, imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
-            vc.reactor = reactor
-            self.navigationController?.pushViewController(vc, animated: true)
         case .appInfo:
             print("앱 정보 화면으로 이동")
         }

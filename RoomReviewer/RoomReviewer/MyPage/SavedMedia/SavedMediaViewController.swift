@@ -32,6 +32,7 @@ final class SavedMediaViewController: UIViewController, View {
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
+    var updateSections: (() -> Void)?
     var disposeBag = DisposeBag()
     
     init(networkService: NetworkService, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
