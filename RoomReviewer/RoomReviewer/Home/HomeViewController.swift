@@ -158,7 +158,7 @@ final class HomeViewController: UIViewController, View {
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 
-                vc.updateWatchlist = { [weak self] in
+                vc.updateAction = { [weak self] in
                     guard let self = self else { return }
                     self.reactor?.action.onNext(.updateWatchlist)
                 }

@@ -166,7 +166,7 @@ final class MediaDetailViewController: UIViewController, View {
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
-    var updateWatchlist: (() -> Void)?
+    var updateAction: (() -> Void)?
     var disposeBag = DisposeBag()
     
     init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
@@ -402,14 +402,6 @@ final class MediaDetailViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$didUpdateWatchlist)
-            .compactMap { $0 }
-            .asDriver(onErrorJustReturn: ())
-            .drive(with: self) { owner, _ in
-                owner.updateWatchlist?()
-            }
-            .disposed(by: disposeBag)
-        
         reactor.state.map { $0.isStared }
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, isStar in
@@ -442,6 +434,7 @@ final class MediaDetailViewController: UIViewController, View {
         backButton.rx.tap
             .asDriver()
             .drive(with: self) { owner, _ in
+                owner.updateAction?()
                 owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
