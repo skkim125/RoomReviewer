@@ -17,6 +17,7 @@ final class MyPageViewController: UIViewController, View {
     private var myPageCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .myPageCollectionViewLayout).then {
         $0.register(UICollectionViewListCell.self, forCellWithReuseIdentifier: "listCell")
         $0.register(MyPageHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: MyPageHeaderView.reusableID)
+        $0.backgroundColor = .clear
     }
     
     var disposeBag = DisposeBag()
@@ -54,7 +55,9 @@ final class MyPageViewController: UIViewController, View {
     
     private func configureLayout() {
         myPageCollectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
     }
     
@@ -97,6 +100,10 @@ final class MyPageViewController: UIViewController, View {
         let dataSource = RxCollectionViewSectionedReloadDataSource<MyPageSectionModel>(
             configureCell: { dataSource, collectionView, indexPath, item in
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as! UICollectionViewListCell
+                
+                var background = UIBackgroundConfiguration.listPlainCell()
+                background.backgroundColor = .appDarkGray
+                cell.backgroundConfiguration = background
                 
                 var content = cell.defaultContentConfiguration()
                 let imageConfig = UIImage.SymbolConfiguration(pointSize: 15, weight: .regular)
