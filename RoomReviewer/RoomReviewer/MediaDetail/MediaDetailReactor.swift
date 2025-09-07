@@ -184,14 +184,28 @@ final class MediaDetailReactor: Reactor {
             return .just(.setOverviewTruncatable(isTruncatable))
             
         case .starButtonTapped:
-            let id = currentState.media.id
+            let media = currentState.media
+            let creators = currentState.creators
+            let casts = currentState.casts
+            
             let starToggle = currentState.isStared ? false : true
-            return mediaDBManager.updateIsStared(id: id, isStar: starToggle)
+            
+            let updateIsStaredStream = mediaDBManager.updateIsStared(id: media.id, isStar: starToggle)
                 .asObservable()
                 .flatMap { isStar -> Observable<Mutation> in
                     return .just(.updateStarButton(isStar))
                 }
-                .catch { .just(.showError($0)) }
+            
+            return updateIsStaredStream
+                .catch { [weak self] error in
+                    guard let self = self else { return .empty() }
+                    print("\(media.title) 저장되어있지 않음")
+                    return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts)
+                        .asObservable()
+                        .flatMap { _ in
+                            return updateIsStaredStream
+                        }
+                }
         }
     }
     
