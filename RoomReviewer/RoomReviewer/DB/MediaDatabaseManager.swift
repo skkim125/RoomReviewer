@@ -10,13 +10,14 @@ import CoreData
 import RxSwift
 
 protocol MediaDBManager {
-    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast]) -> Single<NSManagedObjectID>
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?) -> Single<NSManagedObjectID>
     
     func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: Int) -> Single<Void?>
-    func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?>
+    func fetchMedia(id: Int) -> Single<(isWatchlist: Bool, objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?>
     func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?>
     func updateIsStared(id: Int, isStar: Bool) -> Single<Bool>
+    func updateIsWatchlist(id: Int, isWatchlist: Bool) -> Single<Bool>
 }
 
 final class MediaDatabaseManager: MediaDBManager {
@@ -27,7 +28,7 @@ final class MediaDatabaseManager: MediaDBManager {
     }
 
     // 보고 싶은 or 리뷰 작성을 위한 Media 생성 & 저장
-    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast]) -> Single<NSManagedObjectID> {
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?) -> Single<NSManagedObjectID> {
         
         return Single.create { [weak self] observer in
             guard let self = self else {
@@ -48,7 +49,7 @@ final class MediaDatabaseManager: MediaDBManager {
                 mediaEntity.backdropURL = backdropURL
                 mediaEntity.releaseDate = releaseDate
                 mediaEntity.watchedDate = watchedDate
-                mediaEntity.addedDate = Date()
+                mediaEntity.addedDate = addedDate
                 mediaEntity.genres = genres
                 
                 for cast in casts {
@@ -150,7 +151,7 @@ final class MediaDatabaseManager: MediaDBManager {
         }
     }
     
-    func fetchMedia(id: Int) -> Single<(objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?> {
+    func fetchMedia(id: Int) -> Single<(isWatchlist: Bool, objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
                 observer(.failure(NetworkError.commonError))
@@ -165,7 +166,8 @@ final class MediaDatabaseManager: MediaDBManager {
                 do {
                     if let entity = try context.fetch(request).first {
                         let isReviewed = !(entity.review == nil)
-                        observer(.success((entity.objectID, entity.isStar, entity.watchedDate, isReviewed)))
+                        let isWatchlist = entity.addedDate != nil
+                        observer(.success((isWatchlist, entity.objectID, entity.isStar, entity.watchedDate, isReviewed)))
                     } else {
                         observer(.success(nil))
                     }
@@ -229,6 +231,38 @@ final class MediaDatabaseManager: MediaDBManager {
                         try backgroundContext.save()
                         print("\(mediaToUpdate.title) 즐겨찾기 업데이트 완료 = \(isStar)")
                         observer(.success((mediaToUpdate.isStar)))
+                    } else {
+                        observer(.failure(NetworkError.commonError))
+                    }
+                } catch {
+                    print("업데이트 실패: \(error.localizedDescription)")
+                    observer(.failure(error))
+                }
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
+    func updateIsWatchlist(id: Int, isWatchlist: Bool) -> Single<Bool> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.failure(NetworkError.commonError))
+                return Disposables.create()
+            }
+            
+            let backgroundContext = self.stack.newBackgroundContext()
+            
+            backgroundContext.perform {
+                let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %d", id)
+                
+                do {
+                    if let mediaToUpdate = try backgroundContext.fetch(request).first {
+                        mediaToUpdate.addedDate = isWatchlist ? Date() : nil
+                        print(mediaToUpdate.addedDate)
+                        try backgroundContext.save()
+                        observer(.success(mediaToUpdate.addedDate != nil))
                     } else {
                         observer(.failure(NetworkError.commonError))
                     }
