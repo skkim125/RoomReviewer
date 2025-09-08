@@ -135,7 +135,7 @@ extension HomeReactor {
         return mediaDBManager.fetchAllMedia()
             .asObservable()
             .map { medias -> [HomeSectionItem] in
-                return medias.filter { $0.review == nil }
+                return medias.filter { $0.review == nil && $0.addedDate != nil }
                     .map { $0.toDomain() }
                     .map { HomeSectionItem.watchlist(item: $0) }
             }

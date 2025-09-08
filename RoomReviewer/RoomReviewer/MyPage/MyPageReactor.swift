@@ -70,7 +70,7 @@ final class MyPageReactor: Reactor {
         let sectionModel = mediaDBManager.fetchAllMedia()
             .asObservable()
             .map { mediaEntities -> [MyPageSectionModel] in
-                let watchlistCount = mediaEntities.filter { $0.watchedDate == nil }.count
+                let watchlistCount = mediaEntities.filter { $0.addedDate != nil }.count
                 let watchHistoryCount = mediaEntities.filter { $0.watchedDate != nil }.count
                 let reviewCount = mediaEntities.filter { $0.review != nil }.count
                 let isStarCount = mediaEntities.filter { $0.isStar }.count
