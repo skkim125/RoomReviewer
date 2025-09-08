@@ -127,9 +127,12 @@ final class SavedMediaViewController: UIViewController, View {
     
     private func bindAction(_ reactor: SavedMediaReactor) {
         self.rx.methodInvoked(#selector(viewDidLoad))
-            .map { _ in
-                Reactor.Action.viewDidLoad
-            }
+            .map { _ in Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.rx.methodInvoked(#selector(viewWillAppear))
+            .map { _ in Reactor.Action.updateSavedMedias }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         

@@ -157,9 +157,12 @@ final class MyPageViewController: UIViewController, View {
     
     private func bindAction(_ reactor: MyPageReactor) {
         self.rx.methodInvoked(#selector(viewDidLoad))
-            .map { _ in
-                Reactor.Action.viewDidLoad
-            }
+            .map { _ in Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.rx.methodInvoked(#selector(viewWillAppear))
+            .map { _ in Reactor.Action.updateSections }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
