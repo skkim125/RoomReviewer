@@ -109,7 +109,7 @@ final class SavedMediaReactor: Reactor {
                 var medias: [MediaEntity] = []
                 switch sectionType {
                 case .watchlist:
-                    medias = mediaEntities.filter { $0.watchedDate == nil }
+                    medias = mediaEntities.filter { $0.addedDate != nil }
                 case .watched:
                     medias = mediaEntities.filter { $0.watchedDate != nil && $0.review == nil }
                 case .reviewed:
