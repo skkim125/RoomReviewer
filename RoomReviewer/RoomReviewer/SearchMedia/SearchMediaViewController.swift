@@ -13,7 +13,7 @@ import Then
 
 final class SearchMediaViewController: UIViewController, View {
     private let searchMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnPosterCollectionViewLayout).then {
-        $0.register(ThreeColumnPosterCollectionViewCell.self, forCellWithReuseIdentifier: ThreeColumnPosterCollectionViewCell.cellID)
+        $0.register(PosterCollectionViewCell.self, forCellWithReuseIdentifier: PosterCollectionViewCell.cellID)
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = false
     }
@@ -94,7 +94,7 @@ final class SearchMediaViewController: UIViewController, View {
             .compactMap { $0 }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(to: searchMediaCollectionView.rx.items(cellIdentifier: ThreeColumnPosterCollectionViewCell.cellID, cellType: ThreeColumnPosterCollectionViewCell.self)) { [weak self] index, item, cell in
+            .bind(to: searchMediaCollectionView.rx.items(cellIdentifier: PosterCollectionViewCell.cellID, cellType: PosterCollectionViewCell.self)) { [weak self] index, item, cell in
                 guard let self = self else { return }
                 let reactor = ThreeColumnPosterCollectionViewCellReactor(media: item, imageLoader: self.imageProvider)
                 cell.reactor = reactor

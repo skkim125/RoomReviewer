@@ -1,5 +1,5 @@
 //
-//  ThreeColumnMediaCollectionViewCell.swift
+//  PosterCollectionViewCell.swift
 //  RoomReviewer
 //
 //  Created by 김상규 on 7/12/25.
@@ -13,8 +13,8 @@ import SnapKit
 import Then
 import ImageIO
 
-final class ThreeColumnPosterCollectionViewCell: UICollectionViewCell, View {
-    static let cellID = "ThreeColumnMediaCollectionViewCell"
+final class PosterCollectionViewCell: UICollectionViewCell, View {
+    static let cellID = "PosterCollectionViewCell"
     var disposeBag = DisposeBag()
     
     private let shadowView = UIView().then {
@@ -43,7 +43,7 @@ final class ThreeColumnPosterCollectionViewCell: UICollectionViewCell, View {
     }
 }
 
-extension ThreeColumnPosterCollectionViewCell {
+extension PosterCollectionViewCell {
     func bind(reactor: ThreeColumnPosterCollectionViewCellReactor) {
         reactor.state.map({ $0.isLoading })
             .distinctUntilChanged()
@@ -80,8 +80,10 @@ extension ThreeColumnPosterCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        reactor = nil
-        posterImageView.image = nil
+        
+        self.reactor = nil
+        self.posterImageView.image = nil
+        self.disposeBag = DisposeBag()
     }
     
     private func configureHierarchy() {
