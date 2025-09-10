@@ -23,6 +23,7 @@
         <attribute name="overview" optional="YES" attributeType="String"/>
         <attribute name="posterURL" optional="YES" attributeType="String"/>
         <attribute name="releaseDate" optional="YES" attributeType="String"/>
+        <attribute name="tier" optional="YES" attributeType="String"/>
         <attribute name="title" attributeType="String"/>
         <attribute name="type" attributeType="String"/>
         <attribute name="watchedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
