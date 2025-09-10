@@ -18,6 +18,7 @@ protocol MediaDBManager {
     func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?>
     func updateIsStared(id: Int, isStar: Bool) -> Single<Bool>
     func updateIsWatchlist(id: Int, isWatchlist: Bool) -> Single<Bool>
+    func updateTier(mediaID: Int, newTier: String?) -> Single<Void>
 }
 
 final class MediaDatabaseManager: MediaDBManager {
@@ -260,7 +261,6 @@ final class MediaDatabaseManager: MediaDBManager {
                 do {
                     if let mediaToUpdate = try backgroundContext.fetch(request).first {
                         mediaToUpdate.addedDate = isWatchlist ? Date() : nil
-                        print(mediaToUpdate.addedDate)
                         try backgroundContext.save()
                         observer(.success(mediaToUpdate.addedDate != nil))
                     } else {
@@ -268,6 +268,39 @@ final class MediaDatabaseManager: MediaDBManager {
                     }
                 } catch {
                     print("업데이트 실패: \(error.localizedDescription)")
+                    observer(.failure(error))
+                }
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
+    // 티어 설정
+    func updateTier(mediaID: Int, newTier: String?) -> Single<Void> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.failure(NetworkError.commonError))
+                return Disposables.create()
+            }
+            
+            let backgroundContext = self.stack.newBackgroundContext()
+            
+            backgroundContext.perform {
+                let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %d", mediaID)
+                
+                do {
+                    if let mediaToUpdate = try backgroundContext.fetch(request).first {
+                        mediaToUpdate.tier = newTier
+                        try backgroundContext.save()
+                        print("\(mediaToUpdate.title) 티어 업데이트 완료 -> \(newTier ?? "Unranked")")
+                        observer(.success(()))
+                    } else {
+                        observer(.failure(NetworkError.commonError))
+                    }
+                } catch {
+                    print("티어 업데이트 실패: \(error.localizedDescription)")
                     observer(.failure(error))
                 }
             }

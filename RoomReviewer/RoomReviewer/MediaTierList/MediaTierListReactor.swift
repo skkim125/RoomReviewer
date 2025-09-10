@@ -12,6 +12,7 @@ import RxSwift
 final class MediaTierListReactor: Reactor {
     enum Action {
         case viewDidLoad
+        case moveItem(from: IndexPath, to: IndexPath)
     }
     
     enum Mutation {
@@ -39,6 +40,53 @@ final class MediaTierListReactor: Reactor {
                     self.createSections(from: mediaEntities)
                 }
                 .map(Mutation.setSections)
+            
+        case .moveItem(let from, let to):
+            var sections = self.currentState.sections
+            let sourceItem = sections[from.section].items[from.row]
+            let media: Media
+            switch sourceItem {
+            case .ranked(let m), .unranked(let m):
+                media = m
+            }
+            
+            if from.section == to.section {
+                var items = sections[from.section].items
+                
+                let movedItem = items.remove(at: from.item)
+                
+                let insertIndex = min(to.item, items.count)
+                items.insert(movedItem, at: insertIndex)
+                
+                sections[from.section] = MediaTierListSectionModel(original: sections[from.section], items: items)
+                
+                return .just(.setSections(sections))
+                
+            } else {
+                let newItem: MediaTierListItem
+                let newTier: Tier?
+                switch sections[to.section] {
+                case .tier(let tier, _):
+                    newItem = .ranked(media: media)
+                    newTier = tier
+                case .unranked:
+                    newItem = .unranked(media: media)
+                    newTier = nil
+                }
+                
+                var sourceItems = sections[from.section].items
+                sourceItems.remove(at: from.item)
+                sections[from.section] = MediaTierListSectionModel(original: sections[from.section], items: sourceItems)
+                
+                var destinationItems = sections[to.section].items
+                destinationItems.insert(newItem, at: to.item)
+                sections[to.section] = MediaTierListSectionModel(original: sections[to.section], items: destinationItems)
+                
+                return self.mediaDBManager.updateTier(mediaID: media.id, newTier: newTier?.rawValue)
+                    .asObservable()
+                    .map { .setSections(sections) }
+                    .catchAndReturn(.setSections(self.currentState.sections))
+            }
         }
     }
     
