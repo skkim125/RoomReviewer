@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		040222642E713FBD0009DC38 /* MediaTierListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040222632E713FBD0009DC38 /* MediaTierListViewController.swift */; };
+		040222662E713FF10009DC38 /* MediaTierListReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040222652E713FF10009DC38 /* MediaTierListReactor.swift */; };
+		040222682E71400F0009DC38 /* MediaTierSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040222672E71400F0009DC38 /* MediaTierSectionModel.swift */; };
+		0402226C2E7141CD0009DC38 /* TierSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0402226B2E7141CD0009DC38 /* TierSectionHeaderView.swift */; };
 		040AD09A2E1F7F6900C6EBC9 /* HomeSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040AD0992E1F7F6900C6EBC9 /* HomeSectionHeaderView.swift */; };
 		040AD09D2E1F879000C6EBC9 /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040AD09C2E1F879000C6EBC9 /* Movie.swift */; };
 		040AD09F2E1F892A00C6EBC9 /* SearchMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040AD09E2E1F892A00C6EBC9 /* SearchMedia.swift */; };
@@ -144,6 +148,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		040222632E713FBD0009DC38 /* MediaTierListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaTierListViewController.swift; sourceTree = "<group>"; };
+		040222652E713FF10009DC38 /* MediaTierListReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaTierListReactor.swift; sourceTree = "<group>"; };
+		040222672E71400F0009DC38 /* MediaTierSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaTierSectionModel.swift; sourceTree = "<group>"; };
+		0402226B2E7141CD0009DC38 /* TierSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierSectionHeaderView.swift; sourceTree = "<group>"; };
 		040AD0992E1F7F6900C6EBC9 /* HomeSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSectionHeaderView.swift; sourceTree = "<group>"; };
 		040AD09C2E1F879000C6EBC9 /* Movie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Movie.swift; sourceTree = "<group>"; };
 		040AD09E2E1F892A00C6EBC9 /* SearchMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMedia.swift; sourceTree = "<group>"; };
@@ -296,6 +304,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		040222622E713F9E0009DC38 /* MediaTierList */ = {
+			isa = PBXGroup;
+			children = (
+				040222632E713FBD0009DC38 /* MediaTierListViewController.swift */,
+				040222652E713FF10009DC38 /* MediaTierListReactor.swift */,
+				0402226E2E7142160009DC38 /* Header */,
+				0402226D2E71420F0009DC38 /* SectionModel */,
+			);
+			path = MediaTierList;
+			sourceTree = "<group>";
+		};
+		0402226D2E71420F0009DC38 /* SectionModel */ = {
+			isa = PBXGroup;
+			children = (
+				040222672E71400F0009DC38 /* MediaTierSectionModel.swift */,
+			);
+			path = SectionModel;
+			sourceTree = "<group>";
+		};
+		0402226E2E7142160009DC38 /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				0402226B2E7141CD0009DC38 /* TierSectionHeaderView.swift */,
+			);
+			path = Header;
+			sourceTree = "<group>";
+		};
 		040AD09B2E1F874200C6EBC9 /* Header */ = {
 			isa = PBXGroup;
 			children = (
@@ -699,6 +734,7 @@
 				04DCA8A32DF2DBD500695361 /* Network */,
 				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
+				040222622E713F9E0009DC38 /* MediaTierList */,
 				04100D212E6AB11C008BF76C /* MyPage */,
 				04A722DB2E549F2400797731 /* CustomView */,
 				042EFE5E2E1403C800810E02 /* Home */,
@@ -1049,6 +1085,7 @@
 				0410D7932E4F2CBD009D38EE /* ImageProvider.swift in Sources */,
 				046EFB482E56E0A200E2736B /* RoomReviewerEntity.xcdatamodeld in Sources */,
 				04DCA8A22DF2DBD100695361 /* Configuration.swift in Sources */,
+				0402226C2E7141CD0009DC38 /* TierSectionHeaderView.swift in Sources */,
 				042EFE642E14040500810E02 /* SearchMediaViewController.swift in Sources */,
 				04FFC7D02DF16A840081AF7C /* AppDelegate.swift in Sources */,
 				043BB04D2DFC4F2A00E5438D /* HomeReactor.swift in Sources */,
@@ -1061,6 +1098,7 @@
 				048E5E1F2E62D92D00189765 /* AppImage.swift in Sources */,
 				043BB0492DFC4EA800E5438D /* HomeViewController.swift in Sources */,
 				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,
+				040222682E71400F0009DC38 /* MediaTierSectionModel.swift in Sources */,
 				04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */,
 				044B8C342E60423900EB016D /* AppFont.swift in Sources */,
 				042F7EB52E658471003272EC /* CreditsSectionHeader.swift in Sources */,
@@ -1071,8 +1109,10 @@
 				04A722DF2E54A1A200797731 /* CommonButton.swift in Sources */,
 				046E7A2E2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift in Sources */,
 				046E7A2F2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift in Sources */,
+				040222642E713FBD0009DC38 /* MediaTierListViewController.swift in Sources */,
 				04100D2E2E6AC2C2008BF76C /* MyPageHeaderView.swift in Sources */,
 				04C97ABA2E236D29001EB1D4 /* ThreeColumnPosterCollectionViewCellReactor.swift in Sources */,
+				040222662E713FF10009DC38 /* MediaTierListReactor.swift in Sources */,
 				04A722DD2E549F3600797731 /* CustomAlertViewController.swift in Sources */,
 				04DCA8A02DF2DB7100695361 /* NetworkError.swift in Sources */,
 				048096522E5DC437002033A0 /* ReviewDatabaseManager.swift in Sources */,

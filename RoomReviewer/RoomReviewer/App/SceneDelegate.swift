@@ -36,16 +36,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         homeNav.tabBarItem.image = UIImage(systemName: "house")
         homeNav.title = "홈"
         
-        let searchReactor = SearchMediaReactor(networkService: networkManager)
-        let searchVC = SearchMediaViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
-        searchVC.reactor = searchReactor
-        let searchNav = UINavigationController(rootViewController: searchVC)
-        searchNav.tabBarItem.image = UIImage(systemName: "magnifyingglass")
-        searchNav.title = "검색"
-//        let tierVC = UIViewController()
-//        let tierNav = UINavigationController(rootViewController: tierVC)
-//        tierNav.tabBarItem.image = UIImage(systemName: "list.triangle")
-//        tierNav.tabBarItem.title = "티어표"
+        let tierListReactor = MediaTierListReactor(mediaDBManager: mediaDatabaseManager)
+        let tierListVC = MediaTierListViewController(imageProvider: imageProvider)
+        tierListVC.reactor = tierListReactor
+        let tierListNav = UINavigationController(rootViewController: tierListVC)
+        tierListNav.tabBarItem.image = UIImage(systemName: "list.number")
+        tierListNav.title = "티어"
         
         let mypageReactor = MyPageReactor(mediaDBManager: mediaDatabaseManager)
         let myPageVC = MyPageViewController(networkService: networkManager,imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
@@ -56,8 +52,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         tabBarController.viewControllers = [
             homeNav,
-            searchNav,
-//            tierNav,
+            tierListNav,
             myPageNav
         ]
         
