@@ -30,6 +30,7 @@ extension MediaEntity {
     @NSManaged public var review: ReviewEntity?
     @NSManaged public var crews: NSOrderedSet
     @NSManaged public var casts: NSOrderedSet
+    @NSManaged public var tier: String?
 }
 
 extension MediaEntity {
