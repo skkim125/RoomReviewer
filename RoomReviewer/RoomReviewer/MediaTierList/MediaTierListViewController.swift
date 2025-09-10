@@ -14,7 +14,7 @@ import Then
 final class MediaTierListViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .mediaTierListLayout).then {
+    private lazy var tierListCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .mediaTierListLayout).then {
         $0.backgroundColor = .clear
         $0.register(PosterCollectionViewCell.self, forCellWithReuseIdentifier: PosterCollectionViewCell.cellID)
         $0.register(TierSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TierSectionHeaderView.reusableID)
@@ -43,11 +43,11 @@ final class MediaTierListViewController: UIViewController, View {
     }
     
     func configureHierarchy() {
-        view.addSubview(collectionView)
+        view.addSubview(tierListCollectionView)
     }
     
     private func configureLayout() {
-        collectionView.snp.makeConstraints {
+        tierListCollectionView.snp.makeConstraints {
             $0.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
@@ -96,7 +96,7 @@ final class MediaTierListViewController: UIViewController, View {
         )
         
         reactor.state.map { $0.sections }
-            .bind(to: collectionView.rx.items(dataSource: dataSource))
+            .bind(to: tierListCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
     }
 }
