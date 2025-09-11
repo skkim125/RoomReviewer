@@ -33,7 +33,6 @@ final class SearchMediaViewController: UIViewController, View {
     }
     
     private let isSheetView: Bool
-    
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
@@ -130,7 +129,9 @@ final class SearchMediaViewController: UIViewController, View {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let reactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
+                let networkManager = NetworkManager(dataFetcher: dataFetcher)
+                let reactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = reactor
                 owner.navigationController?.pushViewController(vc, animated: true)

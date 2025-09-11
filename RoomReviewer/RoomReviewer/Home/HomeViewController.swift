@@ -61,17 +61,12 @@ final class HomeViewController: UIViewController, View {
     }
     
     func bind(reactor: HomeReactor) {
-        bindAction(reactor: reactor)
-        bindState(reactor: reactor)
-    }
-    
-    private func bindAction(reactor: HomeReactor) {
         writeReviewButton.rx.tap
-            .compactMap { HomeReactor.Action.writeButtonTapped }
+            .map { HomeReactor.Action.writeButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.homeCollectionView.rx.modelSelected(HomeSectionModel.Item.self)
+        homeCollectionView.rx.modelSelected(HomeSectionModel.Item.self)
             .compactMap { item -> Media? in
                 switch item {
                 case .trend(let trend):
@@ -87,17 +82,7 @@ final class HomeViewController: UIViewController, View {
             .map { HomeReactor.Action.mediaSelected($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-    }
-    
-    private func bindState(reactor: HomeReactor) {
-        reactor.state.map({ $0.isLoading })
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, value in
-                
-            }
-            .disposed(by: disposeBag)
-            
+        
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSectionModel>(
             configureCell: { [weak self] dataSource, collectionView, indexPath, item in
                 guard let self = self else { return UICollectionViewCell() }
@@ -144,17 +129,29 @@ final class HomeViewController: UIViewController, View {
             }
         )
         
-        reactor.state.map { $0.medias }
+        reactor.state.map { $0.viewState }
+            .compactMap { state -> [HomeSectionModel]? in
+                guard case .loaded(let sections) = state else { return nil }
+                return sections
+            }
+            .bind(to: homeCollectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.viewState }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(to: homeCollectionView.rx.items(dataSource: dataSource))
+            .bind(with: self) { owner, state in
+                owner.updateUI(for: state)
+            }
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let detailReactor = MediaDetailReactor(media: media, networkService: NetworkManager(), imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
+                let networkManager = NetworkManager(dataFetcher: dataFetcher)
+                let detailReactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 
@@ -172,12 +169,59 @@ final class HomeViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let vc = SearchMediaViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, isSheetView: true)
-                vc.reactor = SearchMediaReactor(networkService: NetworkManager())
-//                let nav = UINavigationController(rootViewController: vc)
-//                nav.modalPresentationStyle = .fullScreen
+                let networkManager = NetworkManager(dataFetcher: URLSessionDataFetcher(networkMonitor: NetworkMonitor()))
+                vc.reactor = SearchMediaReactor(networkService: networkManager)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
+    }
+    
+    private var offlineVC: OfflineViewController?
+    
+    private func updateUI(for state: HomeReactor.State.ViewState) {
+        switch state {
+        case .loading:
+            homeCollectionView.isHidden = true
+            dismissOfflineVC()
+        case .loaded:
+            homeCollectionView.isHidden = false
+            dismissOfflineVC()
+        case .offline:
+            homeCollectionView.isHidden = true
+            presentOfflineVC()
+        }
+    }
+    
+    private func presentOfflineVC() {
+        if self.offlineVC == nil {
+            let vc = OfflineViewController()
+            vc.retryAction = { [weak self] in
+                self?.reactor?.action.onNext(.fetchData)
+            }
+            self.offlineVC = vc
+            self.add(vc)
+        }
+    }
+    
+    private func dismissOfflineVC() {
+        self.offlineVC?.remove()
+        self.offlineVC = nil
+    }
+}
+
+fileprivate extension UIViewController {
+    func add(_ child: UIViewController) {
+        addChild(child)
+        view.addSubview(child.view)
+        child.view.frame = view.bounds
+        child.didMove(toParent: self)
+    }
+    
+    func remove() {
+        guard parent != nil else { return }
+        willMove(toParent: nil)
+        view.removeFromSuperview()
+        removeFromParent()
     }
 }
 
