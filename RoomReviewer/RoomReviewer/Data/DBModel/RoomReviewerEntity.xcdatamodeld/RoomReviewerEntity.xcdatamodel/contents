@@ -3,6 +3,7 @@
     <entity name="Cast" representedClassName="CastEntity" syncable="YES">
         <attribute name="character" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="index" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="profileURL" optional="YES" attributeType="String"/>
         <relationship name="media" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Media" inverseName="casts" inverseEntity="Media"/>
@@ -10,6 +11,7 @@
     <entity name="Crew" representedClassName="CrewEntity" syncable="YES">
         <attribute name="department" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="index" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="profileURL" optional="YES" attributeType="String"/>
         <relationship name="media" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Media" inverseName="crews" inverseEntity="Media"/>
@@ -17,12 +19,14 @@
     <entity name="Media" representedClassName="MediaEntity" syncable="YES">
         <attribute name="addedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="backdropURL" optional="YES" attributeType="String"/>
+        <attribute name="certificate" optional="YES" attributeType="String"/>
         <attribute name="genres" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName"/>
         <attribute name="id" attributeType="Integer 64" valueTransformerName="NSSecureUnarchiveFromDataTransformerName" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="isStar" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="overview" optional="YES" attributeType="String"/>
         <attribute name="posterURL" optional="YES" attributeType="String"/>
         <attribute name="releaseDate" optional="YES" attributeType="String"/>
+        <attribute name="runtimeOrEpisodeInfo" attributeType="String"/>
         <attribute name="tier" optional="YES" attributeType="String"/>
         <attribute name="title" attributeType="String"/>
         <attribute name="type" attributeType="String"/>

@@ -27,6 +27,7 @@ struct Cast: Decodable, Equatable {
     let name: String
     let profilePath: String?
     let character: String?
+    var index: Int?
 }
 
 struct Crew: Decodable, Equatable {
