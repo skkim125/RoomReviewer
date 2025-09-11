@@ -16,79 +16,44 @@ final class ImageProvider: ImageProviding {
     // 메모리 캐시
     // [url: UIImage]
     private let memoryCache = NSCache<NSString, UIImage>()
+    private let dataFetcher: DataFetching
     
-    init() {
+    init(dataFetcher: DataFetching) {
+        self.dataFetcher = dataFetcher
         memoryCache.totalCostLimit = 150 * 1024 * 1024
     }
 
     func fetchImage(from urlString: String?) -> Observable<UIImage?> {
-        guard let urlString = urlString else {
+        guard let urlString = urlString, let url = URL(string: API.tmdbImageURL + urlString) else {
             return .just(nil)
         }
         
-        let cacheKey = NSString(string: urlString)
+        let cacheKey = NSString(string: url.absoluteString)
         
         // 메모리 캐시에서 이미지 체크
         if let cachedImage = memoryCache.object(forKey: cacheKey) {
             return .just(cachedImage)
         }
         
+        let request = URLRequest(url: url)
         // 캐시가 없으면 네트워크 다운로드
-        return loadImage(urlString)
+        return dataFetcher.fetchData(request: request)
             .asObservable()
             .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInteractive))
-            .flatMap { [weak self] result -> Observable<UIImage?> in
-                guard let self = self else { return .just(nil) }
+            .map { [weak self] data -> UIImage? in
+                guard let self = self else { return nil }
                 
-                switch result {
-                case .success(let data):
-                    // 다운샘플링 진행
-                    let downsampledImage = downsampledImage(data: data)
-                    
-                    // 캐시에 저장
-                    if let image = downsampledImage {
-                        self.memoryCache.setObject(image, forKey: cacheKey)
-                    }
-                    
-                    return .just(downsampledImage)
-                    
-                case .failure:
-                    return .just(nil)
-                }
-            }
-    }
-    
-    private func loadImage(_ urlString: String?) -> Single<Result<Data, Error>> {
-        return Single.create { single in
-            guard let urlString = urlString, let url = URL(string: API.tmdbImageURL + urlString) else {
-                single(.success(.failure(NetworkError.invalidURL)))
-                return Disposables.create()
-            }
-            
-            let request = URLRequest(url: url)
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    return single(.success(.failure(error)))
+                // 다운샘플링 진행
+                let downsampledImage = self.downsampledImage(data: data)
+                
+                // 캐시에 저장
+                if let image = downsampledImage {
+                    self.memoryCache.setObject(image, forKey: cacheKey)
                 }
                 
-                guard let response = response as? HTTPURLResponse,
-                      response.statusCode == 200 else {
-                    return single(.success(.failure(NetworkError.invalidResponse)))
-                }
-                
-                guard let data = data else {
-                    return single(.success(.failure(NetworkError.invalidData)))
-                }
-                
-                return single(.success(.success(data)))
+                return downsampledImage
             }
-            
-            task.resume()
-            
-            return Disposables.create() {
-                task.cancel()
-            }
-        }
+            .catchAndReturn(nil) // 에러 발생 시 nil 반환
     }
     
     private func downsampledImage(data: Data) -> UIImage? {

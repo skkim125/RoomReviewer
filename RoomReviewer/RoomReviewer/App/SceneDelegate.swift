@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import RxSwift
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    private var networkMonitor: NetworkMonitoring?
+    private var disposeBag = DisposeBag()
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -17,19 +20,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
         
-        window?.rootViewController = setupVC()
+        let networkMonitor = NetworkMonitor()
+        self.networkMonitor = networkMonitor
+        networkMonitor.start() // 모니터링 시작
+        
+        window?.rootViewController = setupVC(networkMonitor: networkMonitor)
         window?.makeKeyAndVisible()
     }
     
-    private func setupVC() -> UITabBarController {
+    private func setupVC(networkMonitor: NetworkMonitoring) -> UITabBarController {
         let tabBarController = UITabBarController()
-        let networkManager = NetworkManager()
-        let imageProvider = ImageProvider()
+        let dataFetcher = URLSessionDataFetcher(networkMonitor: networkMonitor)
+        let networkManager = NetworkManager(dataFetcher: dataFetcher)
+        let imageProvider = ImageProvider(dataFetcher: dataFetcher)
         let dataStack = CoreDataStack(modelName: "RoomReviewerEntity")
         let mediaDatabaseManager = MediaDatabaseManager(stack: dataStack)
         let reviewDatabaseManager = ReviewDatabaseManager(stack: dataStack)
         
-        let homeReactor = HomeReactor(networkService: networkManager, mediaDBManager: mediaDatabaseManager)
+        let homeReactor = HomeReactor(networkService: networkManager, mediaDBManager: mediaDatabaseManager, networkMonitor: networkMonitor)
         let homeVC = HomeViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
@@ -44,7 +52,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         tierListNav.title = "티어"
         
         let mypageReactor = MyPageReactor(mediaDBManager: mediaDatabaseManager)
-        let myPageVC = MyPageViewController(networkService: networkManager,imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
+        let myPageVC = MyPageViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         myPageVC.reactor = mypageReactor
         let myPageNav = UINavigationController(rootViewController: myPageVC)
         myPageNav.tabBarItem.image = UIImage(systemName: "ellipsis")
@@ -60,6 +68,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         tabBarController.tabBar.unselectedItemTintColor = AppColor.appGray
 
         return tabBarController
+    }
+    
+    private func startNetworkMonitoring(networkMonitor: NetworkMonitoring) {
+        networkMonitor.start()
+        networkMonitor.isConnected
+            .observe(on: MainScheduler.instance)
+            .distinctUntilChanged()
+            .subscribe(with: self) { owner, isConnected in
+                if !isConnected {
+                    owner.showNetworkErrorAlert()
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func showNetworkErrorAlert() {
+        let alert = CustomAlertViewController(
+            title: "네트워크 오류",
+            subtitle: "네트워크 연결을 확인해주세요.",
+            buttonType: .oneButton
+        )
+        
+        if window?.rootViewController?.presentedViewController == nil {
+            window?.rootViewController?.present(alert, animated: true)
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

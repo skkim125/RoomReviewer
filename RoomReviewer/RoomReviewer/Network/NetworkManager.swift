@@ -13,44 +13,27 @@ protocol NetworkService {
 }
 
 final class NetworkManager: NetworkService {
+    private let dataFetcher: DataFetching
+    
+    init(dataFetcher: DataFetching) {
+        self.dataFetcher = dataFetcher
+    }
+    
     func callRequest<T: Decodable>(_ target: TargetType) -> Single<Result<T, Error>> {
-        return Single.create { single in
-            do {
-                let request = try target.asURLRequest()
-                
-                let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                    if let error = error {
-                        return single(.success(.failure(error)))
-                    }
-                    
-                    guard let response = response as? HTTPURLResponse,
-                          response.statusCode == 200 else {
-                        return single(.success(.failure(NetworkError.invalidResponse)))
-                    }
-                    
-                    guard let data = data else {
-                        return single(.success(.failure(NetworkError.invalidData)))
-                    }
-                    
+        do {
+            let request = try target.asURLRequest()
+            
+            return dataFetcher.fetchData(request: request)
+                .map { data -> Result<T, Error> in
                     do {
                         let decodedData = try JSONDecoder().decode(T.self, from: data)
-                        return single(.success(.success(decodedData)))
+                        return .success(decodedData)
                     } catch {
-                        return single(.success(.failure(NetworkError.decodingError)))
+                        return .failure(NetworkError.decodingError)
                     }
                 }
-                
-                task.resume()
-                
-                return Disposables.create() {
-                    task.cancel()
-                }
-                
-            } catch {
-                single(.success(.failure(error)))
-            }
-            
-            return Disposables.create()
+        } catch {
+            return .just(.failure(error))
         }
     }
 }

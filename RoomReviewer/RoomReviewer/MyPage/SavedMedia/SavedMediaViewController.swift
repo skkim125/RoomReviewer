@@ -27,7 +27,6 @@ final class SavedMediaViewController: UIViewController, View {
         $0.action = nil
     }
     
-    private let networkService: NetworkService
     private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
@@ -35,8 +34,7 @@ final class SavedMediaViewController: UIViewController, View {
     var updateSections: (() -> Void)?
     var disposeBag = DisposeBag()
     
-    init(networkService: NetworkService, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
-        self.networkService = networkService
+    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
@@ -91,7 +89,9 @@ final class SavedMediaViewController: UIViewController, View {
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
             .bind(with: self) { owner, media in
-                let detailReactor = MediaDetailReactor(media: media, networkService: owner.networkService, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
+                let networkManager = NetworkManager(dataFetcher: dataFetcher)
+                let detailReactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 

@@ -14,18 +14,24 @@ final class HomeReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
     private let mediaDBManager: MediaDBManager
+    private let networkMonitor: NetworkMonitoring
+    private var disposeBag = DisposeBag()
     
-    init(networkService: NetworkService, mediaDBManager: MediaDBManager) {
-        initialState = State()
+    init(networkService: NetworkService, mediaDBManager: MediaDBManager, networkMonitor: NetworkMonitoring) {
+        self.initialState = State()
         self.networkService = networkService
         self.mediaDBManager = mediaDBManager
+        self.networkMonitor = networkMonitor
     }
     
     struct State {
-        var isLoading: Bool = false
-        var medias: [HomeSectionModel] = []
-        var trendMedias: [Int] = []
-        var errorType: Error?
+        enum ViewState: Equatable {
+            case loading
+            case loaded([HomeSectionModel])
+            case offline
+        }
+        
+        var viewState: ViewState = .loading
         @Pulse var presentWriteReviewView: Void?
         @Pulse var selectedMedia: Media?
     }
@@ -38,11 +44,9 @@ final class HomeReactor: Reactor {
     }
     
     enum Mutation {
-        case setLoading(Bool)
-        case fetchedData([HomeSectionModel])
+        case setViewState(State.ViewState)
         case presentWriteReviewView
         case presentMediaDetail(Media)
-        case showError(Error)
         case updateWatchlist([HomeSectionItem])
     }
     
@@ -50,14 +54,16 @@ final class HomeReactor: Reactor {
         switch action {
         case .fetchData:
             return Observable.concat([
-                .just(.setLoading(true)),
-                fetchMedias(),
-                .just(.setLoading(false))
+                .just(.setViewState(.loading)),
+                fetchMedias()
             ])
+
         case .writeButtonTapped:
             return .just(.presentWriteReviewView)
+            
         case .mediaSelected(let media):
             return .just(.presentMediaDetail(media))
+            
         case .updateWatchlist:
             return updateWatchlist()
         }
@@ -67,40 +73,28 @@ final class HomeReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .showError(let error):
-            newState.errorType = error
-        case .fetchedData(let sections):
-            newState.medias = sections
-        case .setLoading(let loaded):
-            newState.isLoading = loaded
+        case .setViewState(let state):
+            newState.viewState = state
         case .presentWriteReviewView:
             newState.presentWriteReviewView = ()
         case .presentMediaDetail(let media):
             newState.selectedMedia = media
-            
         case .updateWatchlist(let items):
-            var newSections = newState.medias
-            
-            if let index = newSections.firstIndex(where: {
-                if case .watchlist = $0 { return true }
-                return false
-            }) {
-                if !items.isEmpty {
-                    newSections[index] = HomeSectionModel.watchlist(item: items)
-                } else {
-                    newSections.remove(at: index)
+            if case .loaded(var sections) = newState.viewState {
+                if let index = sections.firstIndex(where: { if case .watchlist = $0 { return true }
+                    return false
+                }) {
+                    if !items.isEmpty {
+                        sections[index] = HomeSectionModel.watchlist(item: items)
+                    } else {
+                        sections.remove(at: index)
+                    }
+                } else if !items.isEmpty {
+                    let newWatchlistSection = HomeSectionModel.watchlist(item: items)
+                    sections.insert(newWatchlistSection, at: 1)
                 }
-            } else if !items.isEmpty {
-                let trendSection = newSections.first(where: { if case .trend = $0 { return true }; return false })
-                let newWatchlistSection = HomeSectionModel.watchlist(item: items)
-                
-                if trendSection != nil, let trendIndex = newSections.firstIndex(where: { $0 == trendSection }) {
-                    newSections.insert(newWatchlistSection, at: trendIndex + 1)
-                } else {
-                    newSections.insert(newWatchlistSection, at: 0)
-                }
+                newState.viewState = .loaded(sections)
             }
-            newState.medias = newSections
         }
         
         return newState
@@ -124,10 +118,10 @@ extension HomeReactor {
                 sections.append(HomeSectionModel.movie(item: movies))
                 sections.append(HomeSectionModel.tv(item: tvs))
                 
-                return .fetchedData(sections)
+                return .setViewState(.loaded(sections))
             }
-            .catch { error in
-                return .just(.showError(error))
+            .catch { _ in
+                .just(.setViewState(.offline))
             }
     }
     
@@ -140,7 +134,6 @@ extension HomeReactor {
                     .map { HomeSectionItem.watchlist(item: $0) }
             }
             .map { .updateWatchlist($0) }
-            .catch { .just(.showError($0)) }
     }
     
     private func fetchTrending() -> Observable<[HomeSectionItem]> {
