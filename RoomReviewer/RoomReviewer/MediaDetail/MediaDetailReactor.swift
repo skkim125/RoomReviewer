@@ -35,7 +35,9 @@ final class MediaDetailReactor: Reactor {
         var casts: [Cast] = []
         var creators: [Crew] = []
         var credits: [CreditsSectionModel] = []
-        var mediaSemiInfo: String?
+        var releaseYear: String?
+        var certificate: String?
+        var runtimeOrEpisodeInfo: String?
         var isOverviewButtonVisible: Bool = false
         var isOverviewExpanded: Bool = false
         var isLoading: Bool?
@@ -45,6 +47,23 @@ final class MediaDetailReactor: Reactor {
         var mediaObjectID: NSManagedObjectID?
         var isReviewed: Bool = false
         var isStared: Bool = false
+        var mediaSemiInfo: String {
+            var components: [String] = []
+            
+            if let year = releaseYear, !year.isEmpty, year != "정보 없음" {
+                components.append(year)
+            }
+            
+            if let cert = certificate, !cert.isEmpty, cert != "정보 없음", cert != "업데이트 예정" {
+                components.append(cert)
+            }
+            
+            if let runtime = runtimeOrEpisodeInfo, !runtime.isEmpty, runtime != "정보 없음", runtime != "0분" {
+                components.append(runtime)
+            }
+            
+            return components.joined(separator: " · ")
+        }
         @Pulse var showSetWatchedDateAlert: Void?
         @Pulse var pushWriteReviewView: (Media, NSManagedObjectID?)?
     }
@@ -82,39 +101,40 @@ final class MediaDetailReactor: Reactor {
             let media = currentState.media
             print(media.id)
             
-            let setInitialData = Observable.just(Mutation.setInitialData(
+            let localDataStream = mediaDBManager.fetchMediaEntity(id: media.id)
+                .asObservable()
+                .flatMap { entity -> Observable<Mutation> in
+                    if let entity = entity {
+                        let mediaDetail = entity.toMediaDetail()
+                        return .just(.getMediaDetail(mediaDetail))
+                    } else {
+                        return self.fetchMediaCredits()
+                    }
+                }
+            
+            let initialDataStream = Observable.just(Mutation.setInitialData(
                 overview: media.overview,
                 genres: API.convertGenreString(media.genreIDS).joined(separator: " / ")
             ))
             
-            let dbResultStream = mediaDBManager.fetchMedia(id: media.id)
+            let dbStatusStream = mediaDBManager.fetchMedia(id: media.id)
                 .asObservable()
-                .share()
-            
-            let watchlistStatusStream = dbResultStream.map { result -> Mutation in
-                if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result {
-                    return .setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed)
-                } else {
-                    return .setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)
+                .compactMap { result -> Mutation? in
+                    if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result {
+                        return .setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed)
+                    } else {
+                        return .setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)
+                    }
                 }
-            }
             
-            let starStatusStream = dbResultStream.map { result -> Mutation in
-                let isStared = result?.isStar ?? false
-                return .updateStarButton(isStared)
-            }
-            
-            let checkWatchlist = Observable.merge(watchlistStatusStream, starStatusStream)
-            
-            let fetchOthers = Observable.merge(
-                self.fetchMediaCredits(),
+            let imageStream = Observable.merge(
                 self.loadBackdropImage(media.backdropPath ?? ""),
                 self.loadPosterImage(media.posterPath ?? "")
             )
             
             return Observable.concat([
                 .just(.setLoading(true)),
-                Observable.merge(setInitialData, checkWatchlist, fetchOthers).observe(on: MainScheduler.instance),
+                Observable.merge(initialDataStream, localDataStream, dbStatusStream, imageStream).observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
             
@@ -157,7 +177,7 @@ final class MediaDetailReactor: Reactor {
                             return .just(.setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: mediaObjectID, isReviewed: isReviewed))
                         }
                 } else {
-                    return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: Date())
+                    return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: Date(), certificate: currentState.certificate, runtimeOrEpisodeInfo: currentState.runtimeOrEpisodeInfo)
                         .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }
                         .asObservable()
                         .observe(on: MainScheduler.instance)
@@ -218,7 +238,7 @@ final class MediaDetailReactor: Reactor {
                 .catch { [weak self] error in
                     guard let self = self else { return .empty() }
                     print("\(media.title) 저장되어있지 않음")
-                    return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: nil)
+                    return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: nil, certificate: self.currentState.certificate, runtimeOrEpisodeInfo: self.currentState.runtimeOrEpisodeInfo)
                         .asObservable()
                         .flatMap { _ in
                             return updateIsStaredStream
@@ -253,13 +273,9 @@ final class MediaDetailReactor: Reactor {
             }
             newState.credits = sectionModels
             
-            let mediaSemiInfoItems: [String?] = [
-                detail.runtimeOrEpisodeInfo,
-                detail.certificate,
-                detail.releaseYear
-            ]
-            
-            newState.mediaSemiInfo = mediaSemiInfoItems.compactMap { $0 }.joined(separator: " • ")
+            newState.releaseYear = detail.releaseYear
+            newState.certificate = detail.certificate
+            newState.runtimeOrEpisodeInfo = detail.runtimeOrEpisodeInfo
             
         case .setBackdropImage(let image):
             newState.backDropImageData = image

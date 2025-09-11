@@ -20,6 +20,7 @@ extension CastEntity {
     @NSManaged public var profileURL: String?
     @NSManaged public var character: String?
     @NSManaged public var id: Int64
+    @NSManaged public var index: Int64
     @NSManaged public var media: MediaEntity?
 
 }

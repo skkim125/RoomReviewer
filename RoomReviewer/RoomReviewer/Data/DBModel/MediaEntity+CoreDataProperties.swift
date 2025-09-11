@@ -28,16 +28,20 @@ extension MediaEntity {
     @NSManaged public var type: String
     @NSManaged public var watchedDate: Date?
     @NSManaged public var review: ReviewEntity?
-    @NSManaged public var crews: NSOrderedSet
-    @NSManaged public var casts: NSOrderedSet
+    @NSManaged public var crews: NSSet?
+    @NSManaged public var casts: NSSet?
     @NSManaged public var tier: String?
+    @NSManaged public var certificate: String?
+    @NSManaged public var runtimeOrEpisodeInfo: String?
 }
 
+// MARK: Generated accessors for crews
 extension MediaEntity {
     public var crewArray: [CrewEntity] {
-        return self.crews.array as? [CrewEntity] ?? []
+        guard let set = self.crews as? Set<CrewEntity> else { return [] }
+        return set.sorted { $0.index < $1.index }
     }
-    
+
     @objc(addCrewsObject:)
     @NSManaged public func addToCrews(_ value: CrewEntity)
 
@@ -45,32 +49,55 @@ extension MediaEntity {
     @NSManaged public func removeFromCrews(_ value: CrewEntity)
 
     @objc(addCrews:)
-    @NSManaged public func addToCrews(_ values: NSOrderedSet)
+    @NSManaged public func addToCrews(_ values: NSSet)
 
     @objc(removeCrews:)
-    @NSManaged public func removeFromCrews(_ values: NSOrderedSet)
+    @NSManaged public func removeFromCrews(_ values: NSSet)
 }
 
+// MARK: Generated accessors for casts
 extension MediaEntity {
     public var castArray: [CastEntity] {
-        return self.casts.array as? [CastEntity] ?? []
+        guard let set = self.casts as? Set<CastEntity> else { return [] }
+        return set.sorted { $0.index < $1.index }
     }
-    
+
     @objc(addCastsObject:)
     @NSManaged public func addToCasts(_ value: CastEntity)
-    
+
     @objc(removeCastsObject:)
     @NSManaged public func removeFromCasts(_ value: CastEntity)
-    
+
     @objc(addCasts:)
-    @NSManaged public func addToCasts(_ values: NSOrderedSet)
-    
+    @NSManaged public func addToCasts(_ values: NSSet)
+
     @objc(removeCasts:)
-    @NSManaged public func removeFromCasts(_ values: NSOrderedSet)
+    @NSManaged public func removeFromCasts(_ values: NSSet)
 }
 
 extension MediaEntity : Identifiable {
     func toDomain() -> Media {
         return Media(id: Int(self.id), mediaType: MediaType(rawValue: self.type) ?? .person, title: self.title, overview: self.overview, posterPath: self.posterURL, backdropPath: self.backdropURL, genreIDS: self.genres, releaseDate: self.releaseDate, watchedDate: self.watchedDate)
+    }
+    
+    func toMediaDetail() -> MediaDetail {
+        let cast = self.castArray.map { $0.toDomain() }
+        let creator = self.crewArray.map { $0.toDomain() }
+        let releaseYear = String(self.releaseDate?.prefix(4) ?? "")
+        let genres = API.convertGenreString(self.genres)
+
+        return MediaDetail(
+            id: Int(self.id),
+            title: self.title,
+            overview: self.overview ?? "",
+            posterPath: self.posterURL,
+            backdropPath: self.backdropURL,
+            certificate: self.certificate ?? "정보 없음",
+            genres: genres,
+            releaseYear: releaseYear,
+            runtimeOrEpisodeInfo: self.runtimeOrEpisodeInfo ?? "정보 없음",
+            cast: cast,
+            creator: creator
+        )
     }
 }

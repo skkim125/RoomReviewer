@@ -10,11 +10,12 @@ import CoreData
 import RxSwift
 
 protocol MediaDBManager {
-    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?) -> Single<NSManagedObjectID>
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?, certificate: String?, runtimeOrEpisodeInfo: String?) -> Single<NSManagedObjectID>
     
     func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: Int) -> Single<Void?>
     func fetchMedia(id: Int) -> Single<(isWatchlist: Bool, objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?>
+    func fetchMediaEntity(id: Int) -> Single<MediaEntity?>
     func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?>
     func updateIsStared(id: Int, isStar: Bool) -> Single<Bool>
     func updateIsWatchlist(id: Int, isWatchlist: Bool) -> Single<Bool>
@@ -29,7 +30,7 @@ final class MediaDatabaseManager: MediaDBManager {
     }
 
     // 보고 싶은 or 리뷰 작성을 위한 Media 생성 & 저장
-    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?) -> Single<NSManagedObjectID> {
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?, certificate: String?, runtimeOrEpisodeInfo: String?) -> Single<NSManagedObjectID> {
         
         return Single.create { [weak self] observer in
             guard let self = self else {
@@ -52,25 +53,29 @@ final class MediaDatabaseManager: MediaDBManager {
                 mediaEntity.watchedDate = watchedDate
                 mediaEntity.addedDate = addedDate
                 mediaEntity.genres = genres
+                mediaEntity.certificate = certificate
+                mediaEntity.runtimeOrEpisodeInfo = runtimeOrEpisodeInfo
                 
-                for cast in casts {
+                for (index, cast) in casts.enumerated() {
                     let castEntity = CastEntity(context: backgroundContext)
                     
                     castEntity.id = Int64(cast.id)
                     castEntity.name = cast.name
                     castEntity.character = cast.character
                     castEntity.profileURL = cast.profilePath
+                    castEntity.index = Int64(index) // 인덱스 저장
                     
                     mediaEntity.addToCasts(castEntity)
                 }
                 
-                for crew in creators {
+                for (index, crew) in creators.enumerated() {
                     let crewEntity = CrewEntity(context: backgroundContext)
                     
                     crewEntity.id = Int64(crew.id)
                     crewEntity.name = crew.name
                     crewEntity.department = crew.department
                     crewEntity.profileURL = crew.profilePath
+                    crewEntity.index = Int64(index) // 인덱스 저장
                     
                     mediaEntity.addToCrews(crewEntity)
                 }
@@ -173,6 +178,29 @@ final class MediaDatabaseManager: MediaDBManager {
                         observer(.success(nil))
                     }
                     
+                } catch {
+                    observer(.success(nil))
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func fetchMediaEntity(id: Int) -> Single<MediaEntity?> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.failure(NetworkError.commonError))
+                return Disposables.create()
+            }
+            
+            let context = self.stack.viewContext
+            context.perform {
+                let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                request.fetchLimit = 1
+                request.predicate = NSPredicate(format: "id == %d", id)
+                do {
+                    let entity = try context.fetch(request).first
+                    observer(.success(entity))
                 } catch {
                     observer(.success(nil))
                 }

@@ -20,6 +20,7 @@ extension CrewEntity {
     @NSManaged public var department: String?
     @NSManaged public var profileURL: String?
     @NSManaged public var id: Int64
+    @NSManaged public var index: Int64
     @NSManaged public var media: MediaEntity?
 
 }
