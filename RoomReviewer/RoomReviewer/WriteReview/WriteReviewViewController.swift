@@ -117,21 +117,42 @@ final class WriteReviewViewController: UIViewController, View {
         $0.isEnabled = false
     }
     
-    init() {
+    private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
+    
+    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging) {
+        self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private let editButton = UIBarButtonItem(title: "수정", style: .plain, target: nil, action: nil).then {
+        $0.tintColor = AppColor.appWhite
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = AppColor.appBackgroundColor
-        self.title = "감상 기록하기"
         
         configureHierarchy()
         configureLayout()
-        reactor?.action.onNext(.viewDidLoad)
+        configureNavigationBar()
+    }
+    
+    private let dismissButton = UIBarButtonItem().then {
+        $0.image = UIImage(systemName: "chevron.left")
+        $0.tintColor = AppColor.appWhite
+        $0.style = .done
+        $0.target = nil
+        $0.action = nil
+    }
+    
+    private func configureNavigationBar() {
+        self.navigationItem.leftBarButtonItem = dismissButton
+        self.navigationItem.rightBarButtonItem = editButton
     }
     
     func bind(reactor: WriteReviewReactor) {
@@ -145,7 +166,7 @@ final class WriteReviewViewController: UIViewController, View {
             .drive(titleLabel.rx.text)
             .disposed(by: disposeBag)
         
-         reactor.state.map { $0.posterImage }
+        reactor.state.map { $0.posterImage }
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
@@ -181,17 +202,58 @@ final class WriteReviewViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.canSave }
+        reactor.state.map { $0.review }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: "")
+            .drive(reviewTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.comment }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: nil)
+            .drive(reviewDetailTextView.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.quote }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: nil)
+            .drive(quoteTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.isEditMode }
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: false)
-            .drive(with: self) { owner, canSave in
-                owner.saveButton.isEnabled = canSave
-                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.appLightGray
+            .drive(with: self) { owner, isEditMode in
+                owner.ratingView.isUserInteractionEnabled = isEditMode
+                owner.reviewTextField.isUserInteractionEnabled = isEditMode
+                owner.reviewDetailTextView.isUserInteractionEnabled = isEditMode
+                owner.quoteTextField.isUserInteractionEnabled = isEditMode
+                owner.saveButton.isHidden = !isEditMode
+                
+                if isEditMode {
+                    owner.navigationItem.rightBarButtonItem = owner.editButton
+                } else {
+                    owner.navigationItem.rightBarButtonItem = nil
+                }
+                
+                owner.scrollView.snp.remakeConstraints {
+                    $0.top.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide)
+                    
+                    if isEditMode {
+                        $0.bottom.equalTo(owner.saveButton.snp.top).offset(-10)
+                    } else {
+                        $0.bottom.equalTo(owner.view.safeAreaLayoutGuide)
+                    }
+                }
+                
+                owner.title = isEditMode ? "감상 기록하기" : "나의 평론"
             }
             .disposed(by: disposeBag)
     }
     
     private func bindAction(reactor: WriteReviewReactor) {
+        reactor.action.onNext(.viewDidLoad)
+        
         ratingView.didTouchCosmos = { [weak self] rating in
             guard let self = self else { return }
             self.reactor?.action.onNext(.ratingChanged(rating))
@@ -224,9 +286,20 @@ final class WriteReviewViewController: UIViewController, View {
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        editButton.rx.tap
+            .map { _ in Reactor.Action.editButtonTapped }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        dismissButton.rx.tap
+            .asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
-
 
 extension WriteReviewViewController {
     private func configureHierarchy() {
@@ -266,7 +339,7 @@ extension WriteReviewViewController {
             $0.top.equalToSuperview().offset(20)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(view.bounds.width/3)
-            $0.height.equalTo(180)
+            $0.height.equalTo(posterImageView.snp.width).multipliedBy(1.5)
         }
         
         titleLabel.snp.makeConstraints {
@@ -278,13 +351,14 @@ extension WriteReviewViewController {
             $0.top.equalTo(titleLabel.snp.bottom).offset(15)
             $0.horizontalEdges.equalToSuperview().inset(20)
         }
+        
         ratingView.snp.makeConstraints {
             $0.top.equalTo(ratingSectionTitle.snp.bottom).offset(20)
             $0.centerX.equalToSuperview()
         }
         
         reviewTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(ratingView.snp.bottom).offset(25)
+            $0.top.equalTo(ratingView.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(20)
         }
         
@@ -323,7 +397,6 @@ extension WriteReviewViewController {
         }
         
         saveButton.snp.makeConstraints {
-            $0.top.equalTo(scrollView.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(10)
             $0.height.equalTo(50)

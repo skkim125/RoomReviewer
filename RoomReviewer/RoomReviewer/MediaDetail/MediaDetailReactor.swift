@@ -67,7 +67,7 @@ final class MediaDetailReactor: Reactor {
             return components.joined(separator: " · ")
         }
         @Pulse var showSetWatchedDateAlert: Void?
-        @Pulse var pushWriteReviewView: (Media, NSManagedObjectID?)?
+        @Pulse var pushWriteReviewView: (Media, ReviewEntity?)?
     }
     
     enum Action {
@@ -91,7 +91,7 @@ final class MediaDetailReactor: Reactor {
         case setWatchlistStatus(isWatchlisted: Bool, isStared: Bool, watchedDate: Date?, mediaObjectID: NSManagedObjectID?, isReviewed: Bool)
         case showSetWatchedDateAlert
         case setWatchedDate(Date)
-        case pushWriteReviewView
+        case pushWriteReviewView(Media, ReviewEntity?)
         case toggleOverviewExpanded
         case setOverviewTruncatable(Bool)
         case updateStarButton(Bool)
@@ -167,18 +167,29 @@ final class MediaDetailReactor: Reactor {
                 
             } else {
                 let posterSaveStream = imageProvider.fetchImage(urlString: media.posterPath)
-                    .do(onNext: { [weak self] image in
-                        if let image = image, let url = media.posterPath {
-                            self?.imageFileManager.saveImage(image: image.jpegData(compressionQuality: 1.0) ?? Data(), urlString: url)
+                    .flatMap { [weak self] image -> Observable<Void> in
+                        guard let self = self,
+                              let image = image,
+                              let url = media.posterPath,
+                              let data = image.jpegData(compressionQuality: 1.0) else {
+                            return .just(())
                         }
-                    })
+                        self.imageFileManager.saveImage(image: data, urlString: url)
+                        return .just(())
+                    }
                 
                 let backdropSaveStream = imageProvider.fetchImage(urlString: media.backdropPath)
-                    .do(onNext: { [weak self] image in
-                        if let image = image, let url = media.backdropPath {
-                            self?.imageFileManager.saveImage(image: image.jpegData(compressionQuality: 1.0) ?? Data(), urlString: url)
+                    .flatMap { [weak self] image -> Observable<Void> in
+                        guard let self = self,
+                              let image = image,
+                              let url = media.backdropPath,
+                              let data = image.jpegData(compressionQuality: 1.0) else {
+                            return .just(())
                         }
-                    })
+                        self.imageFileManager.saveImage(image: data, urlString: url)
+                        return .just(())
+                    }
+
                 
                 let createMediaStream = mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: Date(), certificate: currentState.certificate, runtimeOrEpisodeInfo: currentState.runtimeOrEpisodeInfo)
                     .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }
@@ -208,7 +219,9 @@ final class MediaDetailReactor: Reactor {
             }
             
         case .writeReviewButtonTapped:
-            return .just(.pushWriteReviewView)
+            let media = currentState.media
+            let existingReview = reviewDBManager.fetchReview(id: media.id)
+            return .just(.pushWriteReviewView(media, existingReview))
             
         case .updateWatchedDate(let date):
             let media = currentState.media
@@ -301,8 +314,8 @@ final class MediaDetailReactor: Reactor {
         case .setWatchedDate(let date):
             newState.watchedDate = date
             
-        case .pushWriteReviewView:
-            newState.pushWriteReviewView = (currentState.media, currentState.mediaObjectID)
+        case .pushWriteReviewView(let media, let reviewEntity):
+            newState.pushWriteReviewView = (media, reviewEntity)
             
         case .showSetWatchedDateAlert:
             newState.showSetWatchedDateAlert = ()

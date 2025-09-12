@@ -6,11 +6,12 @@
 //
 
 import UIKit
+import RxSwift
 import CryptoKit
 
 protocol ImageFileManaging {
     func saveImage(image: Data, urlString: String)
-    func loadImage(urlString: String) -> UIImage?
+    func loadImage(urlString: String?) -> Observable<UIImage?>
     func deleteImage(urlString: String)
 }
 
@@ -44,7 +45,6 @@ final class ImageFileManager: ImageFileManaging {
     func saveImage(image: Data, urlString: String) {
         let name = fileName(for: urlString)
         let fileURL = imageDirectory.appendingPathComponent(name)
-        print(fileURL.absoluteString)
         
         do {
             try image.write(to: fileURL)
@@ -53,13 +53,18 @@ final class ImageFileManager: ImageFileManaging {
         }
     }
 
-    func loadImage(urlString: String) -> UIImage? {
+    func loadImage(urlString: String?) -> Observable<UIImage?> {
+        guard let urlString = urlString, !urlString.isEmpty else {
+            return .just(nil)
+        }
+        
         let name = fileName(for: urlString)
         let fileURL = imageDirectory.appendingPathComponent(name)
+        
         guard let data = try? Data(contentsOf: fileURL), let image = UIImage(data: data) else {
-            return nil
+            return .just(nil)
         }
-        return image
+        return .just(image)
     }
 
     func deleteImage(urlString: String) {

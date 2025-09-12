@@ -12,17 +12,24 @@ import CoreData
 
 final class WriteReviewReactor: Reactor {
     struct State {
-        let mediaObjectID: NSManagedObjectID
+        let media: Media
         let title: String
         let posterPath: String?
-//        var contentType: MediaType
+        var reviewEntity: ReviewEntity?
         var posterImage: UIImage?
-        var rating: Double = 0
-        var review: String = ""
-        var comment: String = ""
-        var quote: String = ""
+        var rating: Double
+        var review: String
+        var comment: String?
+        var quote: String?
         var isSaving: Bool = false
         var canSave: Bool = false
+        var isEditMode: Bool
+        
+        let initialRating: Double
+        let initialReview: String
+        let initialComment: String?
+        let initialQuote: String?
+        
         @Pulse var shouldDismiss: Void?
     }
     
@@ -33,27 +40,62 @@ final class WriteReviewReactor: Reactor {
         case commentChanged(String)
         case quoteChanged(String)
         case saveButtonTapped
+        case editButtonTapped
     }
     
     enum Mutation {
         case setPosterImage(UIImage?)
         case setRating(Double)
         case setReview(String)
-        case setQuote(String)
-        case setComment(String)
+        case setQuote(String?)
+        case setComment(String?)
         case setSaving(Bool)
         case dismissView
+        case setEditMode(Bool)
+        case setInitialReviewData(ReviewEntity)
     }
     
     var initialState: State
     
-    private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
-    init(mediaObjectID: NSManagedObjectID, title: String, posterPath: String?, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
-        self.initialState = State(mediaObjectID: mediaObjectID, title: title, posterPath: posterPath)
-        self.imageProvider = imageProvider
+    init(media: Media, review: ReviewEntity?, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+        if let existingReview = review {
+            self.initialState = State(
+                media: media,
+                title: media.title,
+                posterPath: media.posterPath,
+                reviewEntity: existingReview,
+                rating: existingReview.rating,
+                review: existingReview.review,
+                comment: existingReview.comment,
+                quote: existingReview.quote,
+                isEditMode: false,
+                initialRating: existingReview.rating,
+                initialReview: existingReview.review,
+                initialComment: existingReview.comment,
+                initialQuote: existingReview.quote
+            )
+        } else {
+            self.initialState = State(
+                media: media,
+                title: media.title,
+                posterPath: media.posterPath,
+                reviewEntity: nil,
+                rating: 0,
+                review: "",
+                comment: nil,
+                quote: nil,
+                isEditMode: true,
+                initialRating: 0,
+                initialReview: "",
+                initialComment: nil,
+                initialQuote: nil
+            )
+        }
+        self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
     }
@@ -61,7 +103,16 @@ final class WriteReviewReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad:
-            return loadPosterImage(currentState.posterPath)
+            let imageLoad = loadPosterImage(currentState.posterPath)
+            
+            if let reviewEntity = currentState.reviewEntity {
+                return Observable.concat([
+                    imageLoad,
+                    .just(.setInitialReviewData(reviewEntity))
+                ])
+            } else {
+                return imageLoad
+            }
             
         case .ratingChanged(let score):
             return .just(.setRating(score))
@@ -74,9 +125,19 @@ final class WriteReviewReactor: Reactor {
             
         case .quoteChanged(let quote):
             return .just(.setQuote(quote))
+            
         case .saveButtonTapped:
             let state = currentState
-            return saveReview(mediaObjectID: state.mediaObjectID, rating: state.rating, review: state.review, comment: state.comment, quote: state.quote)
+            if let reviewEntity = state.reviewEntity {
+                return reviewDBManager.updateReview(reviewEntity.objectID, rating: state.rating, review: state.review, comment: state.comment, quote: state.quote)
+                    .asObservable()
+                    .map { .dismissView }
+            } else {
+                return createReview(mediaID: state.media.id, rating: state.rating, review: state.review, comment: state.comment, quote: state.quote)
+            }
+            
+        case .editButtonTapped:
+            return .just(.setEditMode(true))
         }
     }
     
@@ -98,6 +159,14 @@ final class WriteReviewReactor: Reactor {
             newState.quote = quote
         case .setComment(let comment):
             newState.comment = comment
+        case .setEditMode(let isEditMode):
+            newState.isEditMode = isEditMode
+        case .setInitialReviewData(let reviewEntity):
+            newState.rating = reviewEntity.rating
+            newState.review = reviewEntity.review
+            newState.comment = reviewEntity.comment
+            newState.quote = reviewEntity.quote
+            newState.reviewEntity = reviewEntity
         }
         
         newState.canSave = !newState.review.isEmpty && newState.rating > 0
@@ -106,12 +175,14 @@ final class WriteReviewReactor: Reactor {
     }
     
     private func loadPosterImage(_ imagePath: String?) -> Observable<Mutation> {
-        return imageProvider.fetchImage(urlString: imagePath)
-            .map { .setPosterImage($0) }
+        return imageFileManager.loadImage(urlString: imagePath)
+            .map { image in
+                return .setPosterImage(image)
+            }
     }
     
-    private func saveReview(mediaObjectID: NSManagedObjectID, rating: Double, review: String, comment: String?, quote: String?) -> Observable<Mutation> {
-        return reviewDBManager.createReview(mediaObjectID, rating: rating, review: review, comment: comment, quote: quote)
+    private func createReview(mediaID: Int, rating: Double, review: String, comment: String?, quote: String?) -> Observable<Mutation> {
+        return reviewDBManager.createReview(mediaID, rating: rating, review: review, comment: comment, quote: quote)
             .asObservable()
             .map { reviewID in
                 return .dismissView

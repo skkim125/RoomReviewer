@@ -320,13 +320,10 @@ final class MediaDetailViewController: UIViewController, View {
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, mediaInfo in
-                guard let (media, id) = mediaInfo, let validObjectID = id else {
-                    print("Media ObjectID 없음")
-                    return
-                }
+                guard let (media, reviewEntity) = mediaInfo else { return }
                 
-                let reactor = WriteReviewReactor(mediaObjectID: validObjectID, title: media.title, posterPath: media.posterPath, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
-                let vc = WriteReviewViewController()
+                let reactor = WriteReviewReactor(media: media, review: reviewEntity, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = WriteReviewViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager)
                 vc.reactor = reactor
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
@@ -412,10 +409,7 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private func bindAction(reactor: MediaDetailReactor) {
-        rx.methodInvoked(#selector(viewDidLoad))
-            .map{ _ in MediaDetailReactor.Action.viewDidLoad }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
+        reactor.action.onNext(.viewDidLoad)
         
         watchlistButton.rx.tap
             .map { MediaDetailReactor.Action.watchlistButtonTapped }
