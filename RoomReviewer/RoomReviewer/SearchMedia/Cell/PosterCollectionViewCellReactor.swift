@@ -29,13 +29,11 @@ final class PosterCollectionViewCellReactor: Reactor {
 
     var initialState: State
     private let imageProvider: ImageProviding
-    
     private let imageFileManager: ImageFileManaging
 
     init(media: Media, imageProvider: ImageProviding, imageFileManager: ImageFileManaging) {
         self.initialState = State(mediaName: media.title, mediaPosterURL: media.posterPath)
         self.imageProvider = imageProvider
-        
         self.imageFileManager = imageFileManager
     }
 
@@ -46,20 +44,27 @@ final class PosterCollectionViewCellReactor: Reactor {
                 return .just(.setImage(AppImage.emptyPosterImage))
             }
             
-            
-            if let localImage = imageFileManager.loadImage(urlString: url) {
-                return .just(.setImage(localImage))
-            }
-            
-            
-            let imageStream = imageProvider.fetchImage(urlString: url)
-                .map { Mutation.setImage($0) }
-            
-            return Observable.concat([
-                .just(.setLoading(true)),
-                imageStream,
-                .just(.setLoading(false)),
-            ])
+            return imageFileManager.loadImage(urlString: url)
+                .flatMap { [weak self] localImage -> Observable<Mutation> in
+                    guard let self = self else { return .empty()
+                    }
+                    if let image = localImage {
+                        return .just(.setImage(image))
+                    } else {
+                        let networkImageStream = self.imageProvider.fetchImage(urlString: url)
+                            .do(onNext: { image in
+                                guard let image = image, let data = image.pngData() else { return }
+                                self.imageFileManager.saveImage(image: data, urlString: url)
+                            })
+                            .map { Mutation.setImage($0) }
+                        
+                        return Observable.concat([
+                            .just(.setLoading(true)),
+                            networkImageStream,
+                            .just(.setLoading(false)),
+                        ])
+                    }
+                }
         }
     }
 
