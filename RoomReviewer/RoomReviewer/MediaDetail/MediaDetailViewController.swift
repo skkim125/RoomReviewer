@@ -163,14 +163,16 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
     var updateAction: (() -> Void)?
     var disposeBag = DisposeBag()
     
-    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         super.init(nibName: nil, bundle: nil)
@@ -187,9 +189,8 @@ final class MediaDetailViewController: UIViewController, View {
         configureHierarchy()
         configureLayout()
         configureNavigationBar()
-        setupPlaceholderState()
         
-        reactor?.action.onNext(.viewDidLoad)
+        setupPlaceholderState()
     }
     
     private func configureNavigationBar() {
@@ -257,9 +258,9 @@ final class MediaDetailViewController: UIViewController, View {
             .drive(with: self) { owner, image in
                 if let image = image {
                     if image == AppImage.emptyPosterImage {
-                        owner.posterImageView.contentMode = .scaleAspectFit
-                        owner.posterImageView.backgroundColor = AppColor.appLightGray
-                        owner.posterImageView.tintColor = AppColor.appWhite
+                        owner.backDropImageView.contentMode = .scaleAspectFit
+                        owner.backDropImageView.backgroundColor = AppColor.appLightGray
+                        owner.backDropImageView.tintColor = AppColor.appWhite
                     }
                     owner.backDropImageView.image = image
                 } else {
@@ -411,6 +412,11 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private func bindAction(reactor: MediaDetailReactor) {
+        rx.methodInvoked(#selector(viewDidLoad))
+            .map{ _ in MediaDetailReactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         watchlistButton.rx.tap
             .map { MediaDetailReactor.Action.watchlistButtonTapped }
             .bind(to: reactor.action)

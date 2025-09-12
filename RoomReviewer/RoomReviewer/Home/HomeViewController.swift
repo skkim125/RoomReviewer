@@ -14,6 +14,7 @@ import Then
 final class HomeViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
@@ -35,8 +36,9 @@ final class HomeViewController: UIViewController, View {
         $0.action = nil
     }
     
-    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         super.init(nibName: nil, bundle: nil)
@@ -97,20 +99,20 @@ final class HomeViewController: UIViewController, View {
                     
                 case .watchlist(item: let watchList):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
-                    let reactor = HotMediaCollectionViewCellReactor(media: watchList, imageProvider: self.imageProvider)
+                    let reactor = HotMediaCollectionViewCellReactor(media: watchList, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager)
                     cell.reactor = reactor
                     
                     return cell
                     
                 case .movie(let movie):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
-                    let reactor = HotMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider)
+                    let reactor = HotMediaCollectionViewCellReactor(media: movie, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager)
                     cell.reactor = reactor
                     return cell
                     
                 case .tv(let tv):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HotMediaCollectionViewCell.cellID, for: indexPath) as? HotMediaCollectionViewCell else { return UICollectionViewCell() }
-                    let reactor = HotMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider)
+                    let reactor = HotMediaCollectionViewCellReactor(media: tv, imageProvider: self.imageProvider, imageFileManager: imageFileManager)
                     cell.reactor = reactor
                     return cell
                 }
@@ -147,12 +149,13 @@ final class HomeViewController: UIViewController, View {
         
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
-            .observe(on: MainScheduler.instance)
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+                .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
                 let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
                 let networkManager = NetworkManager(dataFetcher: dataFetcher)
-                let detailReactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
-                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let detailReactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 
                 vc.updateAction = { [weak self] in
@@ -168,7 +171,7 @@ final class HomeViewController: UIViewController, View {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = SearchMediaViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, isSheetView: true)
+                let vc = SearchMediaViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, isSheetView: true)
                 let networkManager = NetworkManager(dataFetcher: URLSessionDataFetcher(networkMonitor: NetworkMonitor()))
                 vc.reactor = SearchMediaReactor(networkService: networkManager)
                 owner.navigationController?.pushViewController(vc, animated: true)

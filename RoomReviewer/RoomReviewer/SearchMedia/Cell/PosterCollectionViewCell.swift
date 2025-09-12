@@ -46,7 +46,7 @@ final class PosterCollectionViewCell: UICollectionViewCell, View {
 }
 
 extension PosterCollectionViewCell {
-    func bind(reactor: ThreeColumnPosterCollectionViewCellReactor) {
+    func bind(reactor: PosterCollectionViewCellReactor) {
         reactor.state.map({ $0.isLoading })
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
@@ -55,7 +55,8 @@ extension PosterCollectionViewCell {
 
         reactor.state.map { $0.imageData }
             .distinctUntilChanged()
-            .bind(with: self) { owner, image in
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, image in
                 if let image = image {
                     if image == AppImage.emptyPosterImage {
                         owner.posterImageView.contentMode = .scaleAspectFit
@@ -74,7 +75,7 @@ extension PosterCollectionViewCell {
             .distinctUntilChanged()
             .filter { $0 == nil }
             .map { _ in
-                ThreeColumnPosterCollectionViewCellReactor.Action.loadImage
+                PosterCollectionViewCellReactor.Action.loadImage
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

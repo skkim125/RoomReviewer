@@ -14,7 +14,7 @@ protocol MediaDBManager {
     
     func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: Int) -> Single<Void?>
-    func fetchMedia(id: Int) -> Single<(isWatchlist: Bool, objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?>
+    func fetchMedia(id: Int) -> Single<(Bool, NSManagedObjectID?, Bool, Date?, Bool)?>
     func fetchMediaEntity(id: Int) -> Single<MediaEntity?>
     func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?>
     func updateIsStared(id: Int, isStar: Bool) -> Single<Bool>
@@ -157,33 +157,29 @@ final class MediaDatabaseManager: MediaDBManager {
         }
     }
     
-    func fetchMedia(id: Int) -> Single<(isWatchlist: Bool, objectID: NSManagedObjectID, isStar: Bool, watchedDate: Date?, isReviewed: Bool)?> {
-        return Single.create { [weak self] observer in
-            guard let self = self else {
-                observer(.failure(NetworkError.commonError))
-                return Disposables.create()
-            }
-            
-            let context = self.stack.viewContext
+    func fetchMedia(id: Int) -> Single<(Bool, NSManagedObjectID?, Bool, Date?, Bool)?> {
+        return Single.create { single in
+            let context = self.stack.newBackgroundContext()
             context.perform {
                 let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
-                request.fetchLimit = 1
                 request.predicate = NSPredicate(format: "id == %d", id)
+                request.fetchLimit = 1
+                
                 do {
-                    if let entity = try context.fetch(request).first {
-                        let isReviewed = !(entity.review == nil)
-                        let isWatchlist = entity.addedDate != nil
-                        observer(.success((isWatchlist, entity.objectID, entity.isStar, entity.watchedDate, isReviewed)))
+                    let results = try context.fetch(request)
+                    if let entity = results.first {
+                        let result = (true, entity.objectID, entity.isStar, entity.watchedDate, entity.review != nil)
+                        single(.success(result))
                     } else {
-                        observer(.success(nil))
+                        single(.success(nil))
                     }
-                    
                 } catch {
-                    observer(.success(nil))
+                    single(.failure(error))
                 }
             }
             return Disposables.create()
         }
+        .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
     }
     
     func fetchMediaEntity(id: Int) -> Single<MediaEntity?> {

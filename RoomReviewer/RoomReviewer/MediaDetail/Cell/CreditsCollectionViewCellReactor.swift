@@ -46,8 +46,9 @@ final class CreditsCollectionViewCellReactor: Reactor {
                 return .just(.setImage(AppImage.personImage))
             }
             
-            let imageStream = imageLoader.fetchImage(from: path)
+            let imageStream = imageLoader.fetchImage(urlString: path)
                 .asObservable()
+                .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInteractive))
                 .map { Mutation.setImage($0) }
             
             return Observable.concat([

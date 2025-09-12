@@ -28,14 +28,16 @@ final class SavedMediaViewController: UIViewController, View {
     }
     
     private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
     var updateSections: (() -> Void)?
     var disposeBag = DisposeBag()
     
-    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding,imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         
@@ -81,7 +83,7 @@ final class SavedMediaViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .bind(to: savedMediaCollectionView.rx.items(cellIdentifier: PosterCollectionViewCell.cellID, cellType: PosterCollectionViewCell.self)) { [weak self] index, item, cell in
                 guard let self = self else { return }
-                let reactor = ThreeColumnPosterCollectionViewCellReactor(media: item, imageLoader: self.imageProvider)
+                let reactor = PosterCollectionViewCellReactor(media: item, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager)
                 cell.reactor = reactor
             }
             .disposed(by: disposeBag)
@@ -91,8 +93,8 @@ final class SavedMediaViewController: UIViewController, View {
             .bind(with: self) { owner, media in
                 let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
                 let networkManager = NetworkManager(dataFetcher: dataFetcher)
-                let detailReactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
-                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let detailReactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 
                 vc.updateAction = { [weak self]  in
