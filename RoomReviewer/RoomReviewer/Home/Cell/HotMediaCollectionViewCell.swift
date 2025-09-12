@@ -70,7 +70,9 @@ extension HotMediaCollectionViewCell {
             .disposed(by: disposeBag)
 
         reactor.state.map { $0.imageData }
-            .bind(with: self) { owner, image in
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, image in
                 if let image = image {
                     if image == AppImage.emptyPosterImage {
                         owner.posterImageView.contentMode = .scaleAspectFit

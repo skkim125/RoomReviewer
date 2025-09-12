@@ -28,10 +28,12 @@ final class HotMediaCollectionViewCellReactor: Reactor {
 
     var initialState: State
     private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
 
-    init(media: Media, imageProvider: ImageProviding) {
+    init(media: Media, imageProvider: ImageProviding, imageFileManager: ImageFileManaging) {
         self.initialState = State(mediaName: media.title, mediaPosterURL: media.posterPath)
         self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -41,8 +43,11 @@ final class HotMediaCollectionViewCellReactor: Reactor {
                 return .just(.setImage(AppImage.emptyPosterImage))
             }
             
-            let imageStream = imageProvider.fetchImage(from: url)
-                .observe(on: MainScheduler.instance)
+            if let localImage = imageFileManager.loadImage(urlString: url) {
+                return .just(.setImage(localImage))
+            }
+            
+            let imageStream = imageProvider.fetchImage(urlString: url)
                 .map { Mutation.setImage($0) }
             
             return Observable.concat([

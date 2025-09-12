@@ -14,13 +14,15 @@ final class MediaDetailReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
     private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
-    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.initialState = State(media: media, title: media.title)
         self.networkService = networkService
         self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
     }
@@ -99,9 +101,14 @@ final class MediaDetailReactor: Reactor {
         switch action {
         case .viewDidLoad:
             let media = currentState.media
-            print(media.id)
+            
+            let initialDataStream = Observable.just(Mutation.setInitialData(
+                overview: media.overview,
+                genres: API.convertGenreString(media.genreIDS).joined(separator: " / ")
+            ))
             
             let localDataStream = mediaDBManager.fetchMediaEntity(id: media.id)
+                .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
                     if let entity = entity {
@@ -112,12 +119,8 @@ final class MediaDetailReactor: Reactor {
                     }
                 }
             
-            let initialDataStream = Observable.just(Mutation.setInitialData(
-                overview: media.overview,
-                genres: API.convertGenreString(media.genreIDS).joined(separator: " / ")
-            ))
-            
             let dbStatusStream = mediaDBManager.fetchMedia(id: media.id)
+                .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
                 .asObservable()
                 .compactMap { result -> Mutation? in
                     if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result {
@@ -128,13 +131,16 @@ final class MediaDetailReactor: Reactor {
                 }
             
             let imageStream = Observable.merge(
-                self.loadBackdropImage(media.backdropPath ?? ""),
-                self.loadPosterImage(media.posterPath ?? "")
+                self.loadBackdropImage(currentState.media.backdropPath)
+                    .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated)),
+                self.loadPosterImage(currentState.media.posterPath)
+                    .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             )
             
             return Observable.concat([
                 .just(.setLoading(true)),
-                Observable.merge(initialDataStream, localDataStream, dbStatusStream, imageStream).observe(on: MainScheduler.instance),
+                Observable.merge(initialDataStream, localDataStream, dbStatusStream, imageStream)
+                    .observe(on: MainScheduler.instance),
                 .just(.setLoading(false))
             ])
             
@@ -143,53 +149,52 @@ final class MediaDetailReactor: Reactor {
             let casts = currentState.casts
             let creators = currentState.creators
             let isCurrentlyWatchlisted = currentState.isWatchlisted
-            let isReviewed = currentState.isReviewed
-            let isStared = currentState.isStared
-            let isWatched = currentState.watchedDate != nil
-            let watchedDate = currentState.watchedDate
-            let mediaObjectID = currentState.mediaObjectID
             
             if isCurrentlyWatchlisted {
-                if isWatched || isReviewed || isStared {
-                    return mediaDBManager.updateIsWatchlist(id: media.id, isWatchlist: !isCurrentlyWatchlisted)
-                        .asObservable()
-                        .observe(on: MainScheduler.instance)
-                        .flatMap { isWatchlist -> Observable<Mutation> in
-                            print(isWatchlist)
-                            return .just(.setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: mediaObjectID, isReviewed: isReviewed))
-                        }
-                } else {
-                    return mediaDBManager.deleteMedia(id: media.id)
-                        .asObservable()
-                        .observe(on: MainScheduler.instance)
-                        .flatMap { _ -> Observable<Mutation> in
-                            return .just(.setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false))
-                        }
-                        .catch { .just(.showError($0)) }
+                if let posterPath = media.posterPath {
+                    imageFileManager.deleteImage(urlString: posterPath)
                 }
+                if let backdropPath = media.backdropPath {
+                    imageFileManager.deleteImage(urlString: backdropPath)
+                }
+                
+                return mediaDBManager.deleteMedia(id: media.id)
+                    .asObservable()
+                    .flatMap { _ -> Observable<Mutation> in
+                        return .just(.setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false))
+                    }
+                    .catch { .just(.showError($0)) }
+                
             } else {
-                if isWatched || isReviewed || isStared {
-                    return mediaDBManager.updateIsWatchlist(id: media.id, isWatchlist: !isCurrentlyWatchlisted)
-                        .asObservable()
-                        .observe(on: MainScheduler.instance)
-                        .flatMap { isWatchlist -> Observable<Mutation> in
-                            print(isWatchlist)
-                            return .just(.setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: mediaObjectID, isReviewed: isReviewed))
+                let posterSaveStream = imageProvider.fetchImage(urlString: media.posterPath)
+                    .do(onNext: { [weak self] image in
+                        if let image = image, let url = media.posterPath {
+                            self?.imageFileManager.saveImage(image: image.jpegData(compressionQuality: 1.0) ?? Data(), urlString: url)
                         }
-                } else {
-                    return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: Date(), certificate: currentState.certificate, runtimeOrEpisodeInfo: currentState.runtimeOrEpisodeInfo)
-                        .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }
-                        .asObservable()
-                        .observe(on: MainScheduler.instance)
-                        .flatMap { result -> Observable<Mutation> in
-                            if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result {
-                                return .just(.setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed))
-                            }
-                            return .empty()
+                    })
+                
+                let backdropSaveStream = imageProvider.fetchImage(urlString: media.backdropPath)
+                    .do(onNext: { [weak self] image in
+                        if let image = image, let url = media.backdropPath {
+                            self?.imageFileManager.saveImage(image: image.jpegData(compressionQuality: 1.0) ?? Data(), urlString: url)
                         }
-                        .catch { .just(.showError($0)) }
-                }
+                    })
+                
+                let createMediaStream = mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: Date(), certificate: currentState.certificate, runtimeOrEpisodeInfo: currentState.runtimeOrEpisodeInfo)
+                    .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }
+                    .asObservable()
+                    .flatMap { result -> Observable<Mutation> in
+                        if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result {
+                            return .just(.setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed))
+                        }
+                        return .empty()
+                    }
+                
+                return Observable.zip(posterSaveStream, backdropSaveStream)
+                    .flatMap { _ in createMediaStream }
+                    .catch { .just(.showError($0)) }
             }
+            
         case .watchedButtonTapped:
             let state = currentState
             if currentState.watchedDate == nil {
@@ -358,25 +363,23 @@ extension MediaDetailReactor {
         }
     }
     
-    private func loadBackdropImage(_ imagePath: String) -> Observable<Mutation> {
-        if imagePath.isEmpty {
+    private func loadBackdropImage(_ imagePath: String?) -> Observable<Mutation> {
+        guard let imagePath = imagePath, !imagePath.isEmpty else {
             return .just(.setBackdropImage(AppImage.emptyPosterImage))
-        } else {
-            return imageProvider.fetchImage(from: imagePath)
-                .map { image in
-                    return .setBackdropImage(image)
-                }
         }
+        
+        return imageProvider.fetchImage(urlString: imagePath)
+                .map { .setBackdropImage($0) }
+                .catchAndReturn(.setBackdropImage(nil))
     }
     
-    private func loadPosterImage(_ imagePath: String) -> Observable<Mutation> {
-        if imagePath.isEmpty {
+    private func loadPosterImage(_ imagePath: String?) -> Observable<Mutation> {
+        guard let imagePath = imagePath, !imagePath.isEmpty else {
             return .just(.setPosterImage(AppImage.emptyPosterImage))
-        } else {
-            return imageProvider.fetchImage(from: imagePath)
-                .map { image in
-                    return .setPosterImage(image)
-                }
         }
+        
+        return imageProvider.fetchImage(urlString: imagePath)
+            .map { .setPosterImage($0) }
+            .catchAndReturn(.setPosterImage(nil))
     }
 }

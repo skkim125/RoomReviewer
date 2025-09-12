@@ -10,14 +10,14 @@ import RxSwift
 import RxDataSources
 import ReactorKit
 
-final class ThreeColumnPosterCollectionViewCellReactor: Reactor {
+final class PosterCollectionViewCellReactor: Reactor {
     enum Action {
         case loadImage
     }
 
     enum Mutation {
         case setLoading(Bool)
-        case setImageData(UIImage?)
+        case setImage(UIImage?)
     }
 
     struct State {
@@ -28,22 +28,32 @@ final class ThreeColumnPosterCollectionViewCellReactor: Reactor {
     }
 
     var initialState: State
-    private let imageLoader: ImageProviding
+    private let imageProvider: ImageProviding
+    
+    private let imageFileManager: ImageFileManaging
 
-    init(media: Media, imageLoader: ImageProviding) {
+    init(media: Media, imageProvider: ImageProviding, imageFileManager: ImageFileManaging) {
         self.initialState = State(mediaName: media.title, mediaPosterURL: media.posterPath)
-        self.imageLoader = imageLoader
+        self.imageProvider = imageProvider
+        
+        self.imageFileManager = imageFileManager
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .loadImage:
             guard let url = currentState.mediaPosterURL else {
-                return .just(.setImageData(AppImage.emptyPosterImage))
+                return .just(.setImage(AppImage.emptyPosterImage))
             }
-            let imageStream = imageLoader.fetchImage(from: url)
-                .observe(on: MainScheduler.instance)
-                .map { Mutation.setImageData($0) }
+            
+            
+            if let localImage = imageFileManager.loadImage(urlString: url) {
+                return .just(.setImage(localImage))
+            }
+            
+            
+            let imageStream = imageProvider.fetchImage(urlString: url)
+                .map { Mutation.setImage($0) }
             
             return Observable.concat([
                 .just(.setLoading(true)),
@@ -56,8 +66,8 @@ final class ThreeColumnPosterCollectionViewCellReactor: Reactor {
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setImageData(let data):
-            newState.imageData = data
+        case .setImage(let image):
+            newState.imageData = image
         case .setLoading(let isLoading):
             newState.isLoading = isLoading
         }

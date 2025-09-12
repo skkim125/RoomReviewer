@@ -73,6 +73,9 @@
 		0489D8F22E729B46003FE402 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8F12E729B46003FE402 /* NetworkMonitor.swift */; };
 		0489D8F42E729EA9003FE402 /* DataFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8F32E729EA9003FE402 /* DataFetcher.swift */; };
 		0489D8F62E72B92B003FE402 /* OfflineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8F52E72B92B003FE402 /* OfflineViewController.swift */; };
+		0489D8FC2E741481003FE402 /* ImageFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8FB2E741481003FE402 /* ImageFileManager.swift */; };
+		0489D8FE2E741597003FE402 /* Data+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8FD2E741597003FE402 /* Data+.swift */; };
+		0489D9002E743394003FE402 /* DiskImageCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8FF2E743394003FE402 /* DiskImageCacheManager.swift */; };
 		048E5E1D2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048E5E1C2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift */; };
 		048E5E1F2E62D92D00189765 /* AppImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048E5E1E2E62D92D00189765 /* AppImage.swift */; };
 		04A722DD2E549F3600797731 /* CustomAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A722DC2E549F3600797731 /* CustomAlertViewController.swift */; };
@@ -85,7 +88,7 @@
 		04B9CBC02DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B9CBBF2DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift */; };
 		04C97AB12E224717001EB1D4 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB02E224717001EB1D4 /* Media.swift */; };
 		04C97AB42E2286C3001EB1D4 /* PosterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB32E2286C3001EB1D4 /* PosterCollectionViewCell.swift */; };
-		04C97ABA2E236D29001EB1D4 /* ThreeColumnPosterCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB92E236D29001EB1D4 /* ThreeColumnPosterCollectionViewCellReactor.swift */; };
+		04C97ABA2E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB92E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift */; };
 		04C97ABE2E23784C001EB1D4 /* MediaDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97ABD2E23784C001EB1D4 /* MediaDetailViewController.swift */; };
 		04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97ADB2E23B595001EB1D4 /* MediaDetailReactor.swift */; };
 		04D0D09F2E5C7E61002A6951 /* Cosmos in Frameworks */ = {isa = PBXBuildFile; productRef = 04D0D09E2E5C7E61002A6951 /* Cosmos */; };
@@ -205,6 +208,9 @@
 		0489D8F12E729B46003FE402 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		0489D8F32E729EA9003FE402 /* DataFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataFetcher.swift; sourceTree = "<group>"; };
 		0489D8F52E72B92B003FE402 /* OfflineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineViewController.swift; sourceTree = "<group>"; };
+		0489D8FB2E741481003FE402 /* ImageFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFileManager.swift; sourceTree = "<group>"; };
+		0489D8FD2E741597003FE402 /* Data+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+.swift"; sourceTree = "<group>"; };
+		0489D8FF2E743394003FE402 /* DiskImageCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskImageCacheManager.swift; sourceTree = "<group>"; };
 		048E5E1C2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMediaCollectionViewCellReactor.swift; sourceTree = "<group>"; };
 		048E5E1E2E62D92D00189765 /* AppImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImage.swift; sourceTree = "<group>"; };
 		04A722DC2E549F3600797731 /* CustomAlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlertViewController.swift; sourceTree = "<group>"; };
@@ -214,7 +220,7 @@
 		04B9CBBF2DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotMediaCollectionViewCell.swift; sourceTree = "<group>"; };
 		04C97AB02E224717001EB1D4 /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		04C97AB32E2286C3001EB1D4 /* PosterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterCollectionViewCell.swift; sourceTree = "<group>"; };
-		04C97AB92E236D29001EB1D4 /* ThreeColumnPosterCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeColumnPosterCollectionViewCellReactor.swift; sourceTree = "<group>"; };
+		04C97AB92E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterCollectionViewCellReactor.swift; sourceTree = "<group>"; };
 		04C97ABD2E23784C001EB1D4 /* MediaDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDetailViewController.swift; sourceTree = "<group>"; };
 		04C97ADB2E23B595001EB1D4 /* MediaDetailReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDetailReactor.swift; sourceTree = "<group>"; };
 		04D0D0A22E5C7EB0002A6951 /* WriteReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteReviewViewController.swift; sourceTree = "<group>"; };
@@ -488,6 +494,7 @@
 			children = (
 				044B8C3A2E60831300EB016D /* UICollectionViewLayout+.swift */,
 				042F7EBA2E65CA40003272EC /* String+.swift */,
+				0489D8FD2E741597003FE402 /* Data+.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -495,6 +502,8 @@
 		046285AD2E4E1F9E00365B77 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				0489D8FB2E741481003FE402 /* ImageFileManager.swift */,
+				0489D8FF2E743394003FE402 /* DiskImageCacheManager.swift */,
 				0410D7922E4F2CBD009D38EE /* ImageProvider.swift */,
 				0489D8F12E729B46003FE402 /* NetworkMonitor.swift */,
 			);
@@ -532,7 +541,7 @@
 			isa = PBXGroup;
 			children = (
 				04C97AB32E2286C3001EB1D4 /* PosterCollectionViewCell.swift */,
-				04C97AB92E236D29001EB1D4 /* ThreeColumnPosterCollectionViewCellReactor.swift */,
+				04C97AB92E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -1067,6 +1076,7 @@
 				04100D1D2E698381008BF76C /* CastEntity+CoreDataClass.swift in Sources */,
 				04100D2B2E6ABD38008BF76C /* MyPageSectionModel.swift in Sources */,
 				04100D1E2E698381008BF76C /* CrewEntity+CoreDataProperties.swift in Sources */,
+				0489D8FC2E741481003FE402 /* ImageFileManager.swift in Sources */,
 				04100D1F2E698381008BF76C /* CastEntity+CoreDataProperties.swift in Sources */,
 				04100D202E698381008BF76C /* CrewEntity+CoreDataClass.swift in Sources */,
 				04D0D0A32E5C7EB0002A6951 /* WriteReviewViewController.swift in Sources */,
@@ -1111,8 +1121,10 @@
 				043BB0492DFC4EA800E5438D /* HomeViewController.swift in Sources */,
 				043BB0432DFC4D8800E5438D /* TV.swift in Sources */,
 				040222682E71400F0009DC38 /* MediaTierSectionModel.swift in Sources */,
+				0489D8FE2E741597003FE402 /* Data+.swift in Sources */,
 				04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */,
 				044B8C342E60423900EB016D /* AppFont.swift in Sources */,
+				0489D9002E743394003FE402 /* DiskImageCacheManager.swift in Sources */,
 				042F7EB52E658471003272EC /* CreditsSectionHeader.swift in Sources */,
 				04B9CBC02DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift in Sources */,
 				04FE6C9C2E599E3000CCB76C /* MediaDetail.swift in Sources */,
@@ -1123,7 +1135,7 @@
 				046E7A2F2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift in Sources */,
 				040222642E713FBD0009DC38 /* MediaTierListViewController.swift in Sources */,
 				04100D2E2E6AC2C2008BF76C /* MyPageHeaderView.swift in Sources */,
-				04C97ABA2E236D29001EB1D4 /* ThreeColumnPosterCollectionViewCellReactor.swift in Sources */,
+				04C97ABA2E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift in Sources */,
 				040222662E713FF10009DC38 /* MediaTierListReactor.swift in Sources */,
 				04A722DD2E549F3600797731 /* CustomAlertViewController.swift in Sources */,
 				04DCA8A02DF2DB7100695361 /* NetworkError.swift in Sources */,

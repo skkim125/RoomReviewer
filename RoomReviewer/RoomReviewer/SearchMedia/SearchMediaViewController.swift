@@ -34,12 +34,14 @@ final class SearchMediaViewController: UIViewController, View {
     
     private let isSheetView: Bool
     private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     var disposeBag = DisposeBag()
     
-    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, isSheetView: Bool = false) {
+    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, isSheetView: Bool = false) {
         self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         self.isSheetView = isSheetView
@@ -95,7 +97,7 @@ final class SearchMediaViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .bind(to: searchMediaCollectionView.rx.items(cellIdentifier: PosterCollectionViewCell.cellID, cellType: PosterCollectionViewCell.self)) { [weak self] index, item, cell in
                 guard let self = self else { return }
-                let reactor = ThreeColumnPosterCollectionViewCellReactor(media: item, imageLoader: self.imageProvider)
+                let reactor = PosterCollectionViewCellReactor(media: item, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager)
                 cell.reactor = reactor
             }
             .disposed(by: disposeBag)
@@ -131,8 +133,8 @@ final class SearchMediaViewController: UIViewController, View {
             .bind(with: self) { owner, media in
                 let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
                 let networkManager = NetworkManager(dataFetcher: dataFetcher)
-                let reactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
-                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let reactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = reactor
                 owner.navigationController?.pushViewController(vc, animated: true)
             }

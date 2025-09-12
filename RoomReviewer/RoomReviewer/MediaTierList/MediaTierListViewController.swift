@@ -23,9 +23,11 @@ final class MediaTierListViewController: UIViewController, View {
         $0.dragInteractionEnabled = true
     }
     private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
     
-    init(imageProvider: ImageProviding) {
+    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging) {
         self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -76,7 +78,7 @@ final class MediaTierListViewController: UIViewController, View {
                     media = unrankedMedia
                 }
                 
-                cell.reactor = ThreeColumnPosterCollectionViewCellReactor(media: media, imageLoader: self.imageProvider)
+                cell.reactor = PosterCollectionViewCellReactor(media: media, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager)
                 return cell
             },
             configureSupplementaryView: { dataSource, collectionView, kind, indexPath in

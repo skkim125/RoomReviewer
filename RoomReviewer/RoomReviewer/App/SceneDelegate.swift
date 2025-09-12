@@ -32,27 +32,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tabBarController = UITabBarController()
         let dataFetcher = URLSessionDataFetcher(networkMonitor: networkMonitor)
         let networkManager = NetworkManager(dataFetcher: dataFetcher)
-        let imageProvider = ImageProvider(dataFetcher: dataFetcher)
+        let imageStore: ImageFileManaging = ImageFileManager()
+        let diskCacher = CacheImageFileManager()
+        let imageProvider = ImageProvider(diskCacher: diskCacher, dataFetcher: dataFetcher)
         let dataStack = CoreDataStack(modelName: "RoomReviewerEntity")
         let mediaDatabaseManager = MediaDatabaseManager(stack: dataStack)
         let reviewDatabaseManager = ReviewDatabaseManager(stack: dataStack)
         
         let homeReactor = HomeReactor(networkService: networkManager, mediaDBManager: mediaDatabaseManager, networkMonitor: networkMonitor)
-        let homeVC = HomeViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
+        let homeVC = HomeViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
         homeNav.tabBarItem.image = UIImage(systemName: "house")
         homeNav.title = "홈"
         
         let tierListReactor = MediaTierListReactor(mediaDBManager: mediaDatabaseManager)
-        let tierListVC = MediaTierListViewController(imageProvider: imageProvider)
+        let tierListVC = MediaTierListViewController(imageProvider: imageProvider, imageFileManager: imageStore)
         tierListVC.reactor = tierListReactor
         let tierListNav = UINavigationController(rootViewController: tierListVC)
         tierListNav.tabBarItem.image = UIImage(systemName: "list.number")
         tierListNav.title = "티어"
         
         let mypageReactor = MyPageReactor(mediaDBManager: mediaDatabaseManager)
-        let myPageVC = MyPageViewController(imageProvider: imageProvider, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
+        let myPageVC = MyPageViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
         myPageVC.reactor = mypageReactor
         let myPageNav = UINavigationController(rootViewController: myPageVC)
         myPageNav.tabBarItem.image = UIImage(systemName: "ellipsis")

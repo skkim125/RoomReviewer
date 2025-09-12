@@ -23,11 +23,13 @@ final class MyPageViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
     private let imageProvider: ImageProviding
+    private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
-    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
+        self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         
@@ -174,7 +176,7 @@ final class MyPageViewController: UIViewController, View {
         switch item {
         case .reviews, .watchlist, .watchHistory, .isStared:
             let reactor = SavedMediaReactor(item.sectionType, mediaDBManager: self.mediaDBManager)
-            let vc = SavedMediaViewController(imageProvider: self.imageProvider, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
+            let vc = SavedMediaViewController(imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
             vc.reactor = reactor
             vc.updateSections = { [weak self] in
                 guard let self = self else { return }

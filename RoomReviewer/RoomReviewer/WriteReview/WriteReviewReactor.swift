@@ -106,10 +106,8 @@ final class WriteReviewReactor: Reactor {
     }
     
     private func loadPosterImage(_ imagePath: String?) -> Observable<Mutation> {
-        return imageProvider.fetchImage(from: imagePath)
-            .map { image in
-                return .setPosterImage(image)
-            }
+        return imageProvider.fetchImage(urlString: imagePath)
+            .map { .setPosterImage($0) }
     }
     
     private func saveReview(mediaObjectID: NSManagedObjectID, rating: Double, review: String, comment: String?, quote: String?) -> Observable<Mutation> {
@@ -120,4 +118,3 @@ final class WriteReviewReactor: Reactor {
             }
     }
 }
-
