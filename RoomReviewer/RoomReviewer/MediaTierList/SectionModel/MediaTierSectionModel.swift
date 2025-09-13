@@ -31,7 +31,7 @@ enum Tier: String, CaseIterable {
     }
 }
 
-enum MediaTierListItem: IdentifiableType, Equatable {
+enum MediaTierListItem: IdentifiableType, Equatable, Hashable {
     case ranked(media: Media)
     case unranked(media: Media)
     
@@ -42,6 +42,17 @@ enum MediaTierListItem: IdentifiableType, Equatable {
         case .unranked(let media):
             return "media-\(media.id)"
         }
+    }
+    
+    var media: Media {
+        switch self {
+        case .ranked(let media), .unranked(let media):
+            return media
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(media)
     }
 }
 

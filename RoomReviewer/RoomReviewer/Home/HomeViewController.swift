@@ -17,6 +17,8 @@ final class HomeViewController: UIViewController, View {
     private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
+    private let networkManager: NetworkService
+    private let networkMonitor: NetworkMonitoring
     
     private let homeCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .homeCollectionViewLayout).then {
         $0.register(TrendMediaCollectionViewCell.self, forCellWithReuseIdentifier: TrendMediaCollectionViewCell.cellID)
@@ -36,11 +38,13 @@ final class HomeViewController: UIViewController, View {
         $0.action = nil
     }
     
-    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, networkManager: NetworkService, networkMonitor: NetworkMonitoring) {
         self.imageProvider = imageProvider
         self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
+        self.networkManager = networkManager
+        self.networkMonitor = networkMonitor
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -152,9 +156,7 @@ final class HomeViewController: UIViewController, View {
             .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
                 .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
-                let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
-                let networkManager = NetworkManager(dataFetcher: dataFetcher)
-                let detailReactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let detailReactor = MediaDetailReactor(media: media, networkService: owner.networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, networkMonitor: owner.networkMonitor)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 
@@ -171,7 +173,7 @@ final class HomeViewController: UIViewController, View {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = SearchMediaViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, isSheetView: true)
+                let vc = SearchMediaViewController(networkMonitor: owner.networkMonitor, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, isSheetView: true)
                 let networkManager = NetworkManager(dataFetcher: URLSessionDataFetcher(networkMonitor: NetworkMonitor()))
                 vc.reactor = SearchMediaReactor(networkService: networkManager)
                 owner.navigationController?.pushViewController(vc, animated: true)

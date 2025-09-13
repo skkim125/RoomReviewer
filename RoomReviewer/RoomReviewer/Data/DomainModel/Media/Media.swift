@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Media: Equatable {
+struct Media: Equatable, Hashable {
     let id: Int
     let mediaType: MediaType
     let title: String

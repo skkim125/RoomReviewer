@@ -30,6 +30,7 @@ final class OfflineViewController: UIViewController {
         view.backgroundColor = AppColor.appBackgroundColor
         configureHierarchy()
         configureLayout()
+        bind()
     }
     
     private func configureHierarchy() {

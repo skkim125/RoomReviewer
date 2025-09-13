@@ -104,17 +104,20 @@ final class MediaDatabaseManager: MediaDBManager {
                 return Disposables.create()
             }
             
-            let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
-            let sortDescriptor = NSSortDescriptor(key: "addedDate", ascending: false)
-            request.sortDescriptors = [sortDescriptor]
-            
-            do {
-                let results = try stack.viewContext.fetch(request)
-                observer(.success(results))
+            let backgroundContext = self.stack.newBackgroundContext()
+            backgroundContext.perform {
+                let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                let sortDescriptor = NSSortDescriptor(key: "addedDate", ascending: false)
+                request.sortDescriptors = [sortDescriptor]
                 
-            } catch {
-                print("Failed to fetch media: \(error)")
-                observer(.success([]))
+                do {
+                    let results = try backgroundContext.fetch(request)
+                    observer(.success(results))
+                    
+                } catch {
+                    print("Failed to fetch media: \(error)")
+                    observer(.success([]))
+                }
             }
             
             return Disposables.create()

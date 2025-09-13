@@ -33,13 +33,15 @@ final class SearchMediaViewController: UIViewController, View {
     }
     
     private let isSheetView: Bool
+    private let networkMonitor: NetworkMonitoring
     private let imageProvider: ImageProviding
     private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     var disposeBag = DisposeBag()
     
-    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, isSheetView: Bool = false) {
+    init(networkMonitor: NetworkMonitoring, imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, isSheetView: Bool = false) {
+        self.networkMonitor = networkMonitor
         self.imageProvider = imageProvider
         self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
@@ -133,7 +135,7 @@ final class SearchMediaViewController: UIViewController, View {
             .bind(with: self) { owner, media in
                 let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
                 let networkManager = NetworkManager(dataFetcher: dataFetcher)
-                let reactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let reactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, networkMonitor: owner.networkMonitor)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = reactor
                 owner.navigationController?.pushViewController(vc, animated: true)

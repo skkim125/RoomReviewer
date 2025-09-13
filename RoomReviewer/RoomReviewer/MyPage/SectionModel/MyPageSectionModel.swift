@@ -45,10 +45,10 @@ extension MyPageSectionModel: SectionModelType {
 }
 
 enum MyPageSectionItem {
-    case reviews(count: Int)
-    case watchlist(count: Int)
-    case watchHistory(count: Int)
-    case isStared(count: Int)
+    case reviews([Media])
+    case watchlist([Media])
+    case watchHistory([Media])
+    case isStared([Media])
     
     case appInfo
     
@@ -99,8 +99,8 @@ enum MyPageSectionItem {
     
     var detailText: String? {
         switch self {
-        case .reviews(let count), .watchlist(let count), .watchHistory(let count), .isStared(count: let count):
-            return "\(count)개"
+        case .reviews(let medias), .watchlist(let medias), .watchHistory(let medias), .isStared(count: let medias):
+            return "\(medias.count)개"
         default:
             return nil
         }

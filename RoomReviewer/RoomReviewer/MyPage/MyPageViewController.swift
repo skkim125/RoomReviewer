@@ -26,12 +26,16 @@ final class MyPageViewController: UIViewController, View {
     private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
+    private let networkManager: NetworkService
+    private let networkMonitor: NetworkMonitoring
     
-    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, networkManager: NetworkService, networkMonitor: NetworkMonitoring) {
         self.imageProvider = imageProvider
         self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
+        self.networkManager = networkManager
+        self.networkMonitor = networkMonitor
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -148,8 +152,9 @@ final class MyPageViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$updateSection)
-            .compactMap { $0 }
-            .bind(with: self) { owner, _ in
+            .map { $0 }
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, _ in
                 owner.myPageCollectionView.reloadData()
             }
             .disposed(by: disposeBag)
@@ -174,9 +179,9 @@ final class MyPageViewController: UIViewController, View {
     
     private func moveSection(_ item: MyPageSectionItem) {
         switch item {
-        case .reviews, .watchlist, .watchHistory, .isStared:
-            let reactor = SavedMediaReactor(item.sectionType, mediaDBManager: self.mediaDBManager)
-            let vc = SavedMediaViewController(imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
+        case .reviews(let medias), .watchlist(let medias), .watchHistory(let medias), .isStared(let medias):
+            let reactor = SavedMediaReactor(medias: medias, item.sectionType, mediaDBManager: self.mediaDBManager)
+            let vc = SavedMediaViewController(imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager, networkManager: self.networkManager, networkMonitor: self.networkMonitor)
             vc.reactor = reactor
             vc.updateSections = { [weak self] in
                 guard let self = self else { return }
