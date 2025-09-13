@@ -40,7 +40,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let reviewDatabaseManager = ReviewDatabaseManager(stack: dataStack)
         
         let homeReactor = HomeReactor(networkService: networkManager, mediaDBManager: mediaDatabaseManager, networkMonitor: networkMonitor)
-        let homeVC = HomeViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
+        let homeVC = HomeViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager, networkManager: networkManager, networkMonitor: networkMonitor)
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
         homeNav.tabBarItem.image = UIImage(systemName: "house")
@@ -54,7 +54,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         tierListNav.title = "티어"
         
         let mypageReactor = MyPageReactor(mediaDBManager: mediaDatabaseManager)
-        let myPageVC = MyPageViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager)
+        let myPageVC = MyPageViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager, networkManager: networkManager, networkMonitor: networkMonitor)
         myPageVC.reactor = mypageReactor
         let myPageNav = UINavigationController(rootViewController: myPageVC)
         myPageNav.tabBarItem.image = UIImage(systemName: "ellipsis")

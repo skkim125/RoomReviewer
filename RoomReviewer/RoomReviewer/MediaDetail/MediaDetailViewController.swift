@@ -169,6 +169,7 @@ final class MediaDetailViewController: UIViewController, View {
     
     var updateAction: (() -> Void)?
     var disposeBag = DisposeBag()
+    private var offlineVC: OfflineViewController?
     
     init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
@@ -189,8 +190,6 @@ final class MediaDetailViewController: UIViewController, View {
         configureHierarchy()
         configureLayout()
         configureNavigationBar()
-        
-        setupPlaceholderState()
     }
     
     private func configureNavigationBar() {
@@ -207,13 +206,11 @@ final class MediaDetailViewController: UIViewController, View {
     
     private func bindState(reactor: MediaDetailReactor) {
         
-        reactor.state.map { $0.isLoading }
+        reactor.state.map { $0.viewState }
             .distinctUntilChanged()
-            .compactMap { $0 }
-            .filter { !$0 }
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self) { owner, isLoading in
-                owner.removePlaceholderState()
+            .asDriver(onErrorJustReturn: .loaded)
+            .drive(with: self) { owner, state in
+                owner.updateUI(for: state)
             }
             .disposed(by: disposeBag)
         
@@ -283,14 +280,6 @@ final class MediaDetailViewController: UIViewController, View {
                 } else {
                     owner.posterImageView.backgroundColor = AppColor.appDarkGray
                 }
-            }
-            .disposed(by: disposeBag)
-        
-        reactor.state.map { $0.errorType }
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self) { owner, error in
-                guard let error = error else { return }
-                print("로드 에러: \(error.localizedDescription)")
             }
             .disposed(by: disposeBag)
         
@@ -721,5 +710,53 @@ extension MediaDetailViewController {
         genreLabel.textColor = AppColor.appLightGray
         semiInfoLabel.textColor = AppColor.appLightGray
         overviewLabel.textColor = AppColor.appWhite
+    }
+    
+    private func updateUI(for state: MediaDetailReactor.State.ViewState) {
+        switch state {
+        case .loading:
+            scrollView.isHidden = false
+            dismissOfflineVC()
+            setupPlaceholderState()
+        case .loaded:
+            scrollView.isHidden = false
+            dismissOfflineVC()
+            removePlaceholderState()
+        case .offline:
+            scrollView.isHidden = true
+            presentOfflineVC()
+        }
+    }
+    
+    private func presentOfflineVC() {
+        if self.offlineVC == nil {
+            let vc = OfflineViewController()
+            vc.retryAction = { [weak self] in
+                self?.reactor?.action.onNext(.viewDidLoad)
+            }
+            self.offlineVC = vc
+            add(vc)
+        }
+    }
+    
+    private func dismissOfflineVC() {
+        offlineVC?.remove()
+        offlineVC = nil
+    }
+}
+
+fileprivate extension UIViewController {
+    func add(_ child: UIViewController) {
+        addChild(child)
+        view.addSubview(child.view)
+        child.view.frame = view.bounds
+        child.didMove(toParent: self)
+    }
+    
+    func remove() {
+        guard parent != nil else { return }
+        willMove(toParent: nil)
+        view.removeFromSuperview()
+        removeFromParent()
     }
 }

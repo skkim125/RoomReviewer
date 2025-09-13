@@ -59,10 +59,12 @@ final class MediaTierListViewController: UIViewController, View {
     }
     
     func bind(reactor: MediaTierListReactor) {
-        self.rx.methodInvoked(#selector(viewDidLoad))
-            .map { _ in Reactor.Action.viewDidLoad }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
+//        self.rx.methodInvoked(#selector(viewDidLoad))
+//            .map { _ in Reactor.Action.viewDidLoad }
+//            .bind(to: reactor.action)
+//            .disposed(by: disposeBag)
+        
+        reactor.action.onNext(.viewDidLoad)
         
         let dataSource = RxCollectionViewSectionedAnimatedDataSource<MediaTierListSectionModel>(
             configureCell: { [weak self] dataSource, collectionView, indexPath, item in
@@ -99,6 +101,11 @@ final class MediaTierListViewController: UIViewController, View {
         
         reactor.state.map { $0.sections }
             .bind(to: tierListCollectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        self.rx.methodInvoked(#selector(viewWillAppear))
+            .map { _ in Reactor.Action.updateSavedMedia }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
 }

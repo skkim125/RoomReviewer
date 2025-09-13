@@ -70,12 +70,12 @@ final class MyPageReactor: Reactor {
         let sectionModel = mediaDBManager.fetchAllMedia()
             .asObservable()
             .map { mediaEntities -> [MyPageSectionModel] in
-                let watchlistCount = mediaEntities.filter { $0.addedDate != nil }.count
-                let watchHistoryCount = mediaEntities.filter { $0.watchedDate != nil }.count
-                let reviewCount = mediaEntities.filter { $0.review != nil }.count
-                let isStarCount = mediaEntities.filter { $0.isStar }.count
+                let watchlist = mediaEntities.filter { $0.addedDate != nil }.map { $0.toDomain() }
+                let watchHistory = mediaEntities.filter { $0.watchedDate != nil }.map { $0.toDomain() }
+                let review = mediaEntities.filter { $0.review != nil }.map { $0.toDomain() }
+                let isStar = mediaEntities.filter { $0.isStar }.map { $0.toDomain() }
                 
-                let activitySectionModel: MyPageSectionModel = .myActivity(items: [.watchlist(count: watchlistCount), .watchHistory(count: watchHistoryCount), .reviews(count: reviewCount), .isStared(count: isStarCount)])
+                let activitySectionModel: MyPageSectionModel = .myActivity(items: [.watchlist(watchlist), .watchHistory(watchHistory), .reviews(review), .isStared(isStar)])
                 
                 let sectionModels: [MyPageSectionModel] = [activitySectionModel, .management(items: [
                     .appInfo

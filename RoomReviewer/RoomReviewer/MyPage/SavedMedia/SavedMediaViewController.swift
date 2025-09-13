@@ -31,15 +31,19 @@ final class SavedMediaViewController: UIViewController, View {
     private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
+    private let networkManager: NetworkService
+    private let networkMonitor: NetworkMonitoring
     
     var updateSections: (() -> Void)?
     var disposeBag = DisposeBag()
     
-    init(imageProvider: ImageProviding,imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding,imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, networkManager: NetworkService, networkMonitor: NetworkMonitoring) {
         self.imageProvider = imageProvider
         self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
+        self.networkManager = networkManager
+        self.networkMonitor = networkMonitor
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -91,9 +95,7 @@ final class SavedMediaViewController: UIViewController, View {
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
             .bind(with: self) { owner, media in
-                let dataFetcher = URLSessionDataFetcher(networkMonitor: NetworkMonitor())
-                let networkManager = NetworkManager(dataFetcher: dataFetcher)
-                let detailReactor = MediaDetailReactor(media: media, networkService: networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let detailReactor = MediaDetailReactor(media: media, networkService: owner.networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, networkMonitor: owner.networkMonitor)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 
@@ -119,12 +121,13 @@ final class SavedMediaViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$updateSavedMedias)
-            .compactMap { $0 }
-            .bind(with: self) { owner, _ in
-                owner.savedMediaCollectionView.reloadData()
-            }
-            .disposed(by: disposeBag)
+//        reactor.pulse(\.$updateSavedMedias)
+//            .map { $0 }
+//            .asDriver(onErrorJustReturn: nil)
+//            .drive(with: self) { owner, _ in
+//                owner.savedMediaCollectionView.reloadData()
+//            }
+//            .disposed(by: disposeBag)
     }
     
     private func bindAction(_ reactor: SavedMediaReactor) {

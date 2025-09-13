@@ -62,8 +62,8 @@ final class SavedMediaReactor: Reactor {
     
     private let mediaDBManager: MediaDBManager
     
-    init(_ sectionType: SectionType, mediaDBManager: MediaDBManager) {
-        self.initialState = State(sectionType: sectionType)
+    init(medias: [Media], _ sectionType: SectionType, mediaDBManager: MediaDBManager) {
+        self.initialState = State(sectionType: sectionType, savedMedia: medias)
         self.mediaDBManager = mediaDBManager
     }
     
@@ -111,7 +111,7 @@ final class SavedMediaReactor: Reactor {
                 case .watchlist:
                     medias = mediaEntities.filter { $0.addedDate != nil }
                 case .watched:
-                    medias = mediaEntities.filter { $0.watchedDate != nil && $0.review == nil }
+                    medias = mediaEntities.filter { $0.watchedDate != nil}
                 case .reviewed:
                     medias = mediaEntities.filter { $0.review != nil }
                 case .isStared:

@@ -17,17 +17,29 @@ final class MediaDetailReactor: Reactor {
     private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
+    private let networkMonitor: NetworkMonitoring
+    private var disposeBag = DisposeBag()
     
-    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, networkMonitor: NetworkMonitoring) {
         self.initialState = State(media: media, title: media.title)
         self.networkService = networkService
         self.imageProvider = imageProvider
         self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
+        self.networkMonitor = networkMonitor
+        
+        monitorNetwork()
     }
     
     struct State {
+        enum ViewState: Equatable {
+            case loading
+            case loaded
+            case offline
+        }
+        var viewState: ViewState = .loaded
+        
         var media: Media
         var title: String
         var overview: String?
@@ -42,8 +54,6 @@ final class MediaDetailReactor: Reactor {
         var runtimeOrEpisodeInfo: String?
         var isOverviewButtonVisible: Bool = false
         var isOverviewExpanded: Bool = false
-        var isLoading: Bool?
-        var errorType: Error?
         var isWatchlisted: Bool = false
         var watchedDate: Date?
         var mediaObjectID: NSManagedObjectID?
@@ -82,12 +92,10 @@ final class MediaDetailReactor: Reactor {
     }
     
     enum Mutation {
-        case setLoading(Bool)
-        case setInitialData(overview: String?, genres: String?)
+        case setViewState(State.ViewState)
         case getMediaDetail(MediaDetail)
         case setBackdropImage(UIImage?)
         case setPosterImage(UIImage?)
-        case showError(Error)
         case setWatchlistStatus(isWatchlisted: Bool, isStared: Bool, watchedDate: Date?, mediaObjectID: NSManagedObjectID?, isReviewed: Bool)
         case showSetWatchedDateAlert
         case setWatchedDate(Date)
@@ -101,23 +109,6 @@ final class MediaDetailReactor: Reactor {
         switch action {
         case .viewDidLoad:
             let media = currentState.media
-            
-            let initialDataStream = Observable.just(Mutation.setInitialData(
-                overview: media.overview,
-                genres: API.convertGenreString(media.genreIDS).joined(separator: " / ")
-            ))
-            
-            let localDataStream = mediaDBManager.fetchMediaEntity(id: media.id)
-                .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
-                .asObservable()
-                .flatMap { entity -> Observable<Mutation> in
-                    if let entity = entity {
-                        let mediaDetail = entity.toMediaDetail()
-                        return .just(.getMediaDetail(mediaDetail))
-                    } else {
-                        return self.fetchMediaCredits()
-                    }
-                }
             
             let dbStatusStream = mediaDBManager.fetchMedia(id: media.id)
                 .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
@@ -137,12 +128,28 @@ final class MediaDetailReactor: Reactor {
                     .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             )
             
-            return Observable.concat([
-                .just(.setLoading(true)),
-                Observable.merge(initialDataStream, localDataStream, dbStatusStream, imageStream)
-                    .observe(on: MainScheduler.instance),
-                .just(.setLoading(false))
-            ])
+            let detailFetchStream = mediaDBManager.fetchMediaEntity(id: media.id)
+                .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+                .asObservable()
+                .flatMap { [weak self] entity -> Observable<Mutation> in
+                    guard let self = self else { return .empty() }
+                    if let entity = entity {
+                        let mediaDetail = entity.toMediaDetail()
+                        return .concat([
+                            .just(.getMediaDetail(mediaDetail)),
+                            .just(.setViewState(.loaded))
+                        ])
+                    } else {
+                        return Observable.concat([
+                            .just(.setViewState(.loading)),
+                            self.fetchMediaCredits(),
+                            .just(.setViewState(.loaded)),
+                        ])
+                    }
+                }
+            
+            return Observable.merge(detailFetchStream, dbStatusStream, imageStream)
+                .observe(on: MainScheduler.instance)
             
         case .watchlistButtonTapped:
             let media = currentState.media
@@ -163,7 +170,10 @@ final class MediaDetailReactor: Reactor {
                     .flatMap { _ -> Observable<Mutation> in
                         return .just(.setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false))
                     }
-                    .catch { .just(.showError($0)) }
+                    .catch { error in
+                        print("Error deleting media: \(error)")
+                        return .empty()
+                    }
                 
             } else {
                 let posterSaveStream = imageProvider.fetchImage(urlString: media.posterPath)
@@ -203,7 +213,10 @@ final class MediaDetailReactor: Reactor {
                 
                 return Observable.zip(posterSaveStream, backdropSaveStream)
                     .flatMap { _ in createMediaStream }
-                    .catch { .just(.showError($0)) }
+                    .catch { error in
+                        print("Error creating media: \(error)")
+                        return .empty()
+                    }
             }
             
         case .watchedButtonTapped:
@@ -231,7 +244,10 @@ final class MediaDetailReactor: Reactor {
                 .flatMap { _ -> Observable<Mutation> in
                     return .just(.setWatchedDate(date))
                 }
-                .catch { .just(.showError($0)) }
+                .catch { error in
+                    print("Error updating watched date: \(error)")
+                    return .empty()
+                }
             
         case .moreOverviewButtonTapped:
             return .just(.toggleOverviewExpanded)
@@ -269,15 +285,13 @@ final class MediaDetailReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .setLoading(let loading):
-            newState.isLoading = loading
-            
-        case .setInitialData(let overview, let genres):
-            newState.overview = overview
-            newState.genres = genres
+        case .setViewState(let viewState):
+            newState.viewState = viewState
             
         case .getMediaDetail(let mediaInfo):
             let detail = mediaInfo
+            newState.overview = detail.overview
+            newState.genres = detail.genres.joined(separator: " / ")
             newState.casts = detail.cast
             newState.creators = detail.creator
             var sectionModels: [CreditsSectionModel] = []
@@ -300,9 +314,6 @@ final class MediaDetailReactor: Reactor {
             
         case .setPosterImage(let image):
             newState.posterImageData = image
-            
-        case .showError(let error):
-            newState.errorType = error
             
         case .setWatchlistStatus(let isWatchlisted, let isStared, let date, let objectID, let isReviewed):
             newState.isWatchlisted = isWatchlisted
@@ -335,6 +346,19 @@ final class MediaDetailReactor: Reactor {
 }
 
 extension MediaDetailReactor {
+    private func monitorNetwork() {
+        networkMonitor.isConnected
+            .skip(1)
+            .distinctUntilChanged()
+            .filter { $0 }
+            .subscribe(with: self) { owner, _ in
+                if case .offline = owner.currentState.viewState {
+                    owner.action.onNext(.viewDidLoad)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+
     private func date(from string: String?) -> Date? {
         guard let dateString = string else { return nil }
         let formatter = DateFormatter()
@@ -356,7 +380,10 @@ extension MediaDetailReactor {
                     case .success(let detail):
                         return .just(.getMediaDetail(detail.toDomain()))
                     case .failure(let error):
-                        return .just(.showError(error))
+                        if let networkError = error as? NetworkError, networkError == .offline {
+                            return .just(.setViewState(.offline))
+                        }
+                        return .just(.setViewState(.offline))
                     }
                 }
         case .tv:
@@ -368,7 +395,10 @@ extension MediaDetailReactor {
                     case .success(let detail):
                         return .just(.getMediaDetail(detail.toDomain()))
                     case .failure(let error):
-                        return .just(.showError(error))
+                        if let networkError = error as? NetworkError, networkError == .offline {
+                            return .just(.setViewState(.offline))
+                        }
+                        return .just(.setViewState(.offline))
                     }
                 }
         default:

@@ -13,6 +13,7 @@ final class MediaTierListReactor: Reactor {
     enum Action {
         case viewDidLoad
         case moveItem(from: IndexPath, to: IndexPath)
+        case updateSavedMedia
     }
     
     enum Mutation {
@@ -87,6 +88,26 @@ final class MediaTierListReactor: Reactor {
                     .map { .setSections(sections) }
                     .catchAndReturn(.setSections(self.currentState.sections))
             }
+            
+        case .updateSavedMedia:
+            let currentStateItems = Set(
+                self.currentState.sections.flatMap { $0.items }.map { $0.media }
+            )
+            
+            return mediaDBManager.fetchAllMedia()
+                .asObservable()
+                .flatMap { [weak self] mediaEntities -> Observable<Mutation> in
+                    guard let self = self else { return .empty() }
+                    
+                    let newItems = Set(mediaEntities.map { $0.toDomain() })
+                    
+                    if currentStateItems == newItems {
+                        return .empty()
+                    }
+                    
+                    let newSections = self.createSections(from: mediaEntities)
+                    return .just(.setSections(newSections))
+                }
         }
     }
     
