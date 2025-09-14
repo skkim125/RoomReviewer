@@ -25,12 +25,35 @@ final class URLSessionDataFetcher: DataFetching {
                 return Single.create { single in
                     let task = URLSession.shared.dataTask(with: request) { data, response, error in
                         if let error = error {
-                            single(.failure(error))
+                            if let urlError = error as? URLError, urlError.code == .timedOut {
+                                single(.failure(NetworkError.timeout))
+                            } else {
+                                single(.failure(error))
+                            }
                             return
                         }
-                        
-                        guard let response = response as? HTTPURLResponse,
-                              response.statusCode == 200 else {
+
+                        guard let response = response as? HTTPURLResponse else {
+                            single(.failure(NetworkError.invalidResponse))
+                            return
+                        }
+
+                        switch response.statusCode {
+                        case 200:
+                            break
+                        case 429:
+                            single(.failure(NetworkError.tooManyRequests))
+                            return
+                        case 500:
+                            single(.failure(NetworkError.serverError))
+                            return
+                        case 502:
+                            single(.failure(NetworkError.badGateway))
+                            return
+                        case 503:
+                            single(.failure(NetworkError.serviceUnavailable))
+                            return
+                        default:
                             single(.failure(NetworkError.invalidResponse))
                             return
                         }

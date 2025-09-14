@@ -72,18 +72,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return tabBarController
     }
     
-    private func startNetworkMonitoring(networkMonitor: NetworkMonitoring) {
-        networkMonitor.start()
-        networkMonitor.isConnected
-            .observe(on: MainScheduler.instance)
-            .distinctUntilChanged()
-            .subscribe(with: self) { owner, isConnected in
-                if !isConnected {
-                    owner.showNetworkErrorAlert()
-                }
-            }
-            .disposed(by: disposeBag)
-    }
+//    private func startNetworkMonitoring(networkMonitor: NetworkMonitoring) {
+//        networkMonitor.start()
+//        networkMonitor.isConnected
+//            .observe(on: MainScheduler.instance)
+//            .distinctUntilChanged()
+//            .subscribe(with: self) { owner, isConnected in
+//                if !isConnected {
+//                    owner.showNetworkErrorAlert()
+//                }
+//            }
+//            .disposed(by: disposeBag)
+//    }
     
     private func showNetworkErrorAlert() {
         let alert = CustomAlertViewController(
