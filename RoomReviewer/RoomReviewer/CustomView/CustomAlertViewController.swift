@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import Then
 
 enum AlertButtonType {
     case oneButton
@@ -20,7 +21,10 @@ final class CustomAlertViewController: UIViewController {
     private var confirmAction: CompletionHandler?
     private let disposeBag = DisposeBag()
     
-    private let containerView = UIView()
+    private let containerView = UIView().then {
+        $0.layer.borderColor = AppColor.appGray.cgColor
+        $0.layer.borderWidth = 0.5
+    }
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
     private let entireStackView = UIStackView()

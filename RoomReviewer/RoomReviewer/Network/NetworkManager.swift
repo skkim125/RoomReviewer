@@ -32,6 +32,9 @@ final class NetworkManager: NetworkService {
                         return .failure(NetworkError.decodingError)
                     }
                 }
+                .catch { error in
+                    return .just(.failure(error))
+                }
         } catch {
             return .just(.failure(error))
         }

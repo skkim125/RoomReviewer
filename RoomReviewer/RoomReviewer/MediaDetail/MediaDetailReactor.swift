@@ -80,6 +80,7 @@ final class MediaDetailReactor: Reactor {
         @Pulse var showSetWatchedDateAlert: Void?
         @Pulse var pushWriteReviewView: (Media, ReviewEntity?)?
         @Pulse var showNetworkErrorAndDismiss: Void?
+        @Pulse var error: Error?
     }
     
     enum Action {
@@ -106,6 +107,7 @@ final class MediaDetailReactor: Reactor {
         case setOverviewTruncatable(Bool)
         case updateStarButton(Bool)
         case showNetworkErrorAndDismiss
+        case showError(Error)
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -122,6 +124,9 @@ final class MediaDetailReactor: Reactor {
                     } else {
                         return .setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)
                     }
+                }
+                .catch { error in
+                    return .just(.showError(error))
                 }
             
             let imageStream = Observable.merge(
@@ -179,7 +184,7 @@ final class MediaDetailReactor: Reactor {
                     }
                     .catch { error in
                         print("Error deleting media: \(error)")
-                        return .empty()
+                        return .just(.showError(DatabaseError.deleteFailed))
                     }
                 
             } else {
@@ -222,7 +227,7 @@ final class MediaDetailReactor: Reactor {
                     .flatMap { _ in createMediaStream }
                     .catch { error in
                         print("Error creating media: \(error)")
-                        return .empty()
+                        return .just(.showError(DatabaseError.saveFailed))
                     }
             }
             
@@ -253,7 +258,7 @@ final class MediaDetailReactor: Reactor {
                 }
                 .catch { error in
                     print("Error updating watched date: \(error)")
-                    return .empty()
+                    return .just(.showError(DatabaseError.updateFailed))
                 }
             
         case .moreOverviewButtonTapped:
@@ -276,13 +281,17 @@ final class MediaDetailReactor: Reactor {
                 }
             
             return updateIsStaredStream
-                .catch { [weak self] error in
+                .catch { [weak self] error -> Observable<Mutation> in
                     guard let self = self else { return .empty() }
                     print("\(media.title) 저장되어있지 않음")
                     return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: nil, certificate: self.currentState.certificate, runtimeOrEpisodeInfo: self.currentState.runtimeOrEpisodeInfo)
                         .asObservable()
                         .flatMap { _ in
                             return updateIsStaredStream
+                        }
+                        .catch { createError in
+                            print("Error creating media after star update failure: \(createError)")
+                            return .just(.showError(DatabaseError.saveFailed))
                         }
                 }
         }
@@ -352,6 +361,8 @@ final class MediaDetailReactor: Reactor {
             
         case .showNetworkErrorAndDismiss:
             newState.showNetworkErrorAndDismiss = ()
+        case .showError(let error):
+            newState.error = error
         }
         
         return newState
@@ -383,8 +394,11 @@ extension MediaDetailReactor {
                     case .failure(let error):
                         if let networkError = error as? NetworkError, networkError == .offline {
                             return .just(.showNetworkErrorAndDismiss)
+                        } else if let networkError = error as? NetworkError {
+                            return .just(.showError(networkError))
+                        } else {
+                            return .just(.showError(NetworkError.commonError))
                         }
-                        return .just(.showNetworkErrorAndDismiss)
                     }
                 }
         case .tv:
@@ -398,8 +412,11 @@ extension MediaDetailReactor {
                     case .failure(let error):
                         if let networkError = error as? NetworkError, networkError == .offline {
                             return .just(.showNetworkErrorAndDismiss)
+                        } else if let networkError = error as? NetworkError {
+                            return .just(.showError(networkError))
+                        } else {
+                            return .just(.showError(NetworkError.commonError))
                         }
-                        return .just(.showNetworkErrorAndDismiss)
                     }
                 }
         default:

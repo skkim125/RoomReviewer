@@ -13,10 +13,10 @@ protocol MediaDBManager {
     func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?, certificate: String?, runtimeOrEpisodeInfo: String?) -> Single<NSManagedObjectID>
     
     func fetchAllMedia() -> Single<[MediaEntity]>
-    func deleteMedia(id: Int) -> Single<Void?>
+    func deleteMedia(id: Int) -> Single<Void>
     func fetchMedia(id: Int) -> Single<(Bool, NSManagedObjectID?, Bool, Date?, Bool)?>
     func fetchMediaEntity(id: Int) -> Single<MediaEntity?>
-    func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?>
+    func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID>
     func updateIsStared(id: Int, isStar: Bool) -> Single<Bool>
     func updateIsWatchlist(id: Int, isWatchlist: Bool) -> Single<Bool>
     func updateTier(mediaID: Int, newTier: String?) -> Single<Void>
@@ -88,7 +88,7 @@ final class MediaDatabaseManager: MediaDBManager {
                 } catch {
                     print("저장 실패: \(error.localizedDescription)")
                     
-                    observer(.failure(error))
+                    observer(.failure(DatabaseError.saveFailed))
                 }
             }
             
@@ -100,7 +100,7 @@ final class MediaDatabaseManager: MediaDBManager {
     func fetchAllMedia() -> Single<[MediaEntity]> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -116,7 +116,7 @@ final class MediaDatabaseManager: MediaDBManager {
                     
                 } catch {
                     print("Failed to fetch media: \(error)")
-                    observer(.success([]))
+                    observer(.failure(DatabaseError.fetchFailed))
                 }
             }
             
@@ -125,10 +125,10 @@ final class MediaDatabaseManager: MediaDBManager {
     }
     
     // 보고싶은 Media 삭제
-    func deleteMedia(id: Int) -> Single<Void?> {
+    func deleteMedia(id: Int) -> Single<Void> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.success(nil))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -148,11 +148,11 @@ final class MediaDatabaseManager: MediaDBManager {
                         print("\(title) 삭제 완료")
                         observer(.success(()))
                     } else {
-                        observer(.failure(NetworkError.commonError))
+                        observer(.failure(DatabaseError.deleteFailed))
                     }
                 } catch {
                     print("미디어 삭제 실패: \(error.localizedDescription)")
-                    observer(.failure(error))
+                    observer(.failure(DatabaseError.deleteFailed))
                 }
             }
             
@@ -177,7 +177,7 @@ final class MediaDatabaseManager: MediaDBManager {
                         single(.success(nil))
                     }
                 } catch {
-                    single(.failure(error))
+                    single(.failure(DatabaseError.fetchFailed))
                 }
             }
             return Disposables.create()
@@ -188,7 +188,7 @@ final class MediaDatabaseManager: MediaDBManager {
     func fetchMediaEntity(id: Int) -> Single<MediaEntity?> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -201,17 +201,17 @@ final class MediaDatabaseManager: MediaDBManager {
                     let entity = try context.fetch(request).first
                     observer(.success(entity))
                 } catch {
-                    observer(.success(nil))
+                    observer(.failure(DatabaseError.fetchFailed))
                 }
             }
             return Disposables.create()
         }
     }
     
-    func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID?> {
+    func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -228,11 +228,11 @@ final class MediaDatabaseManager: MediaDBManager {
                         print("\(mediaToUpdate.title) 시청 날짜 업데이트 완료")
                         observer(.success((mediaToUpdate.objectID)))
                     } else {
-                        observer(.failure(NetworkError.commonError))
+                        observer(.failure(DatabaseError.updateFailed))
                     }
                 } catch {
                     print("업데이트 실패: \(error.localizedDescription)")
-                    observer(.failure(error))
+                    observer(.failure(DatabaseError.updateFailed))
                 }
             }
             
@@ -243,7 +243,7 @@ final class MediaDatabaseManager: MediaDBManager {
     func updateIsStared(id: Int, isStar: Bool) -> Single<Bool> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -260,11 +260,11 @@ final class MediaDatabaseManager: MediaDBManager {
                         print("\(mediaToUpdate.title) 즐겨찾기 업데이트 완료 = \(isStar)")
                         observer(.success((mediaToUpdate.isStar)))
                     } else {
-                        observer(.failure(NetworkError.commonError))
+                        observer(.failure(DatabaseError.updateFailed))
                     }
                 } catch {
                     print("업데이트 실패: \(error.localizedDescription)")
-                    observer(.failure(error))
+                    observer(.failure(DatabaseError.updateFailed))
                 }
             }
             
@@ -275,7 +275,7 @@ final class MediaDatabaseManager: MediaDBManager {
     func updateIsWatchlist(id: Int, isWatchlist: Bool) -> Single<Bool> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -291,11 +291,11 @@ final class MediaDatabaseManager: MediaDBManager {
                         try backgroundContext.save()
                         observer(.success(mediaToUpdate.addedDate != nil))
                     } else {
-                        observer(.failure(NetworkError.commonError))
+                        observer(.failure(DatabaseError.updateFailed))
                     }
                 } catch {
                     print("업데이트 실패: \(error.localizedDescription)")
-                    observer(.failure(error))
+                    observer(.failure(DatabaseError.updateFailed))
                 }
             }
             
@@ -307,7 +307,7 @@ final class MediaDatabaseManager: MediaDBManager {
     func updateTier(mediaID: Int, newTier: String?) -> Single<Void> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -324,11 +324,11 @@ final class MediaDatabaseManager: MediaDBManager {
                         print("\(mediaToUpdate.title) 티어 업데이트 완료 -> \(newTier ?? "Unranked")")
                         observer(.success(()))
                     } else {
-                        observer(.failure(NetworkError.commonError))
+                        observer(.failure(DatabaseError.updateFailed))
                     }
                 } catch {
                     print("티어 업데이트 실패: \(error.localizedDescription)")
-                    observer(.failure(error))
+                    observer(.failure(DatabaseError.updateFailed))
                 }
             }
             

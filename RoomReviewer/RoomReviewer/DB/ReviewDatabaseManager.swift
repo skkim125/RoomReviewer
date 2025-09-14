@@ -14,8 +14,8 @@ protocol ReviewDBManager {
     func updateReview(_ reviewObjectID: NSManagedObjectID, rating: Double, review: String, comment: String?, quote: String?) -> Single<Void>
     
     func fetchAllReview() -> Single<[ReviewEntity]>
-    func deleteReview(reviewObjectID: NSManagedObjectID) -> Single<Void?>
-    func fetchReview(reviewObjectID: NSManagedObjectID) -> Single<ReviewEntity?>
+    func deleteReview(reviewObjectID: NSManagedObjectID) -> Single<Void>
+    func fetchReview(reviewObjectID: NSManagedObjectID) -> Single<ReviewEntity>
     func isReviewExists(id: Int) -> Bool
     func fetchReview(id: Int) -> ReviewEntity?
 }
@@ -31,7 +31,7 @@ final class ReviewDatabaseManager: ReviewDBManager {
         
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -58,12 +58,12 @@ final class ReviewDatabaseManager: ReviewDBManager {
                         
                         observer(.success(entity.objectID))
                     } else {
-                        observer(.failure(NetworkError.commonError))
+                        observer(.failure(DatabaseError.saveFailed))
                     }
                 } catch {
                     print("저장 실패: \(error.localizedDescription)")
                     
-                    observer(.failure(error))
+                    observer(.failure(DatabaseError.saveFailed))
                 }
             }
             
@@ -74,7 +74,7 @@ final class ReviewDatabaseManager: ReviewDBManager {
     func fetchAllReview() -> Single<[ReviewEntity]> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -88,17 +88,17 @@ final class ReviewDatabaseManager: ReviewDBManager {
                 
             } catch {
                 print("Failed to fetch media: \(error)")
-                observer(.success([]))
+                observer(.failure(DatabaseError.fetchFailed))
             }
             
             return Disposables.create()
         }
     }
     
-    func deleteReview(reviewObjectID: NSManagedObjectID) -> Single<Void?> {
+    func deleteReview(reviewObjectID: NSManagedObjectID) -> Single<Void> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.success(nil))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -109,22 +109,22 @@ final class ReviewDatabaseManager: ReviewDBManager {
                     print("\(object.media.title) (\(object.id)) 리뷰 삭제 완료")
                     observer(.success(()))
                 } else {
-                    observer(.failure(NetworkError.commonError))
+                    observer(.failure(DatabaseError.deleteFailed))
                 }
                 
             } catch {
                 print("Failed to fetch media: \(error)")
-                observer(.success(nil))
+                observer(.failure(DatabaseError.deleteFailed))
             }
             
             return Disposables.create()
         }
     }
     
-    func fetchReview(reviewObjectID: NSManagedObjectID) -> Single<ReviewEntity?>{
+    func fetchReview(reviewObjectID: NSManagedObjectID) -> Single<ReviewEntity>{
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 
                 return Disposables.create()
             }
@@ -133,12 +133,12 @@ final class ReviewDatabaseManager: ReviewDBManager {
                 if let Object = try stack.viewContext.existingObject(with: reviewObjectID) as? ReviewEntity {
                     observer(.success(Object))
                 } else {
-                    observer(.failure(NetworkError.commonError))
+                    observer(.failure(DatabaseError.fetchFailed))
                 }
                 
             } catch {
                 print("Failed to fetch media: \(error)")
-                observer(.success(nil))
+                observer(.failure(DatabaseError.fetchFailed))
             }
             return Disposables.create()
         }
@@ -177,7 +177,7 @@ final class ReviewDatabaseManager: ReviewDBManager {
     func updateReview(_ reviewObjectID: NSManagedObjectID, rating: Double, review: String, comment: String?, quote: String?) -> Single<Void> {
         return Single.create { [weak self] observer in
             guard let self = self else {
-                observer(.failure(NetworkError.commonError))
+                observer(.failure(DatabaseError.commonError))
                 return Disposables.create()
             }
             
@@ -186,7 +186,7 @@ final class ReviewDatabaseManager: ReviewDBManager {
             backgroundContext.perform {
                 do {
                     guard let entity = try backgroundContext.existingObject(with: reviewObjectID) as? ReviewEntity else {
-                        observer(.failure(NetworkError.commonError))
+                        observer(.failure(DatabaseError.updateFailed))
                         return
                     }
                     
@@ -201,7 +201,7 @@ final class ReviewDatabaseManager: ReviewDBManager {
                     observer(.success(()))
                 } catch {
                     print("Failed to update review: \(error.localizedDescription)")
-                    observer(.failure(error))
+                    observer(.failure(DatabaseError.updateFailed))
                 }
             }
             return Disposables.create()

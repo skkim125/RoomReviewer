@@ -45,6 +45,7 @@
 		043BB0502DFD5EE000E5438D /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB04F2DFD5EE000E5438D /* RxBlocking */; };
 		043BB0522DFD5EE000E5438D /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB0512DFD5EE000E5438D /* RxCocoa */; };
 		043BB0542DFD5EE000E5438D /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB0532DFD5EE000E5438D /* RxSwift */; };
+		04417ABF2E770D34002DC640 /* DatabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04417ABE2E770D34002DC640 /* DatabaseError.swift */; };
 		044952592E08169D00D75C4A /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 044952582E08169D00D75C4A /* Differentiator */; };
 		0449525B2E08169D00D75C4A /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 0449525A2E08169D00D75C4A /* RxDataSources */; };
 		044952642E081A4A00D75C4A /* HomeSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044952632E081A4A00D75C4A /* HomeSectionModel.swift */; };
@@ -185,6 +186,7 @@
 		043BB0462DFC4DDA00E5438D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		043BB0482DFC4EA800E5438D /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		043BB04C2DFC4F2A00E5438D /* HomeReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactor.swift; sourceTree = "<group>"; };
+		04417ABE2E770D34002DC640 /* DatabaseError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseError.swift; sourceTree = "<group>"; };
 		044952632E081A4A00D75C4A /* HomeSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSectionModel.swift; sourceTree = "<group>"; };
 		044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeReactorLoadDataUnitTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
@@ -642,6 +644,7 @@
 		04FE6C8F2E5867D300CCB76C /* DB */ = {
 			isa = PBXGroup;
 			children = (
+				04417ABE2E770D34002DC640 /* DatabaseError.swift */,
 				04B379092E51D74E00C2F3EA /* CoreDataStack.swift */,
 				0480964D2E5DC118002033A0 /* MediaDatabaseManager.swift */,
 				048096512E5DC437002033A0 /* ReviewDatabaseManager.swift */,
@@ -1143,6 +1146,7 @@
 				04D0D0A52E5C7EB9002A6951 /* WriteReviewReactor.swift in Sources */,
 				04B3790A2E51D74E00C2F3EA /* CoreDataStack.swift in Sources */,
 				046E7A352E574D1000FAF58A /* CreditsCollectionVIewCell.swift in Sources */,
+				04417ABF2E770D34002DC640 /* DatabaseError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
