@@ -27,13 +27,13 @@ struct Search: Decodable, Equatable {
     let title, originalTitle: String?
     let overview, posterPath: String?
     let mediaType: MediaType
-    let genreIDS: [Int]
+    let genreIDS: [Int]?
     let releaseDate: String?
     let firstAirDate: String?
     let video: Bool?
     let name, originalName: String?
     let originCountry: [String]?
-    let popularity: Double
+    let popularity: Double?
 
     enum CodingKeys: String, CodingKey {
         case backdropPath = "backdrop_path"

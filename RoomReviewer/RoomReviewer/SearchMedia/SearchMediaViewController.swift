@@ -87,12 +87,40 @@ final class SearchMediaViewController: UIViewController, View {
             .map { SearchMediaReactor.Action.selectedMedia($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+            
+        searchMediaCollectionView.rx.willDisplayCell
+            .filter { [weak self] (_, indexPath) in
+                guard let self = self, let reactor = self.reactor else { return false }
+                let triggerIndex = reactor.currentState.searchResults.count - 5
+                return indexPath.item == triggerIndex && triggerIndex > 0
+            }
+            .map { _ in SearchMediaReactor.Action.loadNextPage }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+            
+        searchMediaCollectionView.rx.didScroll
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .map { [weak self] in
+                guard let self = self else { return false }
+                let scrollView = self.searchMediaCollectionView
+                let offsetY = scrollView.contentOffset.y
+                let contentHeight = scrollView.contentSize.height
+                let frameHeight = scrollView.frame.height
+                
+                if contentHeight <= frameHeight { return false }
+                
+                return offsetY >= contentHeight - frameHeight
+            }
+            .distinctUntilChanged()
+            .filter { $0 }
+            .map { _ in SearchMediaReactor.Action.scrolledToBottom }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func bindState(reactor: SearchMediaReactor) {
         
-        reactor.pulse(\.$searchResults)
-            .compactMap { $0 }
+        reactor.state.map { $0.searchResults }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: searchMediaCollectionView.rx.items(cellIdentifier: PosterCollectionViewCell.cellID, cellType: PosterCollectionViewCell.self)) { [weak self] index, item, cell in
@@ -139,6 +167,14 @@ final class SearchMediaViewController: UIViewController, View {
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
+            
+        reactor.pulse(\.$isLastPage)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self) { owner, _ in
+                owner.showLastPageAlert()
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -150,7 +186,7 @@ extension SearchMediaViewController {
     
     private func configureLayout() {
         searchTextField.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             $0.height.equalTo(40)
         }
@@ -158,11 +194,7 @@ extension SearchMediaViewController {
         searchMediaCollectionView.snp.makeConstraints {
             $0.top.equalTo(searchTextField.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(10)
-            if self.isSheetView {
-                $0.bottom.equalToSuperview()
-            } else {
-                $0.bottom.equalTo(view.safeAreaLayoutGuide)
-            }
+            $0.bottom.equalToSuperview()
         }
     }
     
@@ -196,5 +228,13 @@ extension SearchMediaViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
         navigationItem.rightBarButtonItem = dismissButton
     }
+    
+    private func showLastPageAlert() {
+        let alert = CustomAlertViewController(
+            title: "알림",
+            subtitle: "마지막 페이지입니다.",
+            buttonType: .oneButton
+        )
+        present(alert, animated: true)
     }
 }
