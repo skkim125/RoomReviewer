@@ -25,13 +25,9 @@ final class HomeReactor: Reactor {
     }
     
     struct State {
-        enum ViewState: Equatable {
-            case loading
-            case loaded([HomeSectionModel])
-            case offline
-        }
-        
-        var viewState: ViewState = .loading
+        var sections: [HomeSectionModel] = []
+        var isLoading: Bool = true
+        var isOffline: Bool = false
         @Pulse var presentWriteReviewView: Void?
         @Pulse var selectedMedia: Media?
     }
@@ -44,7 +40,9 @@ final class HomeReactor: Reactor {
     }
     
     enum Mutation {
-        case setViewState(State.ViewState)
+        case setSections([HomeSectionModel])
+        case setLoading(Bool)
+        case setOffline(Bool)
         case presentWriteReviewView
         case presentMediaDetail(Media)
         case updateWatchlist([HomeSectionItem])
@@ -53,9 +51,14 @@ final class HomeReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchData:
+            let isConnected = networkMonitor.isCurrentlyConnected
+            let dataStream = isConnected ? fetchOnlineData() : fetchOfflineData()
+            
             return Observable.concat([
-                .just(.setViewState(.loading)),
-                fetchMedias()
+                .just(.setLoading(true)),
+                .just(.setOffline(!isConnected)),
+                dataStream,
+                .just(.setLoading(false))
             ])
 
         case .writeButtonTapped:
@@ -73,36 +76,41 @@ final class HomeReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .setViewState(let state):
-            newState.viewState = state
+        case .setSections(let sections):
+            newState.sections = sections
+        case .setLoading(let isLoading):
+            newState.isLoading = isLoading
+        case .setOffline(let isOffline):
+            newState.isOffline = isOffline
         case .presentWriteReviewView:
             newState.presentWriteReviewView = ()
         case .presentMediaDetail(let media):
             newState.selectedMedia = media
         case .updateWatchlist(let items):
-            if case .loaded(var sections) = newState.viewState {
-                if let index = sections.firstIndex(where: { if case .watchlist = $0 { return true }
-                    return false
-                }) {
-                    if !items.isEmpty {
-                        sections[index] = HomeSectionModel.watchlist(item: items)
-                    } else {
-                        sections.remove(at: index)
-                    }
-                } else if !items.isEmpty {
-                    let newWatchlistSection = HomeSectionModel.watchlist(item: items)
-                    sections.insert(newWatchlistSection, at: 1)
+            var currentSections = newState.sections
+            if let index = currentSections.firstIndex(where: { if case .watchlist = $0 { return true }
+                return false
+            }) {
+                if !items.isEmpty {
+                    currentSections[index] = HomeSectionModel.watchlist(item: items)
+                } else {
+                    currentSections.remove(at: index)
                 }
-                newState.viewState = .loaded(sections)
+            } else if !items.isEmpty {
+                let newWatchlistSection = HomeSectionModel.watchlist(item: items)
+                if currentSections.count > 1 {
+                    currentSections.insert(newWatchlistSection, at: 1)
+                } else {
+                    currentSections.append(newWatchlistSection)
+                }
             }
+            newState.sections = currentSections
         }
         
         return newState
     }
-}
-
-extension HomeReactor {
-    private func fetchMedias() -> Observable<Mutation> {
+    
+    private func fetchOnlineData() -> Observable<Mutation> {
         let trendingMedias = fetchTrending()
         let watchlist = fetchWatchlist()
         let movies = fetchMovie()
@@ -111,17 +119,32 @@ extension HomeReactor {
         return Observable.zip(trendingMedias, watchlist, movies, tvs)
             .map { (trend, watchlists, movies, tvs) -> Mutation in
                 var sections: [HomeSectionModel] = []
-                sections.append(HomeSectionModel.trend(item: trend))
+                
+                if !trend.isEmpty {
+                    sections.append(HomeSectionModel.trend(item: trend))
+                }
                 if !watchlists.isEmpty {
                     sections.append(HomeSectionModel.watchlist(item: watchlists))
                 }
-                sections.append(HomeSectionModel.movie(item: movies))
-                sections.append(HomeSectionModel.tv(item: tvs))
+                if !movies.isEmpty {
+                    sections.append(HomeSectionModel.movie(item: movies))
+                }
+                if !tvs.isEmpty {
+                    sections.append(HomeSectionModel.tv(item: tvs))
+                }
                 
-                return .setViewState(.loaded(sections))
+                return .setSections(sections)
             }
-            .catch { _ in
-                .just(.setViewState(.offline))
+    }
+    
+    private func fetchOfflineData() -> Observable<Mutation> {
+        return fetchWatchlist()
+            .map { watchlists -> Mutation in
+                var sections: [HomeSectionModel] = []
+                if !watchlists.isEmpty {
+                    sections.append(HomeSectionModel.watchlist(item: watchlists))
+                }
+                return .setSections(sections)
             }
     }
     
