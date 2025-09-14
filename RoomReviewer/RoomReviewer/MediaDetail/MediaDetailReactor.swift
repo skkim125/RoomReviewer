@@ -28,15 +28,12 @@ final class MediaDetailReactor: Reactor {
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         self.networkMonitor = networkMonitor
-        
-        monitorNetwork()
     }
     
     struct State {
         enum ViewState: Equatable {
             case loading
             case loaded
-            case offline
         }
         var viewState: ViewState = .loaded
         
@@ -78,6 +75,7 @@ final class MediaDetailReactor: Reactor {
         }
         @Pulse var showSetWatchedDateAlert: Void?
         @Pulse var pushWriteReviewView: (Media, ReviewEntity?)?
+        @Pulse var showNetworkErrorAndDismiss: Void?
     }
     
     enum Action {
@@ -103,6 +101,7 @@ final class MediaDetailReactor: Reactor {
         case toggleOverviewExpanded
         case setOverviewTruncatable(Bool)
         case updateStarButton(Bool)
+        case showNetworkErrorAndDismiss
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -140,6 +139,10 @@ final class MediaDetailReactor: Reactor {
                             .just(.setViewState(.loaded))
                         ])
                     } else {
+                        if !self.networkMonitor.isCurrentlyConnected {
+                            return .just(.showNetworkErrorAndDismiss)
+                        }
+                        
                         return Observable.concat([
                             .just(.setViewState(.loading)),
                             self.fetchMediaCredits(),
@@ -296,11 +299,14 @@ final class MediaDetailReactor: Reactor {
             newState.creators = detail.creator
             var sectionModels: [CreditsSectionModel] = []
             let creators = detail.creator.sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ CreditsSectionItem.creators(item: $0) })
-            let creatorsSectionModel = CreditsSectionModel.creators(item: creators)
+            if !creators.isEmpty {
+                let creatorsSectionModel = CreditsSectionModel.creators(item: creators)
+                sectionModels.append(creatorsSectionModel)
+            }
+            
             let casts = detail.cast.map({ CreditsSectionItem.casts(item: $0) })
-            let castsSectionModel = CreditsSectionModel.casts(item: casts)
-            sectionModels.append(creatorsSectionModel)
             if !casts.isEmpty {
+                let castsSectionModel = CreditsSectionModel.casts(item: casts)
                 sectionModels.append(castsSectionModel)
             }
             newState.credits = sectionModels
@@ -339,6 +345,9 @@ final class MediaDetailReactor: Reactor {
             
         case .updateStarButton(let isStar):
             newState.isStared = isStar
+            
+        case .showNetworkErrorAndDismiss:
+            newState.showNetworkErrorAndDismiss = ()
         }
         
         return newState
@@ -346,18 +355,6 @@ final class MediaDetailReactor: Reactor {
 }
 
 extension MediaDetailReactor {
-    private func monitorNetwork() {
-        networkMonitor.isConnected
-            .skip(1)
-            .distinctUntilChanged()
-            .filter { $0 }
-            .subscribe(with: self) { owner, _ in
-                if case .offline = owner.currentState.viewState {
-                    owner.action.onNext(.viewDidLoad)
-                }
-            }
-            .disposed(by: disposeBag)
-    }
 
     private func date(from string: String?) -> Date? {
         guard let dateString = string else { return nil }
@@ -381,9 +378,9 @@ extension MediaDetailReactor {
                         return .just(.getMediaDetail(detail.toDomain()))
                     case .failure(let error):
                         if let networkError = error as? NetworkError, networkError == .offline {
-                            return .just(.setViewState(.offline))
+                            return .just(.showNetworkErrorAndDismiss)
                         }
-                        return .just(.setViewState(.offline))
+                        return .just(.showNetworkErrorAndDismiss)
                     }
                 }
         case .tv:
@@ -396,9 +393,9 @@ extension MediaDetailReactor {
                         return .just(.getMediaDetail(detail.toDomain()))
                     case .failure(let error):
                         if let networkError = error as? NetworkError, networkError == .offline {
-                            return .just(.setViewState(.offline))
+                            return .just(.showNetworkErrorAndDismiss)
                         }
-                        return .just(.setViewState(.offline))
+                        return .just(.showNetworkErrorAndDismiss)
                     }
                 }
         default:

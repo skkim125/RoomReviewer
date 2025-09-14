@@ -169,7 +169,6 @@ final class MediaDetailViewController: UIViewController, View {
     
     var updateAction: (() -> Void)?
     var disposeBag = DisposeBag()
-    private var offlineVC: OfflineViewController?
     
     init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
@@ -368,15 +367,34 @@ final class MediaDetailViewController: UIViewController, View {
             .bind(to: creditsCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-        creditsStream
-            .bind(with: self) { owner, sectionModels in
-                if sectionModels.count == 1 {
-                    owner.creditsCollectionView.snp.remakeConstraints {
+        let overviewButtonVisibilityStream = reactor.state.map { $0.isOverviewButtonVisible }.distinctUntilChanged()
+
+        Observable.combineLatest(creditsStream, overviewButtonVisibilityStream)
+            .bind(with: self) { owner, combined in
+                let sectionModels = combined.0
+                let isOverviewButtonVisible = combined.1
+                
+                let height: CGFloat
+                switch sectionModels.count {
+                case 0:
+                    height = 0
+                case 1:
+                    height = 200
+                default:
+                    height = 400
+                }
+                
+                owner.creditsCollectionView.isHidden = (height == 0)
+                
+                owner.creditsCollectionView.snp.remakeConstraints {
+                    if isOverviewButtonVisible {
+                        $0.top.equalTo(owner.moreOverviewButton.snp.bottom)
+                    } else {
                         $0.top.equalTo(owner.overviewLabel.snp.bottom).offset(10)
-                        $0.horizontalEdges.equalTo(owner.contentView).inset(10)
-                        $0.height.equalTo(200)
-                        $0.bottom.equalToSuperview().inset(10)
                     }
+                    $0.horizontalEdges.equalTo(owner.contentView).inset(10)
+                    $0.height.equalTo(height)
+                    $0.bottom.equalToSuperview().inset(10)
                 }
             }
             .disposed(by: disposeBag)
@@ -393,6 +411,14 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, isStar in
                 owner.starToggleButton.image = isStar ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+            }
+            .disposed(by: disposeBag)
+            
+        reactor.pulse(\.$showNetworkErrorAndDismiss)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self) { owner, _ in
+                owner.showNetworkErrorAlertAndDismiss()
             }
             .disposed(by: disposeBag)
     }
@@ -561,15 +587,6 @@ final class MediaDetailViewController: UIViewController, View {
             
             let isVisible = fullHeight > maxHeight
             
-            if !isVisible {
-                self.creditsCollectionView.snp.remakeConstraints {
-                    $0.top.equalTo(self.overviewLabel.snp.bottom).offset(10)
-                    $0.horizontalEdges.equalTo(self.contentView).inset(10)
-                    $0.height.equalTo(400)
-                    $0.bottom.equalToSuperview().inset(10)
-                }
-            }
-            
             reactor.action.onNext(.setOverviewButtonVisible(isVisible))
         }
     }
@@ -649,12 +666,12 @@ extension MediaDetailViewController {
         }
         
         moreOverviewButton.snp.makeConstraints {
-            $0.top.equalTo(overviewLabel.snp.bottom)
+            $0.top.equalTo(overviewLabel.snp.bottom).offset(5)
             $0.trailing.equalTo(overviewLabel.snp.trailing)
         }
         
         creditsCollectionView.snp.makeConstraints {
-            $0.top.equalTo(moreOverviewButton.snp.bottom)
+            $0.top.equalTo(moreOverviewButton.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(contentView).inset(10)
             $0.height.equalTo(400)
             $0.bottom.equalToSuperview().inset(10)
@@ -716,47 +733,22 @@ extension MediaDetailViewController {
         switch state {
         case .loading:
             scrollView.isHidden = false
-            dismissOfflineVC()
             setupPlaceholderState()
         case .loaded:
             scrollView.isHidden = false
-            dismissOfflineVC()
             removePlaceholderState()
-        case .offline:
-            scrollView.isHidden = true
-            presentOfflineVC()
         }
     }
     
-    private func presentOfflineVC() {
-        if self.offlineVC == nil {
-            let vc = OfflineViewController()
-            vc.retryAction = { [weak self] in
-                self?.reactor?.action.onNext(.viewDidLoad)
-            }
-            self.offlineVC = vc
-            add(vc)
+    private func showNetworkErrorAlertAndDismiss() {
+        let alert = CustomAlertViewController(
+            title: "네트워크 오류",
+            subtitle: "네트워크 연결을 확인해주세요.",
+            buttonType: .oneButton
+        ) { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
         }
-    }
-    
-    private func dismissOfflineVC() {
-        offlineVC?.remove()
-        offlineVC = nil
-    }
-}
-
-fileprivate extension UIViewController {
-    func add(_ child: UIViewController) {
-        addChild(child)
-        view.addSubview(child.view)
-        child.view.frame = view.bounds
-        child.didMove(toParent: self)
-    }
-    
-    func remove() {
-        guard parent != nil else { return }
-        willMove(toParent: nil)
-        view.removeFromSuperview()
-        removeFromParent()
+        
+        present(alert, animated: true)
     }
 }
