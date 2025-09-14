@@ -191,7 +191,42 @@ final class MyPageViewController: UIViewController, View {
             self.navigationController?.pushViewController(vc, animated: true)
             
         case .appInfo:
-            print("앱 정보 화면으로 이동")
+            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
+            let appIcon = UIImage(named: "appIconImage")
+
+            let infoView = UIView()
+            let iconImageView = UIImageView(image: appIcon)
+            iconImageView.tintColor = AppColor.appWhite
+            iconImageView.layer.cornerRadius = 12
+            iconImageView.clipsToBounds = true
+            
+            let versionLabel = UILabel()
+            versionLabel.text = "버전 정보: \(version)"
+            versionLabel.font = AppFont.subTitle
+            versionLabel.textColor = AppColor.appWhite
+            versionLabel.textAlignment = .center
+            
+            infoView.addSubview(iconImageView)
+            infoView.addSubview(versionLabel)
+            
+            iconImageView.snp.makeConstraints { make in
+                make.top.equalToSuperview().offset(10)
+                make.centerX.equalToSuperview()
+                make.width.height.equalTo(80)
+            }
+            
+            versionLabel.snp.makeConstraints { make in
+                make.top.equalTo(iconImageView.snp.bottom).offset(10)
+                make.leading.trailing.equalToSuperview()
+                make.bottom.equalToSuperview().inset(10)
+            }
+
+            let alert = CustomAlertViewController(
+                title: "앱 정보",
+                buttonType: .oneButton,
+                contentView: infoView
+            )
+            self.present(alert, animated: true)
         }
     }
 }
