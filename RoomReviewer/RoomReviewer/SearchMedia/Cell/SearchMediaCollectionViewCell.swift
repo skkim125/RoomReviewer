@@ -80,6 +80,7 @@ extension SearchMediaCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        disposeBag = DisposeBag()
         reactor = nil
         posterImageView.image = nil
     }

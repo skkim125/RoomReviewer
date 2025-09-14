@@ -44,7 +44,7 @@ final class HotMediaCollectionViewCellReactor: Reactor {
             }
             
             let imageStream = imageProvider.fetchImage(urlString: url)
-                .map { Mutation.setImage($0) }
+                .map { Mutation.setImage($0 ?? AppImage.emptyPosterImage) }
             
             return Observable.concat([
                 .just(.setLoading(true)),

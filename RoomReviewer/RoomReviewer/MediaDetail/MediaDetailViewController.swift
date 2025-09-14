@@ -170,6 +170,10 @@ final class MediaDetailViewController: UIViewController, View {
     var updateAction: (() -> Void)?
     var disposeBag = DisposeBag()
     
+    deinit {
+        print("MediaDetailViewController deinit")
+    }
+    
     init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
         self.imageFileManager = imageFileManager

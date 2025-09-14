@@ -62,6 +62,10 @@ final class SavedMediaReactor: Reactor {
     
     private let mediaDBManager: MediaDBManager
     
+    deinit {
+        print("SavedMediaReactor deinit")
+    }
+    
     init(medias: [Media], _ sectionType: SectionType, mediaDBManager: MediaDBManager) {
         self.initialState = State(sectionType: sectionType, savedMedia: medias)
         self.mediaDBManager = mediaDBManager

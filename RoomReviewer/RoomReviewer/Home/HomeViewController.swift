@@ -193,6 +193,28 @@ final class HomeViewController: UIViewController, View {
                 owner.navigationController?.present(nav, animated: true)
             }
             .disposed(by: disposeBag)
+        
+        networkMonitor.isConnected
+            .distinctUntilChanged()
+            .filter { $0 }
+            .skip(1)
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, isConnected in
+                owner.homeCollectionView.visibleCells.forEach { cell in
+                    if let trendCell = cell as? TrendMediaCollectionViewCell, let reactor = trendCell.reactor {
+                        if reactor.currentState.imageData == AppImage.emptyPosterImage {
+                            reactor.action.onNext(.loadImage)
+                        }
+                    }
+                    
+                    if let hotCell = cell as? HotMediaCollectionViewCell, let reactor = hotCell.reactor {
+                        if reactor.currentState.imageData == AppImage.emptyPosterImage {
+                            reactor.action.onNext(.loadImage)
+                        }
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
     }
     }
 
