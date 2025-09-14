@@ -13,7 +13,7 @@ extension Data {
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceShouldCacheImmediately: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 1028
+            kCGImageSourceThumbnailMaxPixelSize: 1280
         ]
         
         guard let source = CGImageSourceCreateWithData(self as CFData, nil),

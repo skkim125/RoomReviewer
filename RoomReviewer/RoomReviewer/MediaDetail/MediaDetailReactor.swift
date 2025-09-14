@@ -20,6 +20,10 @@ final class MediaDetailReactor: Reactor {
     private let networkMonitor: NetworkMonitoring
     private var disposeBag = DisposeBag()
     
+    deinit {
+        print("MediaDetailReactor deinit")
+    }
+    
     init(media: Media, networkService: NetworkService, imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, networkMonitor: NetworkMonitoring) {
         self.initialState = State(media: media, title: media.title)
         self.networkService = networkService

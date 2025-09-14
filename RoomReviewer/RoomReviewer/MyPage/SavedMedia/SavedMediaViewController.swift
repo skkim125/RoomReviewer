@@ -51,6 +51,10 @@ final class SavedMediaViewController: UIViewController, View {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    deinit {
+        print("SavedMediaViewController deinit")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,18 +98,21 @@ final class SavedMediaViewController: UIViewController, View {
         
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
-            .bind(with: self) { owner, media in
-                let detailReactor = MediaDetailReactor(media: media, networkService: owner.networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, networkMonitor: owner.networkMonitor)
-                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] media in
+                guard let self = self else { return }
+                
+                let detailReactor = MediaDetailReactor(media: media, networkService: self.networkManager, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager, networkMonitor: self.networkMonitor)
+                let vc = MediaDetailViewController(imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
                 vc.reactor = detailReactor
                 
-                vc.updateAction = { [weak self]  in
+                vc.updateAction = { [weak self] in
                     guard let self = self else { return }
                     self.reactor?.action.onNext(.updateSavedMedias)
                 }
                 
-                owner.navigationController?.pushViewController(vc, animated: true)
-            }
+                self.navigationController?.pushViewController(vc, animated: true)
+            })
             .disposed(by: disposeBag)
         
         reactor.state.compactMap { $0.navigationbarTitle }
@@ -120,14 +127,6 @@ final class SavedMediaViewController: UIViewController, View {
                 owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
-        
-//        reactor.pulse(\.$updateSavedMedias)
-//            .map { $0 }
-//            .asDriver(onErrorJustReturn: nil)
-//            .drive(with: self) { owner, _ in
-//                owner.savedMediaCollectionView.reloadData()
-//            }
-//            .disposed(by: disposeBag)
     }
     
     private func bindAction(_ reactor: SavedMediaReactor) {

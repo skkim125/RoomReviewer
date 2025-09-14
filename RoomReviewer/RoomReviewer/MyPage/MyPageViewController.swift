@@ -150,14 +150,6 @@ final class MyPageViewController: UIViewController, View {
                 owner.moveSection(section)
             }
             .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$updateSection)
-            .map { $0 }
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self) { owner, _ in
-                owner.myPageCollectionView.reloadData()
-            }
-            .disposed(by: disposeBag)
     }
     
     private func bindAction(_ reactor: MyPageReactor) {
