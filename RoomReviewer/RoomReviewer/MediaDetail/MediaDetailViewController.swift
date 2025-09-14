@@ -425,6 +425,14 @@ final class MediaDetailViewController: UIViewController, View {
                 owner.showNetworkErrorAlertAndDismiss()
             }
             .disposed(by: disposeBag)
+            
+        reactor.pulse(\.$error)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: NetworkError.commonError)
+            .drive(with: self) { owner, error in
+                owner.showErrorAlert(error: error)
+            }
+            .disposed(by: disposeBag)
     }
     
     private func bindAction(reactor: MediaDetailReactor) {
@@ -753,6 +761,15 @@ extension MediaDetailViewController {
             self?.navigationController?.popViewController(animated: true)
         }
         
+        present(alert, animated: true)
+    }
+    
+    private func showErrorAlert(error: Error) {
+        let alert = CustomAlertViewController(
+            title: "오류 발생",
+            subtitle: error.localizedDescription,
+            buttonType: .oneButton
+        )
         present(alert, animated: true)
     }
 }
