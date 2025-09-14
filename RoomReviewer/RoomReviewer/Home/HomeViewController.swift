@@ -38,6 +38,12 @@ final class HomeViewController: UIViewController, View {
         $0.action = nil
     }
     
+    private lazy var offlineView = OfflineView().then {
+        $0.retryAction = { [weak self] in
+            self?.reactor?.action.onNext(.fetchData)
+        }
+    }
+    
     init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, networkManager: NetworkService, networkMonitor: NetworkMonitoring) {
         self.imageProvider = imageProvider
         self.imageFileManager = imageFileManager
@@ -64,6 +70,7 @@ final class HomeViewController: UIViewController, View {
         configureHierarchy()
         configureLayout()
         configureNavigationBar()
+        offlineView.isHidden = true
     }
     
     func bind(reactor: HomeReactor) {
@@ -135,19 +142,24 @@ final class HomeViewController: UIViewController, View {
             }
         )
         
-        reactor.state.map { $0.viewState }
-            .compactMap { state -> [HomeSectionModel]? in
-                guard case .loaded(let sections) = state else { return nil }
-                return sections
-            }
+        reactor.state.map { $0.sections }
             .bind(to: homeCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.viewState }
+        reactor.state.map { !$0.isOffline }
             .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, state in
-                owner.updateUI(for: state)
+            .asDriver(onErrorJustReturn: true)
+            .drive(with: self) { owner, isHidden in
+                owner.offlineView.isHidden = isHidden
+                owner.homeCollectionView.isScrollEnabled = isHidden
+                owner.homeCollectionView.snp.remakeConstraints { make in
+                    make.top.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide)
+                    if !isHidden {
+                        make.bottom.equalTo(owner.offlineView.snp.top)
+                    } else {
+                        make.bottom.equalTo(owner.view.safeAreaLayoutGuide)
+                    }
+                }
             }
             .disposed(by: disposeBag)
         
@@ -173,71 +185,32 @@ final class HomeViewController: UIViewController, View {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = SearchMediaViewController(networkMonitor: owner.networkMonitor, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, isSheetView: true)
-                let networkManager = NetworkManager(dataFetcher: URLSessionDataFetcher(networkMonitor: NetworkMonitor()))
-                vc.reactor = SearchMediaReactor(networkService: networkManager)
-                owner.navigationController?.pushViewController(vc, animated: true)
+                let vc = SearchMediaViewController(networkMonitor: owner.networkMonitor, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                vc.reactor = SearchMediaReactor(networkService: owner.networkManager)
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .fullScreen
+                
+                owner.navigationController?.present(nav, animated: true)
             }
             .disposed(by: disposeBag)
     }
-    
-    private var offlineVC: OfflineViewController?
-    
-    private func updateUI(for state: HomeReactor.State.ViewState) {
-        switch state {
-        case .loading:
-            homeCollectionView.isHidden = true
-            dismissOfflineVC()
-        case .loaded:
-            homeCollectionView.isHidden = false
-            dismissOfflineVC()
-        case .offline:
-            homeCollectionView.isHidden = true
-            presentOfflineVC()
-        }
     }
-    
-    private func presentOfflineVC() {
-        if self.offlineVC == nil {
-            let vc = OfflineViewController()
-            vc.retryAction = { [weak self] in
-                self?.reactor?.action.onNext(.fetchData)
-            }
-            self.offlineVC = vc
-            self.add(vc)
-        }
-    }
-    
-    private func dismissOfflineVC() {
-        self.offlineVC?.remove()
-        self.offlineVC = nil
-    }
-}
-
-fileprivate extension UIViewController {
-    func add(_ child: UIViewController) {
-        addChild(child)
-        view.addSubview(child.view)
-        child.view.frame = view.bounds
-        child.didMove(toParent: self)
-    }
-    
-    func remove() {
-        guard parent != nil else { return }
-        willMove(toParent: nil)
-        view.removeFromSuperview()
-        removeFromParent()
-    }
-}
 
 extension HomeViewController {
     private func configureHierarchy() {
         view.addSubview(homeCollectionView)
+        view.addSubview(offlineView)
     }
     
     private func configureLayout() {
+        offlineView.snp.makeConstraints {
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(160)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+        
         homeCollectionView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeAreaLayoutGuide)
+            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
