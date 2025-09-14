@@ -29,7 +29,7 @@ final class CustomAlertViewController: UIViewController {
     
     private let customContentView: UIView?
     
-    private lazy var confirmButton = CommonButton(title: "확인", foregroundColor: AppColor.appWhite, backgroundColor: .systemBlue)
+    private lazy var confirmButton = CommonButton(title: "확인", foregroundColor: AppColor.appWhite, backgroundColor: .systemRed)
     private lazy var cancelButton = CommonButton(title: "취소", foregroundColor: AppColor.appWhite, backgroundColor: AppColor.appLightGray)
 
     init(title: String, subtitle: String? = nil, buttonType: AlertButtonType, contentView: UIView? = nil, confirmAction: CompletionHandler? = nil) {
@@ -76,7 +76,7 @@ final class CustomAlertViewController: UIViewController {
     private func configureLayout() {
         containerView.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(20)
+            make.horizontalEdges.equalToSuperview().inset(30)
             make.top.greaterThanOrEqualToSuperview().offset(20)
             make.bottom.lessThanOrEqualToSuperview().inset(20)
         }
@@ -94,6 +94,7 @@ final class CustomAlertViewController: UIViewController {
         containerView.clipsToBounds = true
         
         entireStackView.axis = .vertical
+        entireStackView.spacing = 10
         
         contentStackView.axis = .vertical
         contentStackView.spacing = 5
