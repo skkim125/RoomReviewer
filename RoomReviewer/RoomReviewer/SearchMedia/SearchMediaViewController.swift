@@ -25,14 +25,13 @@ final class SearchMediaViewController: UIViewController, View {
     }
     
     private let dismissButton = UIBarButtonItem().then {
-        $0.image = UIImage(systemName: "chevron.left")
+        $0.image = UIImage(systemName: "xmark")
         $0.tintColor = AppColor.appWhite
         $0.style = .done
         $0.target = nil
         $0.action = nil
     }
     
-    private let isSheetView: Bool
     private let networkMonitor: NetworkMonitoring
     private let imageProvider: ImageProviding
     private let imageFileManager: ImageFileManaging
@@ -40,13 +39,12 @@ final class SearchMediaViewController: UIViewController, View {
     private let reviewDBManager: ReviewDBManager
     var disposeBag = DisposeBag()
     
-    init(networkMonitor: NetworkMonitoring, imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, isSheetView: Bool = false) {
+    init(networkMonitor: NetworkMonitoring, imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.networkMonitor = networkMonitor
         self.imageProvider = imageProvider
         self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
-        self.isSheetView = isSheetView
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -125,7 +123,7 @@ final class SearchMediaViewController: UIViewController, View {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                owner.navigationController?.popViewController(animated: true)
+                owner.navigationController?.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
         
@@ -169,37 +167,34 @@ extension SearchMediaViewController {
     }
     
     private func configureNavigationBar() {
-        if isSheetView {
-            navigationItem.leftBarButtonItem = dismissButton
-            navigationItem.title = "컨텐츠 검색"
-        } else {
-            let appIconView = UIView()
-            let label = UILabel()
-            label.font = AppFont.boldLargeTitle
-            label.text = "컨텐츠 검색"
-            label.textColor = AppColor.appWhite
-            
-            let image = UIImage(systemName: "sunglasses")
-            let imageView = UIImageView(image: image)
-            imageView.tintColor = .systemRed
-            imageView.contentMode = .scaleAspectFill
-            
-            appIconView.addSubview(label)
-            appIconView.addSubview(imageView)
-            
-            imageView.snp.makeConstraints {
-                $0.leading.equalTo(appIconView).offset(2)
-                $0.width.equalTo(50)
-                $0.height.equalTo(20)
-                $0.centerY.equalTo(appIconView)
-            }
-            
-            label.snp.makeConstraints {
-                $0.leading.equalTo(imageView.snp.trailing).offset(5)
-                $0.centerY.equalTo(appIconView)
-            }
-            
-            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
+        let appIconView = UIView()
+        let label = UILabel()
+        label.font = AppFont.boldLargeTitle
+        label.text = "컨텐츠 검색"
+        label.textColor = AppColor.appWhite
+        
+        let image = UIImage(systemName: "sunglasses")
+        let imageView = UIImageView(image: image)
+        imageView.tintColor = .systemRed
+        imageView.contentMode = .scaleAspectFill
+        
+        appIconView.addSubview(label)
+        appIconView.addSubview(imageView)
+        
+        imageView.snp.makeConstraints {
+            $0.leading.equalTo(appIconView).offset(2)
+            $0.width.equalTo(50)
+            $0.height.equalTo(20)
+            $0.centerY.equalTo(appIconView)
         }
+        
+        label.snp.makeConstraints {
+            $0.leading.equalTo(imageView.snp.trailing).offset(5)
+            $0.centerY.equalTo(appIconView)
+        }
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
+        navigationItem.rightBarButtonItem = dismissButton
+    }
     }
 }

@@ -55,7 +55,33 @@ final class MediaTierListViewController: UIViewController, View {
     }
     
     private func configureNavigationBar() {
-        self.navigationItem.title = "나만의 티어리스트"
+        let appIconView = UIView()
+        let label = UILabel()
+        label.font = AppFont.boldLargeTitle
+        label.text = "나의 티어리스트"
+        label.textColor = AppColor.appWhite
+        
+        let image = UIImage(systemName: "sunglasses")
+        let imageView = UIImageView(image: image)
+        imageView.tintColor = .systemRed
+        imageView.contentMode = .scaleAspectFill
+        
+        appIconView.addSubview(label)
+        appIconView.addSubview(imageView)
+        
+        imageView.snp.makeConstraints {
+            $0.leading.equalTo(appIconView).offset(2)
+            $0.width.equalTo(50)
+            $0.height.equalTo(20)
+            $0.centerY.equalTo(appIconView)
+        }
+        
+        label.snp.makeConstraints {
+            $0.leading.equalTo(imageView.snp.trailing).offset(5)
+            $0.centerY.equalTo(appIconView)
+        }
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
     }
     
     func bind(reactor: MediaTierListReactor) {
