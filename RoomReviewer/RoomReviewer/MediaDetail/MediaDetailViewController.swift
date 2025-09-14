@@ -365,42 +365,11 @@ final class MediaDetailViewController: UIViewController, View {
         let creditsStream = reactor.state.map { $0.credits }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
+            .debug("✅ Credits Stream") // <--- 디버그 연산자 추가
             .share()
         
         creditsStream
             .bind(to: creditsCollectionView.rx.items(dataSource: dataSource))
-            .disposed(by: disposeBag)
-        
-        let overviewButtonVisibilityStream = reactor.state.map { $0.isOverviewButtonVisible }.distinctUntilChanged()
-
-        Observable.combineLatest(creditsStream, overviewButtonVisibilityStream)
-            .bind(with: self) { owner, combined in
-                let sectionModels = combined.0
-                let isOverviewButtonVisible = combined.1
-                
-                let height: CGFloat
-                switch sectionModels.count {
-                case 0:
-                    height = 0
-                case 1:
-                    height = 200
-                default:
-                    height = 400
-                }
-                
-                owner.creditsCollectionView.isHidden = (height == 0)
-                
-                owner.creditsCollectionView.snp.remakeConstraints {
-                    if isOverviewButtonVisible {
-                        $0.top.equalTo(owner.moreOverviewButton.snp.bottom)
-                    } else {
-                        $0.top.equalTo(owner.overviewLabel.snp.bottom).offset(10)
-                    }
-                    $0.horizontalEdges.equalTo(owner.contentView).inset(10)
-                    $0.height.equalTo(height)
-                    $0.bottom.equalToSuperview().inset(10)
-                }
-            }
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.isOverviewExpanded }
@@ -684,9 +653,9 @@ extension MediaDetailViewController {
         
         creditsCollectionView.snp.makeConstraints {
             $0.top.equalTo(moreOverviewButton.snp.bottom).offset(10)
-            $0.horizontalEdges.equalTo(contentView).inset(10)
-            $0.height.equalTo(400)
-            $0.bottom.equalToSuperview().inset(10)
+            $0.horizontalEdges.equalTo(contentView)
+            $0.height.equalTo(440)
+            $0.bottom.equalTo(contentView).inset(10)
         }
     }
 }

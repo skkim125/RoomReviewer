@@ -133,7 +133,7 @@ extension HotMediaCollectionViewCell {
         
         tvNameLabel.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(8)
-            $0.bottom.equalToSuperview().inset(8)
+            $0.bottom.equalTo(posterImageView.snp.bottom).inset(8)
         }
     }
 }
