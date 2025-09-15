@@ -59,9 +59,9 @@
 		044B8C342E60423900EB016D /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044B8C332E60423900EB016D /* AppFont.swift */; };
 		044B8C3B2E60831300EB016D /* UICollectionViewLayout+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044B8C3A2E60831300EB016D /* UICollectionViewLayout+.swift */; };
 		0461E4D52E1A900C00EDB5D6 /* SearchMediaReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */; };
-		046B38062E786BCE00354C37 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 046B38052E786BCE00354C37 /* GoogleService-Info.plist */; };
 		046B38092E786F1500354C37 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 046B38082E786F1500354C37 /* FirebaseAnalytics */; };
 		046B380B2E786F1500354C37 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 046B380A2E786F1500354C37 /* FirebaseCrashlytics */; };
+		046B380E2E788C5900354C37 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 046B380D2E788C5900354C37 /* GoogleService-Info.plist */; };
 		046E7A2E2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */; };
 		046E7A2F2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */; };
 		046E7A352E574D1000FAF58A /* CreditsCollectionVIewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046E7A342E574D1000FAF58A /* CreditsCollectionVIewCell.swift */; };
@@ -198,7 +198,7 @@
 		044B8C332E60423900EB016D /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
 		044B8C3A2E60831300EB016D /* UICollectionViewLayout+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionViewLayout+.swift"; sourceTree = "<group>"; };
 		0461E4D42E1A900B00EDB5D6 /* SearchMediaReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaReactor.swift; sourceTree = "<group>"; };
-		046B38052E786BCE00354C37 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		046B380D2E788C5900354C37 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReviewEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReviewEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		046E7A342E574D1000FAF58A /* CreditsCollectionVIewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsCollectionVIewCell.swift; sourceTree = "<group>"; };
@@ -752,7 +752,7 @@
 		04FFC7CB2DF16A840081AF7C /* RoomReviewer */ = {
 			isa = PBXGroup;
 			children = (
-				046B38052E786BCE00354C37 /* GoogleService-Info.plist */,
+				046B380D2E788C5900354C37 /* GoogleService-Info.plist */,
 				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04C97AAF2E20D8C4001EB1D4 /* App */,
 				044B8C392E60830500EB016D /* Extension */,
@@ -900,6 +900,7 @@
 				04FFC7A62DF169D60081AF7C /* Sources */,
 				04FFC7A72DF169D60081AF7C /* Frameworks */,
 				04FFC7A82DF169D60081AF7C /* Resources */,
+				046B380C2E788A0200354C37 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1033,11 +1034,36 @@
 			files = (
 				04FFC7CC2DF16A840081AF7C /* Assets.xcassets in Resources */,
 				04FFC7CE2DF16A840081AF7C /* LaunchScreen.storyboard in Resources */,
-				046B38062E786BCE00354C37 /* GoogleService-Info.plist in Resources */,
+				046B380E2E788C5900354C37 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		046B380C2E788A0200354C37 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		041366542E0136C60026514E /* Sources */ = {
@@ -1419,12 +1445,15 @@
 		};
 		04FFC7BE2DF169D70081AF7C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04DCA89A2DF2D99200695361 /* API.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = K7C455FTM9;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RoomReviewer/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "방구석 평론가";
@@ -1453,12 +1482,14 @@
 		};
 		04FFC7BF2DF169D70081AF7C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04DCA89A2DF2D99200695361 /* API.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K7C455FTM9;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RoomReviewer/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "방구석 평론가";
