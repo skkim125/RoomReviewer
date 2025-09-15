@@ -19,6 +19,10 @@ final class MediaDetailViewController: UIViewController, View {
         $0.showsVerticalScrollIndicator = false
     }
     
+    private let activityIndicator = UIActivityIndicatorView(style: .large).then {
+        $0.color = AppColor.appWhite
+    }
+    
     private let contentView = UIView()
     
     private let backDropImageView = UIImageView().then {
@@ -80,8 +84,8 @@ final class MediaDetailViewController: UIViewController, View {
         config.attributedTitle?.font = AppFont.semiboldCallout
         config.imagePlacement = .top
         config.imagePadding = 8
-        
         $0.configuration = config
+        $0.isEnabled = false
     }
     
     private let watchedButton = UIButton().then {
@@ -91,21 +95,17 @@ final class MediaDetailViewController: UIViewController, View {
         config.attributedTitle?.font = AppFont.semiboldCallout
         config.imagePlacement = .top
         config.imagePadding = 8
-        
         $0.configuration = config
     }
     
     private let reviewButton = UIButton().then {
         var config = UIButton.Configuration.plain()
-        
         config.image = UIImage(systemName: "sunglasses")
         config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
-        
         config.title = "평론하기"
         config.attributedTitle?.font = AppFont.semiboldCallout
         config.imagePlacement = .top
         config.imagePadding = 8
-        
         $0.configuration = config
     }
     
@@ -119,22 +119,15 @@ final class MediaDetailViewController: UIViewController, View {
     private let moreOverviewButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         let symbolConfig = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
-        
         config.preferredSymbolConfigurationForImage = symbolConfig
         config.image = UIImage(systemName: "chevron.down")
         config.title = "더보기"
         config.imagePlacement = .trailing
         config.imagePadding = 2
         config.baseForegroundColor = AppColor.appLightGray
-        
-        let attr = NSAttributedString(
-            string: "더보기",
-            attributes: [.font: AppFont.semiboldCallout]
-        )
-        if let attributed = try? AttributedString(attr, including: \.uiKit) {
+        if let attributed = try? AttributedString(NSAttributedString(string: "더보기", attributes: [.font: AppFont.semiboldCallout]), including: \.uiKit) {
             config.attributedTitle = attributed
         }
-        
         $0.configuration = config
     }
     
@@ -205,6 +198,11 @@ final class MediaDetailViewController: UIViewController, View {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        Analytics.logEvent(AnalyticsEventScreenView, parameters: [
+            AnalyticsParameterScreenName: "MediaDetail",
+            AnalyticsParameterScreenClass: "MediaDetailViewController"
+        ])
+        
         if let reactor = self.reactor {
             reactor.action.onNext(.viewWillAppear)
         }
@@ -220,16 +218,38 @@ final class MediaDetailViewController: UIViewController, View {
     func bind(reactor: MediaDetailReactor) {
         bindState(reactor: reactor)
         bindAction(reactor: reactor)
+        
+        reactor.action.onNext(.viewDidLoad)
     }
     
     private func bindState(reactor: MediaDetailReactor) {
-        
-        reactor.state.map { $0.viewState }
+        reactor.state.map { !$0.areImagesLoaded }
             .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: .loaded)
-            .drive(with: self) { owner, state in
-                owner.updateUI(for: state)
+            .asDriver(onErrorJustReturn: false)
+            .drive(activityIndicator.rx.isAnimating)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.isEssentialDataLoaded }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self) { owner, isLoaded in
+                if isLoaded {
+                    owner.removePlaceholderState()
+                } else {
+                    owner.setupPlaceholderState()
+                }
             }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.areImagesLoaded }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: false)
+            .drive(
+                watchlistButton.rx.isEnabled,
+                watchedButton.rx.isEnabled,
+                reviewButton.rx.isEnabled,
+                starToggleButton.rx.isEnabled
+            )
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.genres }
@@ -272,11 +292,6 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
-                    if image == AppImage.emptyPosterImage {
-                        owner.backDropImageView.contentMode = .scaleAspectFit
-                        owner.backDropImageView.backgroundColor = AppColor.appLightGray
-                        owner.backDropImageView.tintColor = AppColor.appWhite
-                    }
                     owner.backDropImageView.image = image
                 } else {
                     owner.backDropImageView.backgroundColor = AppColor.appDarkGray
@@ -289,11 +304,6 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
-                    if image == AppImage.emptyPosterImage {
-                        owner.posterImageView.contentMode = .scaleAspectFit
-                        owner.posterImageView.backgroundColor = AppColor.appLightGray
-                        owner.posterImageView.tintColor = AppColor.appWhite
-                    }
                     owner.posterImageView.image = image
                 } else {
                     owner.posterImageView.backgroundColor = AppColor.appDarkGray
@@ -305,7 +315,6 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: (false, nil, false))
             .drive(with: self) { owner, statuses in
                 let (isWatchlisted, watchedDate, isReviewed) = statuses
-                
                 owner.updateWatchlistButton(isWatchlisted: isWatchlisted, isReviewed: isReviewed, watchedDate: watchedDate)
                 owner.updateWatchedButton(isWatchlisted: isWatchlisted, watchedDate: watchedDate)
                 owner.updateReviewButton(watchedDate: watchedDate, isReviewed: isReviewed)
@@ -317,7 +326,6 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, mediaInfo in
                 guard let (media, reviewEntity) = mediaInfo else { return }
-                
                 let reactor = WriteReviewReactor(media: media, review: reviewEntity, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 let vc = WriteReviewViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager)
                 vc.reactor = reactor
@@ -328,50 +336,30 @@ final class MediaDetailViewController: UIViewController, View {
         reactor.pulse(\.$showSetWatchedDateAlert)
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, flag in
-                if let _ = flag {
-                    owner.presentCalendarAlert()
-                }
+                if let _ = flag { owner.presentCalendarAlert() }
             }
             .disposed(by: disposeBag)
 
         let dataSource = RxCollectionViewSectionedReloadDataSource<CreditsSectionModel>(
             configureCell: { [weak self] dataSource, collectionView, indexPath, item in
                 guard let self = self, let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CreditsCollectionViewCell.cellID, for: indexPath) as? CreditsCollectionViewCell else { return UICollectionViewCell() }
-                
                 switch dataSource[indexPath] {
-                case .casts(item: let cast):
-                    let reactor = CreditsCollectionViewCellReactor(name: cast.name, role: cast.character, profilePath: cast.profilePath, imageLoader: self.imageProvider)
-                    
-                    cell.reactor = reactor
-                    
-                case .creators(item: let creator):
-                    let reactor = CreditsCollectionViewCellReactor(name: creator.name, role: creator.department, profilePath: creator.profilePath, imageLoader: self.imageProvider)
-                    
-                    cell.reactor = reactor
+                case .casts(let cast):
+                    cell.reactor = CreditsCollectionViewCellReactor(name: cast.name, role: cast.character, profilePath: cast.profilePath, imageLoader: self.imageProvider)
+                case .creators(let creator):
+                    cell.reactor = CreditsCollectionViewCellReactor(name: creator.name, role: creator.department, profilePath: creator.profilePath, imageLoader: self.imageProvider)
                 }
-                
                 return cell
             },
             configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
-                guard kind == UICollectionView.elementKindSectionHeader else {
-                    return UICollectionReusableView()
-                }
-                
-                guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: CreditsSectionHeader.reusableID, for: indexPath) as? CreditsSectionHeader else { return UICollectionReusableView() }
-                
-                let section = dataSource.sectionModels[indexPath.section]
-                headerView.configureUI(header: section.header)
-                
+                guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CreditsSectionHeader.reusableID, for: indexPath) as? CreditsSectionHeader else { return UICollectionReusableView() }
+                headerView.configureUI(header: dataSource[indexPath.section].header)
                 return headerView
             }
         )
         
-        let creditsStream = reactor.state.map { $0.credits }
+        reactor.state.map { $0.credits }
             .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .share()
-        
-        creditsStream
             .bind(to: creditsCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
@@ -408,34 +396,31 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private func bindAction(reactor: MediaDetailReactor) {
-        reactor.action.onNext(.viewDidLoad)
-        
         watchlistButton.rx.tap
             .do(onNext: { [weak reactor] in
                 guard let reactor = reactor else { return }
                 let state = reactor.currentState
-                
-                Analytics.logEvent("click_watchlistButton", parameters: [
-                    "watchlistButton_Bool": !state.isWatchlisted,
-                    "watchlistButton_MediaType": state.media.mediaType.rawValue,
-                    "watchlistButton_MediaTitle": state.media.title
-                ])
+                Analytics.logEvent("detail_watchlist_tapped", parameters: ["media_id": state.media.id, "media_type": state.media.mediaType.rawValue, "media_title": state.media.title, "is_watchlisted_after_tap": !state.isWatchlisted])
             })
             .map { MediaDetailReactor.Action.watchlistButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         watchedButton.rx.tap
-            .do(onNext: { _ in
-                Analytics.logEvent("click_watchedButton", parameters: nil)
+            .do(onNext: { [weak reactor] _ in
+                guard let reactor = reactor else { return }
+                let state = reactor.currentState
+                Analytics.logEvent("detail_watched_tapped", parameters: ["media_id": state.media.id, "media_type": state.media.mediaType.rawValue, "media_title": state.media.title])
             })
             .map { MediaDetailReactor.Action.watchedButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         reviewButton.rx.tap
-            .do(onNext: { _ in
-                Analytics.logEvent("click_reviewButton", parameters: nil)
+            .do(onNext: { [weak reactor] _ in
+                guard let reactor = reactor else { return }
+                let state = reactor.currentState
+                Analytics.logEvent("detail_review_tapped", parameters: ["media_id": state.media.id, "media_type": state.media.mediaType.rawValue, "media_title": state.media.title])
             })
             .map { MediaDetailReactor.Action.writeReviewButtonTapped }
             .bind(to: reactor.action)
@@ -458,12 +443,7 @@ final class MediaDetailViewController: UIViewController, View {
             .do(onNext: { [weak reactor] in
                 guard let reactor = reactor else { return }
                 let state = reactor.currentState
-                Analytics.logEvent("click_starToggleButton", parameters: [
-                    "starToggleButton_MediaType": state.media.mediaType.rawValue,
-                    "starToggleButton_MediaTitle": state.media.title,
-                    "starToggleButton_MediaGenres": state.genres ?? "장르 추적 불가",
-                    "starToggleButton_IsStared": !state.isStared
-                ])
+                Analytics.logEvent("detail_star_tapped", parameters: ["media_id": state.media.id, "media_type": state.media.mediaType.rawValue, "media_title": state.media.title, "is_stared_after_tap": !state.isStared])
             })
             .map { MediaDetailReactor.Action.starButtonTapped }
             .bind(to: reactor.action)
@@ -471,7 +451,10 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private func updateWatchlistButton(isWatchlisted: Bool, isReviewed: Bool, watchedDate: Date?) {
-        watchlistButton.isEnabled = isReviewed == false && watchedDate == nil
+        let areImagesLoaded = reactor?.currentState.areImagesLoaded ?? false
+        let logicEnabled = (isReviewed == false && watchedDate == nil)
+        watchlistButton.isEnabled = logicEnabled && areImagesLoaded
+        
         var config = watchlistButton.configuration ?? UIButton.Configuration.plain()
         
         config.imagePlacement = .top
@@ -497,7 +480,9 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private func updateWatchedButton(isWatchlisted: Bool, watchedDate: Date?) {
-        watchedButton.isEnabled = isWatchlisted
+        let areImagesLoaded = reactor?.currentState.areImagesLoaded ?? false
+        let logicEnabled = isWatchlisted
+        watchedButton.isEnabled = logicEnabled && areImagesLoaded
         
         var config = watchedButton.configuration ?? UIButton.Configuration.plain()
         config.imagePlacement = .top
@@ -523,8 +508,9 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private func updateReviewButton(watchedDate: Date?, isReviewed: Bool) {
-        let isEnabled = (watchedDate != nil)
-        reviewButton.isEnabled = isEnabled
+        let areImagesLoaded = reactor?.currentState.areImagesLoaded ?? false
+        let logicEnabled = (watchedDate != nil)
+        reviewButton.isEnabled = logicEnabled && areImagesLoaded
         
         var config = reviewButton.configuration ?? UIButton.Configuration.plain()
         config.imagePlacement = .top
@@ -538,7 +524,7 @@ final class MediaDetailViewController: UIViewController, View {
         } else {
             config.title = "평론하기"
             config.image = UIImage(systemName: "sunglasses")
-            config.baseForegroundColor = isEnabled ? AppColor.appWhite : AppColor.appGray
+            config.baseForegroundColor = logicEnabled ? AppColor.appWhite : AppColor.appGray
         }
         
         let attr = attributedTitle(text: config.title ?? "", alignment: .center)
@@ -627,6 +613,8 @@ extension MediaDetailViewController {
         }
         
         contentView.addSubview(creditsCollectionView)
+        
+        view.addSubview(activityIndicator)
     }
     
     private func configureLayout() {
@@ -684,6 +672,10 @@ extension MediaDetailViewController {
             $0.horizontalEdges.equalTo(contentView).inset(5)
             $0.height.equalTo(400)
             $0.bottom.equalTo(contentView).inset(10)
+        }
+        
+        activityIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
 }
@@ -745,17 +737,6 @@ extension MediaDetailViewController {
         genreLabel.textColor = AppColor.appLightGray
         semiInfoLabel.textColor = AppColor.appLightGray
         overviewLabel.textColor = AppColor.appWhite
-    }
-    
-    private func updateUI(for state: MediaDetailReactor.State.ViewState) {
-        switch state {
-        case .loading:
-            scrollView.isHidden = false
-            setupPlaceholderState()
-        case .loaded:
-            scrollView.isHidden = false
-            removePlaceholderState()
-        }
     }
     
     private func showNetworkErrorAlertAndDismiss() {
