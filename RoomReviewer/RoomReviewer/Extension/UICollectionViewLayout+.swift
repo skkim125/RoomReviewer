@@ -69,14 +69,14 @@ extension UICollectionViewLayout {
         return UICollectionViewCompositionalLayout { sectionIndex, layoutEnvironment in
             
             let itemSize = NSCollectionLayoutSize(
-                widthDimension: .absolute(120),
+                widthDimension: .absolute(100),
                 heightDimension: .fractionalHeight(1)
             )
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             
             let groupSize = NSCollectionLayoutSize(
-                widthDimension: .absolute(120),
-                heightDimension: .absolute(160)
+                widthDimension: .absolute(100),
+                heightDimension: .absolute(140)
             )
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             group.interItemSpacing = .fixed(10)

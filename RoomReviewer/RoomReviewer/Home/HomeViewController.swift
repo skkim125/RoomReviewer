@@ -40,7 +40,7 @@ final class HomeViewController: UIViewController, View {
     
     private lazy var offlineView = OfflineView().then {
         $0.retryAction = { [weak self] in
-            self?.reactor?.action.onNext(.fetchData)
+            self?.reactor?.action.onNext(.offlineButtonTapped)
         }
     }
     
@@ -166,7 +166,7 @@ final class HomeViewController: UIViewController, View {
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
             .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
-                .observe(on: MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
                 let detailReactor = MediaDetailReactor(media: media, networkService: owner.networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, networkMonitor: owner.networkMonitor)
                 let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
@@ -194,29 +194,34 @@ final class HomeViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
-        networkMonitor.isConnected
-            .distinctUntilChanged()
-            .filter { $0 }
-            .skip(1)
+        reactor.pulse(\.$shouldShowNetworkAlert)
+            .compactMap { $0 }
             .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, isConnected in
-                owner.homeCollectionView.visibleCells.forEach { cell in
-                    if let trendCell = cell as? TrendMediaCollectionViewCell, let reactor = trendCell.reactor {
-                        if reactor.currentState.imageData == AppImage.emptyPosterImage {
-                            reactor.action.onNext(.loadImage)
-                        }
-                    }
-                    
-                    if let hotCell = cell as? HotMediaCollectionViewCell, let reactor = hotCell.reactor {
-                        if reactor.currentState.imageData == AppImage.emptyPosterImage {
-                            reactor.action.onNext(.loadImage)
-                        }
-                    }
+            .bind(with: self) { owner, _ in
+                let alert = CustomAlertViewController(title: "네트워크 연결 없음", subtitle: "네트워크 연결을 확인해주세요.", buttonType: .oneButton)
+                owner.present(alert, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$shouldShowOfflineAlert)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let alert = CustomAlertViewController(
+                    title: "네트워크 연결 끊김",
+                    subtitle: "오프라인 상태로 전환됩니다.",
+                    buttonType: .oneButton
+                )
+                
+                alert.confirmAction = { [weak owner] in
+                    owner?.reactor?.action.onNext(.alertConfirmed)
                 }
+                
+                owner.present(alert, animated: true)
             }
             .disposed(by: disposeBag)
     }
-    }
+}
 
 extension HomeViewController {
     private func configureHierarchy() {

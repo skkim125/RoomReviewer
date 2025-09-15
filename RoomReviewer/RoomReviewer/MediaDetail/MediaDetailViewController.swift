@@ -167,6 +167,12 @@ final class MediaDetailViewController: UIViewController, View {
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
+    private let overviewStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 5
+        $0.alignment = .fill
+    }
+
     var updateAction: (() -> Void)?
     var disposeBag = DisposeBag()
     
@@ -365,7 +371,6 @@ final class MediaDetailViewController: UIViewController, View {
         let creditsStream = reactor.state.map { $0.credits }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .debug("✅ Credits Stream") // <--- 디버그 연산자 추가
             .share()
         
         creditsStream
@@ -590,9 +595,12 @@ extension MediaDetailViewController {
         [watchlistButton, watchedButton, reviewButton].forEach {
             actionButtonStackView.addArrangedSubview($0)
         }
+
+        contentView.addSubview(overviewStackView)
+        [overviewLabel, moreOverviewButton].forEach {
+            overviewStackView.addArrangedSubview($0)
+        }
         
-        contentView.addSubview(overviewLabel)
-        contentView.addSubview(moreOverviewButton)
         contentView.addSubview(creditsCollectionView)
     }
     
@@ -610,7 +618,7 @@ extension MediaDetailViewController {
         backDropImageView.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.top)
             $0.horizontalEdges.equalTo(contentView)
-            $0.height.equalTo(250)
+            $0.height.equalTo(view.bounds.height/3)
             $0.centerX.equalTo(contentView)
         }
         
@@ -641,20 +649,15 @@ extension MediaDetailViewController {
             }
         }
         
-        overviewLabel.snp.makeConstraints {
+        overviewStackView.snp.makeConstraints {
             $0.top.equalTo(actionButtonStackView.snp.bottom).offset(10)
             $0.horizontalEdges.equalTo(contentView).inset(20)
         }
         
-        moreOverviewButton.snp.makeConstraints {
-            $0.top.equalTo(overviewLabel.snp.bottom).offset(5)
-            $0.trailing.equalTo(overviewLabel.snp.trailing)
-        }
-        
         creditsCollectionView.snp.makeConstraints {
-            $0.top.equalTo(moreOverviewButton.snp.bottom).offset(10)
-            $0.horizontalEdges.equalTo(contentView)
-            $0.height.equalTo(440)
+            $0.top.equalTo(overviewStackView.snp.bottom).offset(5)
+            $0.horizontalEdges.equalTo(contentView).inset(5)
+            $0.height.equalTo(400)
             $0.bottom.equalTo(contentView).inset(10)
         }
     }
