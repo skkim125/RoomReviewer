@@ -12,6 +12,7 @@ import RxDataSources
 import ReactorKit
 import SnapKit
 import Then
+import FirebaseAnalytics
 
 final class MediaDetailViewController: UIViewController, View {
     private let scrollView = UIScrollView().then {
@@ -410,16 +411,32 @@ final class MediaDetailViewController: UIViewController, View {
         reactor.action.onNext(.viewDidLoad)
         
         watchlistButton.rx.tap
+            .do(onNext: { [weak reactor] in
+                guard let reactor = reactor else { return }
+                let state = reactor.currentState
+                
+                Analytics.logEvent("click_watchlistButton", parameters: [
+                    "watchlistButton_Bool": !state.isWatchlisted,
+                    "watchlistButton_MediaType": state.media.mediaType.rawValue,
+                    "watchlistButton_MediaTitle": state.media.title
+                ])
+            })
             .map { MediaDetailReactor.Action.watchlistButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         watchedButton.rx.tap
+            .do(onNext: { _ in
+                Analytics.logEvent("click_watchedButton", parameters: nil)
+            })
             .map { MediaDetailReactor.Action.watchedButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         reviewButton.rx.tap
+            .do(onNext: { _ in
+                Analytics.logEvent("click_reviewButton", parameters: nil)
+            })
             .map { MediaDetailReactor.Action.writeReviewButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -438,6 +455,16 @@ final class MediaDetailViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         starToggleButton.rx.tap
+            .do(onNext: { [weak reactor] in
+                guard let reactor = reactor else { return }
+                let state = reactor.currentState
+                Analytics.logEvent("click_starToggleButton", parameters: [
+                    "starToggleButton_MediaType": state.media.mediaType.rawValue,
+                    "starToggleButton_MediaTitle": state.media.title,
+                    "starToggleButton_MediaGenres": state.genres ?? "장르 추적 불가",
+                    "starToggleButton_IsStared": !state.isStared
+                ])
+            })
             .map { MediaDetailReactor.Action.starButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -677,6 +704,11 @@ extension MediaDetailViewController {
             guard let self = self else { return }
             let selectedDate = datePicker.date
             self.reactor?.action.onNext(.updateWatchedDate(selectedDate))
+            guard let state = self.reactor?.currentState else { return }
+            Analytics.logEvent("update_WatchedDate", parameters: [
+                "WatchedDate_Date": selectedDate.formatted(date: .numeric, time: .standard),
+                "WatchedDate_MediaTitle": state.media.title,
+            ])
         }
         
         present(alert, animated: true)
