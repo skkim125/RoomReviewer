@@ -12,6 +12,7 @@ import RxDataSources
 import ReactorKit
 import SnapKit
 import Then
+import FirebaseAnalytics
 
 final class SavedMediaViewController: UIViewController, View {
     private var savedMediaCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .threeColumnPosterCollectionViewLayout).then {
@@ -132,6 +133,13 @@ final class SavedMediaViewController: UIViewController, View {
     
     private func bindAction(_ reactor: SavedMediaReactor) {
         self.rx.methodInvoked(#selector(viewDidLoad))
+            .do(onNext: { [weak reactor] _ in
+                guard let reactor = reactor else { return }
+                let state = reactor.currentState
+                Analytics.logEvent("SavedMedia_Appeared", parameters: [
+                    "SavedMedia_SectionType": state.sectionType.navigationbarTitle
+                ])
+            })
             .map { _ in Reactor.Action.viewDidLoad }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

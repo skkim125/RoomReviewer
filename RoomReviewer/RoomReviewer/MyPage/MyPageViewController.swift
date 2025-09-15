@@ -12,6 +12,7 @@ import RxDataSources
 import ReactorKit
 import SnapKit
 import Then
+import FirebaseAnalytics
 
 final class MyPageViewController: UIViewController, View {
     private var myPageCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .myPageCollectionViewLayout).then {
@@ -167,6 +168,12 @@ final class MyPageViewController: UIViewController, View {
             .map { Reactor.Action.itemSelected($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        Analytics.logEvent("MyPageView_Appeared", parameters: nil)
     }
     
     private func moveSection(_ item: MyPageSectionItem) {

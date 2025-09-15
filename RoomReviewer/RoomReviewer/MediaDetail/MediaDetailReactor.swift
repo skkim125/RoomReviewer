@@ -116,6 +116,8 @@ final class MediaDetailReactor: Reactor {
         case .viewDidLoad:
             let media = currentState.media
             
+            let mutationScheduler = SerialDispatchQueueScheduler(qos: .userInitiated)
+            
             let dbStatusStream = mediaDBManager.fetchMedia(id: media.id)
                 .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
                 .asObservable()
@@ -129,6 +131,7 @@ final class MediaDetailReactor: Reactor {
                 .catch { error in
                     return .just(.showError(error))
                 }
+                .observe(on: mutationScheduler)
             
             let imageStream = Observable.merge(
                 self.loadBackdropImage(currentState.media.backdropPath)
@@ -136,6 +139,7 @@ final class MediaDetailReactor: Reactor {
                 self.loadPosterImage(currentState.media.posterPath)
                     .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             )
+            .observe(on: mutationScheduler)
             
             let detailFetchStream = mediaDBManager.fetchMediaEntity(id: media.id)
                 .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
@@ -160,6 +164,7 @@ final class MediaDetailReactor: Reactor {
                         ])
                     }
                 }
+                .observe(on: mutationScheduler)
             
             return Observable.merge(detailFetchStream, dbStatusStream, imageStream)
                 .observe(on: MainScheduler.instance)

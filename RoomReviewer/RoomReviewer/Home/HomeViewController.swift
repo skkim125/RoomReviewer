@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAnalytics
 import ReactorKit
 import RxDataSources
 import SnapKit
@@ -64,6 +65,12 @@ final class HomeViewController: UIViewController, View {
         configureView()
         
         reactor?.action.onNext(.fetchData)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        Analytics.logEvent("HomeView_appeared", parameters: nil)
     }
     
     private func configureView() {
@@ -191,6 +198,7 @@ final class HomeViewController: UIViewController, View {
                 nav.modalPresentationStyle = .fullScreen
                 
                 owner.navigationController?.present(nav, animated: true)
+                Analytics.logEvent("move_SearchView", parameters: nil)
             }
             .disposed(by: disposeBag)
         

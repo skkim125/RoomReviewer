@@ -10,6 +10,7 @@ import ReactorKit
 import RxDataSources
 import SnapKit
 import Then
+import FirebaseAnalytics
 
 final class MediaTierListViewController: UIViewController, View {
     var disposeBag = DisposeBag()
@@ -130,6 +131,9 @@ final class MediaTierListViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         self.rx.methodInvoked(#selector(viewWillAppear))
+            .do(onNext: { _ in
+                Analytics.logEvent("MediaTierListViewController_Appeared", parameters: nil)
+            })
             .map { _ in Reactor.Action.updateSavedMedia }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -181,6 +185,7 @@ extension MediaTierListViewController: UICollectionViewDropDelegate {
         
         // 시작점과 종착점 전달
         self.reactor?.action.onNext(.moveItem(from: sourceIndexPath, to: finalDestinationIndexPath))
+        Analytics.logEvent("SetTierList", parameters: nil)
     }
     
     // 빈 티어 섹션에 미디어를 두는 경우에 대해 section과 row를을 계산하여 indexPath를 전달

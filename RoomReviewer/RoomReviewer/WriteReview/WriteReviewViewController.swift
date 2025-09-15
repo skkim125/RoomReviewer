@@ -12,6 +12,7 @@ import RxCocoa
 import Cosmos
 import SnapKit
 import Then
+import FirebaseAnalytics
 
 final class WriteReviewViewController: UIViewController, View {
     var disposeBag = DisposeBag()
@@ -310,6 +311,19 @@ final class WriteReviewViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         saveButton.rx.tap
+            .do(onNext: { [weak reactor] in
+                guard let reactor = reactor else { return }
+                let state = reactor.currentState
+                
+                Analytics.logEvent("click_savedButton", parameters: [
+                    "isSaved": state.isEditMode ? "수정" : "등록",
+                    "rating": state.rating,
+                    "mediaTitle": state.media.title,
+                    "reviewCount": state.review.count,
+                    "commentCount": state.comment?.count ?? 0,
+                    "quoteCount": state.quote?.count ?? 0
+                ])
+            })
             .map { _ in
                 return Reactor.Action.saveButtonTapped
             }
@@ -499,23 +513,5 @@ extension WriteReviewViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(10)
             $0.height.equalTo(50)
         }
-    }
-}
-
-extension WriteReviewViewController: UIGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        // Allow touches on UIControl subclasses (buttons, textfields, etc.)
-        if touch.view is UIControl {
-            return false
-        }
-        // Allow touches on the text view
-        if touch.view == self.reviewDetailTextView || touch.view?.isDescendant(of: self.reviewDetailTextView) == true {
-            return false
-        }
-        // Allow touches on the rating view
-        if touch.view == self.ratingView || touch.view?.isDescendant(of: self.ratingView) == true {
-            return false
-        }
-        return true
     }
 }
