@@ -85,6 +85,7 @@ final class MediaDetailReactor: Reactor {
     
     enum Action {
         case viewDidLoad
+        case viewWillAppear
         case watchlistButtonTapped
         case watchedButtonTapped
         case writeReviewButtonTapped
@@ -163,6 +164,17 @@ final class MediaDetailReactor: Reactor {
             return Observable.merge(detailFetchStream, dbStatusStream, imageStream)
                 .observe(on: MainScheduler.instance)
             
+        case .viewWillAppear:
+            let media = currentState.media
+            return mediaDBManager.fetchMedia(id: media.id)
+                .asObservable()
+                .compactMap { result -> Mutation? in
+                    if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result {
+                        return .setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed)
+                    }
+                    return nil
+                }
+        
         case .watchlistButtonTapped:
             let media = currentState.media
             let casts = currentState.casts

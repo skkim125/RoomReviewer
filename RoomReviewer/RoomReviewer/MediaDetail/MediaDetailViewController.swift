@@ -201,6 +201,14 @@ final class MediaDetailViewController: UIViewController, View {
         configureNavigationBar()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let reactor = self.reactor {
+            reactor.action.onNext(.viewWillAppear)
+        }
+    }
+    
     private func configureNavigationBar() {
         navigationItem.title = "상세 정보"
         self.navigationItem.hidesBackButton = true

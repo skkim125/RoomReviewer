@@ -54,6 +54,7 @@ final class WriteReviewReactor: Reactor {
         case dismissView
         case setEditMode(Bool)
         case revertToInitialState
+        case setReviewEntity(ReviewEntity?)
     }
     
     var initialState: State
@@ -123,7 +124,7 @@ final class WriteReviewReactor: Reactor {
             if let reviewEntity = state.reviewEntity {
                 return reviewDBManager.updateReview(reviewEntity.objectID, rating: state.rating, review: state.review, comment: state.comment, quote: state.quote)
                     .asObservable()
-                    .map { .dismissView }
+                    .map { .setEditMode(false) }
             } else {
                 return createReview(mediaID: state.media.id, rating: state.rating, review: state.review, comment: state.comment, quote: state.quote)
             }
@@ -162,6 +163,8 @@ final class WriteReviewReactor: Reactor {
             newState.review = newState.initialReview
             newState.comment = newState.initialComment
             newState.quote = newState.initialQuote
+        case .setReviewEntity(let reviewEntity):
+            newState.reviewEntity = reviewEntity
         }
         
         newState.canSave = !newState.review.isEmpty && newState.rating > 0
@@ -179,8 +182,13 @@ final class WriteReviewReactor: Reactor {
     private func createReview(mediaID: Int, rating: Double, review: String, comment: String?, quote: String?) -> Observable<Mutation> {
         return reviewDBManager.createReview(mediaID, rating: rating, review: review, comment: comment, quote: quote)
             .asObservable()
-            .map { reviewID in
-                return .dismissView
+            .flatMap { [weak self] reviewID -> Observable<Mutation> in
+                guard let self = self else { return .empty() }
+                let reviewEntity = self.reviewDBManager.fetchReview(id: mediaID)
+                return .concat([
+                    .just(.setReviewEntity(reviewEntity)),
+                    .just(.setEditMode(false))
+                ])
             }
     }
 }
