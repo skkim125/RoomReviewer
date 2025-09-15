@@ -176,7 +176,7 @@ final class HomeViewController: UIViewController, View {
                     guard let self = self else { return }
                     self.reactor?.action.onNext(.updateWatchlist)
                 }
-                
+                vc.hidesBottomBarWhenPushed = true
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
