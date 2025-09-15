@@ -15,6 +15,7 @@ import Then
 
 final class WriteReviewViewController: UIViewController, View {
     var disposeBag = DisposeBag()
+    private var activeTextInput: UIView?
 
     private let scrollView = UIScrollView()
     
@@ -99,6 +100,7 @@ final class WriteReviewViewController: UIViewController, View {
         $0.backgroundColor = .secondarySystemBackground
         $0.layer.cornerRadius = 8
         $0.placeholder = "ex) 호의가 계속되면 그게 권리인 줄 알아(선택)"
+        $0.isUserInteractionEnabled = true
         
         let padding = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: $0.frame.height))
         $0.leftView = padding
@@ -108,7 +110,6 @@ final class WriteReviewViewController: UIViewController, View {
     }
     
     private let saveButton = UIButton(type: .system).then {
-        $0.setTitle("내 서재에 저장", for: .normal)
         $0.titleLabel?.font = AppFont.boldTitle
         $0.backgroundColor = .systemRed
         $0.setTitleColor(AppColor.appWhite, for: .normal)
@@ -140,6 +141,7 @@ final class WriteReviewViewController: UIViewController, View {
         configureHierarchy()
         configureLayout()
         configureNavigationBar()
+        setupKeyboardDismissal()
     }
     
     private let dismissButton = UIBarButtonItem().then {
@@ -152,7 +154,6 @@ final class WriteReviewViewController: UIViewController, View {
     
     private func configureNavigationBar() {
         self.navigationItem.leftBarButtonItem = dismissButton
-        self.navigationItem.rightBarButtonItem = editButton
     }
     
     func bind(reactor: WriteReviewReactor) {
@@ -220,19 +221,24 @@ final class WriteReviewViewController: UIViewController, View {
             .drive(quoteTextField.rx.text)
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.isEditMode }
-            .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self) { owner, isEditMode in
+        reactor.state
+            .map { ($0.isEditMode, $0.reviewEntity != nil) }
+            .distinctUntilChanged { $0 == $1 }
+            .asDriver(onErrorJustReturn: (false, false))
+            .drive(with: self) { owner, state in
+                let (isEditMode, hasReview) = state
+                
                 owner.ratingView.isUserInteractionEnabled = isEditMode
                 owner.reviewTextField.isUserInteractionEnabled = isEditMode
                 owner.reviewDetailTextView.isUserInteractionEnabled = isEditMode
                 owner.quoteTextField.isUserInteractionEnabled = isEditMode
-                owner.saveButton.isHidden = !isEditMode
                 
-                if isEditMode {
+                if hasReview {
+                    owner.editButton.title = isEditMode ? "취소" : "수정"
+                    owner.navigationItem.title = isEditMode ? "평론 수정" : "나의 평론"
                     owner.navigationItem.rightBarButtonItem = owner.editButton
                 } else {
+                    owner.navigationItem.title = "평론 작성하기"
                     owner.navigationItem.rightBarButtonItem = nil
                 }
                 
@@ -245,8 +251,25 @@ final class WriteReviewViewController: UIViewController, View {
                         $0.bottom.equalTo(owner.view.safeAreaLayoutGuide)
                     }
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { state -> (isHidden: Bool, title: String) in
+                let isHidden = !state.isEditMode
+                let title: String
                 
-                owner.title = isEditMode ? "감상 기록하기" : "나의 평론"
+                if state.reviewEntity != nil {
+                    title = "수정하기"
+                } else {
+                    title = "평론 작성하기"
+                }
+                return (isHidden, title)
+            }
+            .asDriver(onErrorJustReturn: (isHidden: true, title: ""))
+            .drive(with: self) { owner, buttonState in
+                owner.saveButton.setTitle(buttonState.title, for: .normal)
+                owner.saveButton.isHidden = buttonState.isHidden
             }
             .disposed(by: disposeBag)
     }
@@ -288,8 +311,13 @@ final class WriteReviewViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         editButton.rx.tap
-            .map { _ in Reactor.Action.editButtonTapped }
-            .bind(to: reactor.action)
+            .bind(with: self) { owner, _ in
+                if owner.reactor?.currentState.isEditMode == true {
+                    owner.reactor?.action.onNext(.cancelButtonTapped)
+                } else {
+                    owner.reactor?.action.onNext(.editButtonTapped)
+                }
+            }
             .disposed(by: disposeBag)
         
         dismissButton.rx.tap
@@ -298,6 +326,70 @@ final class WriteReviewViewController: UIViewController, View {
                 owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
+        
+        let keyboardWillShow = NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
+            .compactMap { notification -> (frame: CGRect, duration: TimeInterval)? in
+                guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                      let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return nil }
+                return (frame, duration)
+            }
+
+        let keyboardWillHide = NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
+            .compactMap { notification -> TimeInterval? in
+                return notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval
+            }
+
+        keyboardWillShow
+            .bind(with: self) { owner, info in
+                let contentInset = UIEdgeInsets(top: 0, left: 0, bottom: info.frame.height, right: 0)
+                owner.scrollView.contentInset = contentInset
+                owner.scrollView.scrollIndicatorInsets = contentInset
+                
+                if owner.reactor?.currentState.isEditMode == true {
+                    owner.saveButton.snp.remakeConstraints {
+                        $0.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide).inset(20)
+                        $0.bottom.equalToSuperview().inset(info.frame.height + 10)
+                        $0.height.equalTo(50)
+                    }
+                }
+                
+                UIView.animate(withDuration: info.duration) {
+                    owner.view.layoutIfNeeded()
+                    if let activeField = owner.activeTextInput, activeField == owner.reviewDetailTextView {
+                        owner.scrollView.scrollRectToVisible(activeField.frame, animated: false)
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+
+        keyboardWillHide
+            .bind(with: self) { owner, duration in
+                owner.scrollView.contentInset = .zero
+                owner.scrollView.scrollIndicatorInsets = .zero
+                
+                if owner.reactor?.currentState.isEditMode == true {
+                    owner.saveButton.snp.remakeConstraints {
+                        $0.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide).inset(20)
+                        $0.bottom.equalTo(owner.view.safeAreaLayoutGuide).inset(10)
+                        $0.height.equalTo(50)
+                    }
+                }
+                
+                UIView.animate(withDuration: duration) {
+                    owner.view.layoutIfNeeded()
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func setupKeyboardDismissal() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
 
@@ -317,7 +409,7 @@ extension WriteReviewViewController {
         
         contentView.addSubview(commentTitleLabel)
         contentView.addSubview(reviewDetailTextView)
-        reviewDetailTextView.addSubview(reviewDetailPlaceholderLabel)
+        contentView.addSubview(reviewDetailPlaceholderLabel)
         
         contentView.addSubview(quoteTitleaLabel)
         contentView.addSubview(quoteTextField)
@@ -380,8 +472,8 @@ extension WriteReviewViewController {
         }
         
         reviewDetailPlaceholderLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(10)
-            $0.leading.equalToSuperview().inset(10)
+            $0.top.equalTo(reviewDetailTextView.snp.top).offset(10)
+            $0.leading.equalTo(reviewDetailTextView.snp.leading).offset(10)
         }
         
         quoteTitleaLabel.snp.makeConstraints {
@@ -401,5 +493,23 @@ extension WriteReviewViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(10)
             $0.height.equalTo(50)
         }
+    }
+}
+
+extension WriteReviewViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        // Allow touches on UIControl subclasses (buttons, textfields, etc.)
+        if touch.view is UIControl {
+            return false
+        }
+        // Allow touches on the text view
+        if touch.view == self.reviewDetailTextView || touch.view?.isDescendant(of: self.reviewDetailTextView) == true {
+            return false
+        }
+        // Allow touches on the rating view
+        if touch.view == self.ratingView || touch.view?.isDescendant(of: self.ratingView) == true {
+            return false
+        }
+        return true
     }
 }

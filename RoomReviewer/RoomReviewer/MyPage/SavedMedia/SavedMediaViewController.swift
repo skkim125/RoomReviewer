@@ -105,6 +105,7 @@ final class SavedMediaViewController: UIViewController, View {
                 let detailReactor = MediaDetailReactor(media: media, networkService: self.networkManager, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager, networkMonitor: self.networkMonitor)
                 let vc = MediaDetailViewController(imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
                 vc.reactor = detailReactor
+                vc.hidesBottomBarWhenPushed = true
                 
                 vc.updateAction = { [weak self] in
                     guard let self = self else { return }

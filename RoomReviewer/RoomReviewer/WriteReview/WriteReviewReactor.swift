@@ -41,6 +41,7 @@ final class WriteReviewReactor: Reactor {
         case quoteChanged(String)
         case saveButtonTapped
         case editButtonTapped
+        case cancelButtonTapped
     }
     
     enum Mutation {
@@ -52,7 +53,7 @@ final class WriteReviewReactor: Reactor {
         case setSaving(Bool)
         case dismissView
         case setEditMode(Bool)
-        case setInitialReviewData(ReviewEntity)
+        case revertToInitialState
     }
     
     var initialState: State
@@ -103,16 +104,7 @@ final class WriteReviewReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad:
-            let imageLoad = loadPosterImage(currentState.posterPath)
-            
-            if let reviewEntity = currentState.reviewEntity {
-                return Observable.concat([
-                    imageLoad,
-                    .just(.setInitialReviewData(reviewEntity))
-                ])
-            } else {
-                return imageLoad
-            }
+            return loadPosterImage(currentState.posterPath)
             
         case .ratingChanged(let score):
             return .just(.setRating(score))
@@ -138,6 +130,9 @@ final class WriteReviewReactor: Reactor {
             
         case .editButtonTapped:
             return .just(.setEditMode(true))
+            
+        case .cancelButtonTapped:
+            return .just(.revertToInitialState)
         }
     }
     
@@ -161,12 +156,12 @@ final class WriteReviewReactor: Reactor {
             newState.comment = comment
         case .setEditMode(let isEditMode):
             newState.isEditMode = isEditMode
-        case .setInitialReviewData(let reviewEntity):
-            newState.rating = reviewEntity.rating
-            newState.review = reviewEntity.review
-            newState.comment = reviewEntity.comment
-            newState.quote = reviewEntity.quote
-            newState.reviewEntity = reviewEntity
+        case .revertToInitialState:
+            newState.isEditMode = false
+            newState.rating = newState.initialRating
+            newState.review = newState.initialReview
+            newState.comment = newState.initialComment
+            newState.quote = newState.initialQuote
         }
         
         newState.canSave = !newState.review.isEmpty && newState.rating > 0
