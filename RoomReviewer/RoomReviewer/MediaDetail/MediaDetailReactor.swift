@@ -244,16 +244,7 @@ final class MediaDetailReactor: Reactor {
             }
             
         case .watchedButtonTapped:
-            let state = currentState
-            if currentState.watchedDate == nil {
-                return .just(.showSetWatchedDateAlert)
-            } else {
-                return mediaDBManager.updateWatchedDate(id: currentState.media.id, watchedDate: nil)
-                    .asObservable()
-                    .flatMap { _ -> Observable<Mutation> in
-                        return .just(.setWatchlistStatus(isWatchlisted: state.isWatchlisted, isStared: state.isStared, watchedDate: nil, mediaObjectID: state.mediaObjectID, isReviewed: state.isReviewed))
-                    }
-            }
+            return .just(.showSetWatchedDateAlert)
             
         case .writeReviewButtonTapped:
             let media = currentState.media

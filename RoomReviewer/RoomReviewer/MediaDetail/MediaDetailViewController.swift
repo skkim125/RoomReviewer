@@ -300,23 +300,12 @@ final class MediaDetailViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
-        reactor.state.compactMap { $0.isWatchlisted }
-            .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self) { owner, isWatchlisted in
-                owner.updateWatchlistButton(isWatchlisted: isWatchlisted)
-            }
-            .disposed(by: disposeBag)
-        
         reactor.state.map { ($0.isWatchlisted, $0.watchedDate, $0.isReviewed) }
-            .compactMap { watchlisted, watchedDate, reviewed -> (Bool, Date?, Bool)? in
-                return (watchlisted, watchedDate, reviewed)
-            }
             .asDriver(onErrorJustReturn: (false, nil, false))
             .drive(with: self) { owner, statuses in
                 let (isWatchlisted, watchedDate, isReviewed) = statuses
                 
-                owner.updateWatchlistButton(isWatchlisted: isWatchlisted)
+                owner.updateWatchlistButton(isWatchlisted: isWatchlisted, isReviewed: isReviewed, watchedDate: watchedDate)
                 owner.updateWatchedButton(isWatchlisted: isWatchlisted, watchedDate: watchedDate)
                 owner.updateReviewButton(watchedDate: watchedDate, isReviewed: isReviewed)
             }
@@ -454,7 +443,8 @@ final class MediaDetailViewController: UIViewController, View {
             .disposed(by: disposeBag)
     }
     
-    private func updateWatchlistButton(isWatchlisted: Bool) {
+    private func updateWatchlistButton(isWatchlisted: Bool, isReviewed: Bool, watchedDate: Date?) {
+        watchlistButton.isEnabled = isReviewed == false && watchedDate == nil
         var config = watchlistButton.configuration ?? UIButton.Configuration.plain()
         
         config.imagePlacement = .top
@@ -678,6 +668,10 @@ extension MediaDetailViewController {
         datePicker.preferredDatePickerStyle = .inline
         datePicker.locale = Locale(identifier: "ko-KR")
         datePicker.maximumDate = Date()
+        
+        if let currentWatchedDate = reactor?.currentState.watchedDate {
+            datePicker.date = currentWatchedDate
+        }
         
         let alert = CustomAlertViewController(title: "시청한 날짜 선택", subtitle: "미디어를 시청한 날짜를 선택해주세요.", buttonType: .twoButton, contentView: datePicker) { [weak self] in
             guard let self = self else { return }
