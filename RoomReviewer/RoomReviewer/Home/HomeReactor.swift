@@ -30,6 +30,8 @@ final class HomeReactor: Reactor {
         var isOffline: Bool = false
         @Pulse var presentWriteReviewView: Void?
         @Pulse var selectedMedia: Media?
+        @Pulse var shouldShowNetworkAlert: Void?
+        @Pulse var shouldShowOfflineAlert: Void?
     }
     
     enum Action {
@@ -37,6 +39,8 @@ final class HomeReactor: Reactor {
         case writeButtonTapped
         case mediaSelected(Media)
         case updateWatchlist
+        case offlineButtonTapped
+        case alertConfirmed
     }
     
     enum Mutation {
@@ -46,6 +50,8 @@ final class HomeReactor: Reactor {
         case presentWriteReviewView
         case presentMediaDetail(Media)
         case updateWatchlist([HomeSectionItem])
+        case shouldShowNetworkAlert
+        case shouldShowOfflineAlert
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -69,7 +75,35 @@ final class HomeReactor: Reactor {
             
         case .updateWatchlist:
             return updateWatchlist()
+
+        case .offlineButtonTapped:
+            if !networkMonitor.isCurrentlyConnected {
+                return .just(.shouldShowNetworkAlert)
+            } else {
+                return Observable.concat([
+                    .just(.setLoading(true)),
+                    .just(.setOffline(!networkMonitor.isCurrentlyConnected)),
+                    fetchOnlineData(),
+                    .just(.setLoading(false))
+                ])
+            }
+            
+        case .alertConfirmed:
+            return .concat([
+                .just(.setOffline(true)),
+                self.fetchOfflineData()
+            ])
         }
+    }
+    
+    func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let networkStatusMutation = networkMonitor.isConnected
+            .skip(1)
+            .distinctUntilChanged()
+            .filter { !$0 }
+            .map { _ in Mutation.shouldShowOfflineAlert }
+        
+        return Observable.merge(mutation, networkStatusMutation)
     }
     
     func reduce(state: State, mutation: Mutation) -> State {
@@ -105,6 +139,11 @@ final class HomeReactor: Reactor {
                 }
             }
             newState.sections = currentSections
+            
+        case .shouldShowNetworkAlert:
+            newState.shouldShowNetworkAlert = ()
+        case .shouldShowOfflineAlert:
+            newState.shouldShowOfflineAlert = ()
         }
         
         return newState

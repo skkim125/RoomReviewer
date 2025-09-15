@@ -22,7 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let networkMonitor = NetworkMonitor()
         self.networkMonitor = networkMonitor
-        networkMonitor.start() // 모니터링 시작
+        networkMonitor.start()
         
         window?.rootViewController = setupVC(networkMonitor: networkMonitor)
         window?.makeKeyAndVisible()
@@ -85,17 +85,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //            .disposed(by: disposeBag)
 //    }
     
-    private func showNetworkErrorAlert() {
-        let alert = CustomAlertViewController(
-            title: "네트워크 오류",
-            subtitle: "네트워크 연결을 확인해주세요.",
-            buttonType: .oneButton
-        )
-        
-        if window?.rootViewController?.presentedViewController == nil {
-            window?.rootViewController?.present(alert, animated: true)
-        }
-    }
+//    private func showNetworkErrorAlert() {
+//        let alert = CustomAlertViewController(
+//            title: "네트워크 오류",
+//            subtitle: "네트워크 연결을 확인해주세요.",
+//            buttonType: .oneButton
+//        )
+//        
+//        if window?.rootViewController?.presentedViewController == nil {
+//            window?.rootViewController?.present(alert, animated: true)
+//        }
+//    }
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

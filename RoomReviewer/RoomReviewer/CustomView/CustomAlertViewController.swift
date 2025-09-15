@@ -18,7 +18,7 @@ enum AlertButtonType {
 
 final class CustomAlertViewController: UIViewController {
     typealias CompletionHandler = () -> Void
-    private var confirmAction: CompletionHandler?
+    var confirmAction: CompletionHandler?
     private let disposeBag = DisposeBag()
     
     private let containerView = UIView().then {

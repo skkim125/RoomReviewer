@@ -16,7 +16,7 @@ final class OfflineView: UIView {
     }
     
     private let messageLabel = UILabel().then {
-        $0.text = "네트워크에 연결할 수 없습니다.\n연결 상태를 확인해주세요."
+        $0.text = "오프라인 상태입니다.\n네트워크 연결 상태를 확인해주세요."
         $0.font = AppFont.semiboldSubTitle
         $0.textColor = AppColor.appLightGray
         $0.textAlignment = .center

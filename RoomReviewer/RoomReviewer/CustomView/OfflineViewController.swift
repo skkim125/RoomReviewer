@@ -7,7 +7,7 @@ import Then
 final class OfflineViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
-    var retryAction: (() -> Void)?
+    var offlineButtonTappedAction: (() -> Void)?
     
     private let iconImageView = UIImageView().then {
         $0.image = UIImage(systemName: "wifi.slash")
@@ -62,7 +62,7 @@ final class OfflineViewController: UIViewController {
         retryButton.rx.tap
             .subscribe(with: self) { owner, _ in
                 owner.dismiss(animated: true) {
-                    owner.retryAction?()
+                    owner.offlineButtonTappedAction?()
                 }
             }
             .disposed(by: disposeBag)
