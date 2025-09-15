@@ -21,6 +21,10 @@ final class WriteReviewViewController: UIViewController, View {
     
     private let contentView = UIView()
     
+    deinit {
+        print("WriteReviewViewController deinit")
+    }
+    
     private let posterImageView = UIImageView().then {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
@@ -117,6 +121,8 @@ final class WriteReviewViewController: UIViewController, View {
         $0.layer.cornerRadius = 12
         $0.isEnabled = false
     }
+    
+    var updateReviewHandler: (() -> Void)?
     
     private let imageProvider: ImageProviding
     private let imageFileManager: ImageFileManaging
