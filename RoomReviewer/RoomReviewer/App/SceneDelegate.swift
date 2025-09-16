@@ -24,12 +24,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.networkMonitor = networkMonitor
         networkMonitor.start()
         
-        window?.rootViewController = setupVC(networkMonitor: networkMonitor)
+        let mainTabBarController = setupTabBarController(networkMonitor: networkMonitor)
+        
+        window?.rootViewController = mainTabBarController
         window?.makeKeyAndVisible()
     }
     
-    private func setupVC(networkMonitor: NetworkMonitoring) -> UITabBarController {
-        let tabBarController = UITabBarController()
+    private func setupTabBarController(networkMonitor: NetworkMonitoring) -> UITabBarController {
+        let tabBarController = MainTabBarController(networkMonitor: networkMonitor)
+        
         let dataFetcher = URLSessionDataFetcher(networkMonitor: networkMonitor)
         let networkManager = NetworkManager(dataFetcher: dataFetcher)
         let imageStore: ImageFileManaging = ImageFileManager()
@@ -43,6 +46,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let homeVC = HomeViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager, networkManager: networkManager, networkMonitor: networkMonitor)
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
+        homeNav.delegate = tabBarController
         homeNav.tabBarItem.image = UIImage(systemName: "house")
         homeNav.title = "홈"
         
@@ -50,6 +54,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tierListVC = MediaTierListViewController(imageProvider: imageProvider, imageFileManager: imageStore)
         tierListVC.reactor = tierListReactor
         let tierListNav = UINavigationController(rootViewController: tierListVC)
+        tierListNav.delegate = tabBarController
         tierListNav.tabBarItem.image = UIImage(systemName: "list.number")
         tierListNav.title = "티어"
         
@@ -57,6 +62,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let myPageVC = MyPageViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager, networkManager: networkManager, networkMonitor: networkMonitor)
         myPageVC.reactor = mypageReactor
         let myPageNav = UINavigationController(rootViewController: myPageVC)
+        myPageNav.delegate = tabBarController
         myPageNav.tabBarItem.image = UIImage(systemName: "ellipsis")
         myPageNav.title = "더보기"
         
@@ -68,6 +74,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         tabBarController.tabBar.tintColor = AppColor.appWhite
         tabBarController.tabBar.unselectedItemTintColor = AppColor.appGray
+        
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = AppColor.appBackgroundColor
+        
+        tabBarController.tabBar.standardAppearance = appearance
+        tabBarController.tabBar.scrollEdgeAppearance = appearance
 
         return tabBarController
     }
