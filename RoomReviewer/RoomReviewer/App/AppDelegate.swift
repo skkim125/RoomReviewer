@@ -8,6 +8,7 @@
 import UIKit
 import Firebase
 import FirebaseAnalytics
+import GoogleMobileAds
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         FirebaseApp.configure()
         Analytics.logEvent("app_opened", parameters: nil)
+        MobileAds.shared.start(completionHandler: nil)
         return true
     }
 
