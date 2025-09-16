@@ -17,19 +17,20 @@ final class OfflineView: UIView {
     
     private let messageLabel = UILabel().then {
         $0.text = "오프라인 상태입니다.\n네트워크 연결 상태를 확인해주세요."
-        $0.font = AppFont.semiboldSubTitle
+        $0.font = AppFont.semiboldCallout
         $0.textColor = AppColor.appLightGray
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
     
-    private lazy var retryButton = CommonButton(title: "다시 시도", foregroundColor: AppColor.appWhite, backgroundColor: .systemRed)
+    private lazy var retryButton = CommonButton(title: "다시 연결하기", foregroundColor: AppColor.appWhite, backgroundColor: .systemRed)
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
         
         configureHierarchy()
         configureLayout()
+        self.backgroundColor = .clear
         bind()
     }
     
@@ -45,9 +46,9 @@ final class OfflineView: UIView {
 
     private func configureLayout() {
         iconImageView.snp.makeConstraints {
-            $0.size.equalTo(60)
+            $0.size.equalTo(50)
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(messageLabel.snp.top).offset(-5)
+            $0.bottom.equalTo(messageLabel.snp.top)
         }
         
         messageLabel.snp.makeConstraints {
@@ -56,7 +57,7 @@ final class OfflineView: UIView {
         }
         
         retryButton.snp.makeConstraints {
-            $0.top.equalTo(messageLabel.snp.bottom).offset(20)
+            $0.top.equalTo(messageLabel.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(150)
         }
