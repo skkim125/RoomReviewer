@@ -72,8 +72,10 @@ final class HomeViewController: UIViewController, View {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
         Analytics.logEvent("HomeView_appeared", parameters: nil)
+
+        reactor?.action.onNext(.updateWatchlist)
     }
     
     private func configureView() {
