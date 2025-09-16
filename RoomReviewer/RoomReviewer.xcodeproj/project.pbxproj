@@ -733,6 +733,7 @@
 		04FFC7A12DF169D60081AF7C = {
 			isa = PBXGroup;
 			children = (
+				046B380D2E788C5900354C37 /* GoogleService-Info.plist */,
 				04DCA89A2DF2D99200695361 /* API.xcconfig */,
 				04FFC7CB2DF16A840081AF7C /* RoomReviewer */,
 				041366622E0136CB0026514E /* HomeTVCollectionViewCellReactorTests */,
@@ -761,7 +762,6 @@
 		04FFC7CB2DF16A840081AF7C /* RoomReviewer */ = {
 			isa = PBXGroup;
 			children = (
-				046B380D2E788C5900354C37 /* GoogleService-Info.plist */,
 				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04C97AAF2E20D8C4001EB1D4 /* App */,
 				044B8C392E60830500EB016D /* Extension */,
@@ -1069,6 +1069,7 @@
 				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
 				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}.debug.dylib",
 			);
 			outputFileListPaths = (
 			);
@@ -1571,7 +1572,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
