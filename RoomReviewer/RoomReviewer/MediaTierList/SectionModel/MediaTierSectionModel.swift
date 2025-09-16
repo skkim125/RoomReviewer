@@ -18,13 +18,13 @@ enum Tier: String, CaseIterable {
     var color: UIColor {
         switch self {
         case .S:
-            return .systemRed
+            return .appRed
         case .A:
             return .systemOrange
         case .B:
-            return .systemYellow
+            return .appYellow
         case .C:
-            return .systemGreen
+            return .appGreen
         case .D:
             return .systemBlue
         }

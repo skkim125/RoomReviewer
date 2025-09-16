@@ -17,7 +17,9 @@ final class MainTabBarController: UITabBarController {
     
     private lazy var bannerView = BannerView().then {
         $0.adSize = AdSizeBanner
-        $0.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        $0.adUnitID = Bundle.main.object(
+            forInfoDictionaryKey: "GAD_BannerADs_Identifier"
+        ) as? String ?? ""
         $0.rootViewController = self
         $0.isHidden = true
     }
@@ -38,7 +40,7 @@ final class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.delegate = self
-        loadBannerView()
+//        loadBannerView()
     }
     
     override func viewDidAppear(_ animated: Bool) {

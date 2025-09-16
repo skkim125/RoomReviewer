@@ -207,7 +207,7 @@ extension SearchMediaViewController {
         
         let image = UIImage(systemName: "sunglasses")
         let imageView = UIImageView(image: image)
-        imageView.tintColor = .systemRed
+        imageView.tintColor = .appRed
         imageView.contentMode = .scaleAspectFill
         
         appIconView.addSubview(label)

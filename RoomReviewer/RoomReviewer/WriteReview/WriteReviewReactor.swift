@@ -54,6 +54,7 @@ final class WriteReviewReactor: Reactor {
         case dismissView
         case setEditMode(Bool)
         case revertToInitialState
+        case revertToSavedState
         case setReviewEntity(ReviewEntity?)
     }
     
@@ -121,19 +122,24 @@ final class WriteReviewReactor: Reactor {
             
         case .saveButtonTapped:
             let state = currentState
-            if let reviewEntity = state.reviewEntity {
-                return reviewDBManager.updateReview(reviewEntity.objectID, rating: state.rating, review: state.review, comment: state.comment, quote: state.quote)
-                    .asObservable()
-                    .map { .setEditMode(false) }
-            } else {
-                return createReview(mediaID: state.media.id, rating: state.rating, review: state.review, comment: state.comment, quote: state.quote)
-            }
+            return .concat([
+                .just(.setSaving(true)),
+                saveReview(state: state),
+                .just(.setSaving(false))
+            ])
             
         case .editButtonTapped:
             return .just(.setEditMode(true))
             
         case .cancelButtonTapped:
-            return .just(.revertToInitialState)
+            let state = currentState
+            if state.reviewEntity != nil {
+                // 기존 리뷰가 있는 경우, 저장된 값으로 복원
+                return .just(.revertToSavedState)
+            } else {
+                // 새 리뷰인 경우에만 초기값으로 복원
+                return .just(.revertToInitialState)
+            }
         }
     }
     
@@ -163,6 +169,14 @@ final class WriteReviewReactor: Reactor {
             newState.review = newState.initialReview
             newState.comment = newState.initialComment
             newState.quote = newState.initialQuote
+        case .revertToSavedState:
+            newState.isEditMode = false
+            if let reviewEntity = newState.reviewEntity {
+                newState.rating = reviewEntity.rating
+                newState.review = reviewEntity.review
+                newState.comment = reviewEntity.comment
+                newState.quote = reviewEntity.quote
+            }
         case .setReviewEntity(let reviewEntity):
             newState.reviewEntity = reviewEntity
         }
@@ -179,6 +193,22 @@ final class WriteReviewReactor: Reactor {
             }
     }
     
+    private func saveReview(state: State) -> Observable<Mutation> {
+        if let reviewEntity = state.reviewEntity {
+            return updateReview(reviewObjectID: reviewEntity.objectID,
+                              rating: state.rating,
+                              review: state.review,
+                              comment: state.comment,
+                              quote: state.quote)
+        } else {
+            return createReview(mediaID: state.media.id,
+                              rating: state.rating,
+                              review: state.review,
+                              comment: state.comment,
+                              quote: state.quote)
+        }
+    }
+    
     private func createReview(mediaID: Int, rating: Double, review: String, comment: String?, quote: String?) -> Observable<Mutation> {
         return reviewDBManager.createReview(mediaID, rating: rating, review: review, comment: comment, quote: quote)
             .asObservable()
@@ -189,6 +219,20 @@ final class WriteReviewReactor: Reactor {
                     .just(.setReviewEntity(reviewEntity)),
                     .just(.setEditMode(false))
                 ])
+            }
+            .catch { error in
+                print("리뷰 생성 실패: \(error)")
+                return .empty()
+            }
+    }
+    
+    private func updateReview(reviewObjectID: NSManagedObjectID, rating: Double, review: String, comment: String?, quote: String?) -> Observable<Mutation> {
+        return reviewDBManager.updateReview(reviewObjectID, rating: rating, review: review, comment: comment, quote: quote)
+            .asObservable()
+            .map { .setEditMode(false) }
+            .catch { error in
+                print("리뷰 수정 실패: \(error)")
+                return .empty()
             }
     }
 }

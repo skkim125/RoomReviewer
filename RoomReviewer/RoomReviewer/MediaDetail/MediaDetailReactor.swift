@@ -207,8 +207,12 @@ final class MediaDetailReactor: Reactor {
             guard currentState.processingAction == .none else { return .empty() }
             let media = currentState.media
             let updateStream = mediaDBManager.updateWatchedDate(id: media.id, watchedDate: date).asObservable()
-                .flatMap { _ -> Observable<Mutation> in .just(.setWatchedDate(date)) }
-                .catch { error in .just(.showError(DatabaseError.updateFailed)) }
+                .flatMap { _ -> Observable<Mutation> in .just(.setWatchedDate(date))
+                }
+                .catch { error in
+                        .just(.showError(DatabaseError.updateFailed))
+                }
+            
             return .concat([.just(.setProcessingAction(.updateWatchedDate)), updateStream, .just(.setProcessingAction(.none))])
             
         case .moreOverviewButtonTapped:
@@ -219,15 +223,51 @@ final class MediaDetailReactor: Reactor {
             
         case .starButtonTapped:
             guard currentState.processingAction == .none else { return .empty() }
-            let media = currentState.media, creators = currentState.creators, casts = currentState.casts
+            let media = currentState.media
+            let creators = currentState.creators
+            let casts = currentState.casts
             let starToggle = !currentState.isStared
-            let updateIsStaredStream = mediaDBManager.updateIsStared(id: media.id, isStar: starToggle).asObservable().flatMap { isStar -> Observable<Mutation> in .just(.updateStarButton(isStar)) }
-            let finalStream = updateIsStaredStream.catch { [weak self] error -> Observable<Mutation> in
-                guard let self = self else { return .empty() }
-                return mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: nil, certificate: self.currentState.certificate, runtimeOrEpisodeInfo: self.currentState.runtimeOrEpisodeInfo)
-                    .asObservable().flatMap { _ in return updateIsStaredStream }.catch { createError in .just(.showError(DatabaseError.saveFailed)) }
+            
+            let updateStream = mediaDBManager.updateIsStared(id: media.id, isStar: starToggle)
+                .asObservable()
+                .map { isStar -> Mutation in
+                    .updateStarButton(isStar)
+                }
+            
+            let createAndUpdateStream = updateStream.catch { [weak self] error -> Observable<Mutation> in
+                guard let self = self else { return .just(.showError(DatabaseError.updateFailed)) }
+                
+                return self.mediaDBManager.createMedia(
+                    id: media.id,
+                    title: media.title,
+                    overview: media.overview,
+                    type: media.mediaType.rawValue,
+                    posterURL: media.posterPath,
+                    backdropURL: media.backdropPath,
+                    genres: media.genreIDS,
+                    releaseDate: media.releaseDate,
+                    watchedDate: nil,
+                    creators: creators,
+                    casts: casts,
+                    addedDate: nil,
+                    certificate: self.currentState.certificate,
+                    runtimeOrEpisodeInfo: self.currentState.runtimeOrEpisodeInfo
+                )
+                .asObservable()
+                .flatMap { _ -> Observable<Mutation> in
+                    return self.mediaDBManager.updateIsStared(id: media.id, isStar: starToggle)
+                        .asObservable()
+                        .map { isStar -> Mutation in .updateStarButton(isStar) }
+                        .catch { _ -> Observable<Mutation> in .just(.showError(DatabaseError.saveFailed)) }
+                }
+                .catch { _ -> Observable<Mutation> in .just(.showError(DatabaseError.saveFailed)) }
             }
-            return .concat([.just(.setProcessingAction(.star)), finalStream, .just(.setProcessingAction(.none))])
+            
+            return Observable.concat([
+                Observable.just(.setProcessingAction(.star)),
+                createAndUpdateStream,
+                Observable.just(.setProcessingAction(.none))
+            ])
         }
     }
     
