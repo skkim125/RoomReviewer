@@ -16,7 +16,6 @@ import FirebaseAnalytics
 
 final class WriteReviewViewController: UIViewController, View {
     var disposeBag = DisposeBag()
-    private var activeTextInput: UIView?
 
     private let scrollView = UIScrollView()
     
@@ -54,9 +53,9 @@ final class WriteReviewViewController: UIViewController, View {
         setting.starMargin = 5
         setting.emptyBorderWidth = 2
         setting.filledBorderWidth = 2
-        setting.emptyBorderColor = .systemYellow
-        setting.filledBorderColor = .systemYellow
-        setting.filledColor = .systemYellow
+        setting.emptyBorderColor = .appYellow
+        setting.filledBorderColor = .appYellow
+        setting.filledColor = .appYellow
         
         $0.settings = setting
         $0.rating = 0
@@ -116,7 +115,7 @@ final class WriteReviewViewController: UIViewController, View {
     
     private let saveButton = UIButton(type: .system).then {
         $0.titleLabel?.font = AppFont.boldTitle
-        $0.backgroundColor = .systemRed
+        $0.backgroundColor = .appRed
         $0.setTitleColor(AppColor.appWhite, for: .normal)
         $0.setTitleColor(AppColor.appGray, for: .disabled)
         $0.layer.cornerRadius = 12
@@ -190,7 +189,7 @@ final class WriteReviewViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self) { owner, canSave in
                 owner.saveButton.isEnabled = canSave
-                owner.saveButton.backgroundColor = canSave ? .systemRed : AppColor.appLightGray
+                owner.saveButton.backgroundColor = canSave ? .appRed : AppColor.appLightGray
             }
             .disposed(by: disposeBag)
         
@@ -347,56 +346,14 @@ final class WriteReviewViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
-        let keyboardWillShow = NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
-            .compactMap { notification -> (frame: CGRect, duration: TimeInterval)? in
-                guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-                      let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return nil }
-                return (frame, duration)
-            }
-
-        let keyboardWillHide = NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
-            .compactMap { notification -> TimeInterval? in
-                return notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval
-            }
-
-        keyboardWillShow
-            .bind(with: self) { owner, info in
-                let contentInset = UIEdgeInsets(top: 0, left: 0, bottom: info.frame.height, right: 0)
-                owner.scrollView.contentInset = contentInset
-                owner.scrollView.scrollIndicatorInsets = contentInset
-                
-                if owner.reactor?.currentState.isEditMode == true {
-                    owner.saveButton.snp.remakeConstraints {
-                        $0.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide).inset(20)
-                        $0.bottom.equalToSuperview().inset(info.frame.height + 10)
-                        $0.height.equalTo(50)
+        reviewDetailTextView.rx.didBeginEditing
+            .asDriver()
+            .drive(with: self) { owner, _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    owner.scrollView.scrollRectToVisible(owner.reviewDetailTextView.frame, animated: true)
+                    UIView.animate(withDuration: 0.6) {
+                        owner.view.layoutIfNeeded()
                     }
-                }
-                
-                UIView.animate(withDuration: info.duration) {
-                    owner.view.layoutIfNeeded()
-                    if let activeField = owner.activeTextInput, activeField == owner.reviewDetailTextView {
-                        owner.scrollView.scrollRectToVisible(activeField.frame, animated: false)
-                    }
-                }
-            }
-            .disposed(by: disposeBag)
-
-        keyboardWillHide
-            .bind(with: self) { owner, duration in
-                owner.scrollView.contentInset = .zero
-                owner.scrollView.scrollIndicatorInsets = .zero
-                
-                if owner.reactor?.currentState.isEditMode == true {
-                    owner.saveButton.snp.remakeConstraints {
-                        $0.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide).inset(20)
-                        $0.bottom.equalTo(owner.view.safeAreaLayoutGuide).inset(10)
-                        $0.height.equalTo(50)
-                    }
-                }
-                
-                UIView.animate(withDuration: duration) {
-                    owner.view.layoutIfNeeded()
                 }
             }
             .disposed(by: disposeBag)
@@ -510,7 +467,7 @@ extension WriteReviewViewController {
         
         saveButton.snp.makeConstraints {
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(10)
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-10)
             $0.height.equalTo(50)
         }
     }

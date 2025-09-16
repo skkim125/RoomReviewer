@@ -23,7 +23,7 @@ final class OfflineView: UIView {
         $0.numberOfLines = 0
     }
     
-    private lazy var retryButton = CommonButton(title: "다시 연결하기", foregroundColor: AppColor.appWhite, backgroundColor: .systemRed)
+    private lazy var retryButton = CommonButton(title: "다시 연결하기", foregroundColor: AppColor.appWhite, backgroundColor: .appRed)
     
     override init(frame: CGRect) {
         super.init(frame: .zero)

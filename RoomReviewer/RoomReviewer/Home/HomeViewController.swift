@@ -29,9 +29,9 @@ final class HomeViewController: UIViewController, View {
         $0.backgroundColor = .clear
     }
     
-    private let writeReviewButton = UIBarButtonItem().then {
+    private let searchMediaButton = UIBarButtonItem().then {
         let config = UIImage.SymbolConfiguration(weight: .heavy)
-        let image = UIImage(systemName: "plus", withConfiguration: config)
+        let image = UIImage(systemName: "magnifyingglass", withConfiguration: config)
         $0.image = image
         $0.tintColor = AppColor.appWhite
         $0.style = .done
@@ -84,8 +84,8 @@ final class HomeViewController: UIViewController, View {
     }
     
     func bind(reactor: HomeReactor) {
-        writeReviewButton.rx.tap
-            .map { HomeReactor.Action.writeButtonTapped }
+        searchMediaButton.rx.tap
+            .map { HomeReactor.Action.searchMediaButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -263,7 +263,7 @@ extension HomeViewController {
         
         let image = UIImage(systemName: "sunglasses")
         let imageView = UIImageView(image: image)
-        imageView.tintColor = .systemRed
+        imageView.tintColor = .appRed
         imageView.contentMode = .scaleAspectFill
         
         appIconView.addSubview(label)
@@ -282,6 +282,6 @@ extension HomeViewController {
         }
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
-        navigationItem.rightBarButtonItem = writeReviewButton
+        navigationItem.rightBarButtonItem = searchMediaButton
     }
 }

@@ -141,7 +141,7 @@ final class MediaDetailViewController: UIViewController, View {
     
     private let starToggleButton = UIBarButtonItem().then {
         $0.image = UIImage(systemName: "star")
-        $0.tintColor = .systemYellow
+        $0.tintColor = .appYellow
         $0.style = .done
         $0.target = nil
         $0.action = nil
@@ -478,7 +478,7 @@ final class MediaDetailViewController: UIViewController, View {
         if isWatchlisted {
             config.title = "저장됨"
             config.image = UIImage(systemName: "bookmark.fill")
-            config.baseForegroundColor = .systemYellow
+            config.baseForegroundColor = .appYellow
         } else {
             config.title = "보고 싶어요"
             config.image = UIImage(systemName: "plus.circle")
@@ -533,8 +533,8 @@ final class MediaDetailViewController: UIViewController, View {
         
         if isReviewed {
             config.title = "평론 보기"
-            config.image = UIImage(systemName: "doc.text.fill")
-            config.baseForegroundColor = .systemGreen
+            config.image = UIImage(systemName: "sunglasses.fill")
+            config.baseForegroundColor = .appButtonRed
         } else {
             config.title = "평론하기"
             config.image = UIImage(systemName: "sunglasses")
@@ -699,6 +699,7 @@ extension MediaDetailViewController {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .inline
+        datePicker.tintColor = .appRed
         datePicker.locale = Locale(identifier: "ko-KR")
         datePicker.maximumDate = Date()
         

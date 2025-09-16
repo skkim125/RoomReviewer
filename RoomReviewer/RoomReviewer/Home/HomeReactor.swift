@@ -36,7 +36,7 @@ final class HomeReactor: Reactor {
     
     enum Action {
         case fetchData
-        case writeButtonTapped
+        case searchMediaButtonTapped
         case mediaSelected(Media)
         case updateWatchlist
         case offlineButtonTapped
@@ -67,7 +67,7 @@ final class HomeReactor: Reactor {
                 .just(.setLoading(false))
             ])
 
-        case .writeButtonTapped:
+        case .searchMediaButtonTapped:
             return .just(.presentWriteReviewView)
             
         case .mediaSelected(let media):

@@ -33,7 +33,7 @@ final class CustomAlertViewController: UIViewController {
     
     private let customContentView: UIView?
     
-    private lazy var confirmButton = CommonButton(title: "확인", foregroundColor: AppColor.appWhite, backgroundColor: .systemRed)
+    private lazy var confirmButton = CommonButton(title: "확인", foregroundColor: AppColor.appWhite, backgroundColor: .appRed)
     private lazy var cancelButton = CommonButton(title: "취소", foregroundColor: AppColor.appWhite, backgroundColor: AppColor.appLightGray)
 
     init(title: String, subtitle: String? = nil, buttonType: AlertButtonType, contentView: UIView? = nil, confirmAction: CompletionHandler? = nil) {
