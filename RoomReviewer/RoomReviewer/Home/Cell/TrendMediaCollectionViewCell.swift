@@ -103,6 +103,8 @@ final class TrendMediaCollectionViewCell: UICollectionViewCell, View {
                         owner.posterImageView.contentMode = .scaleAspectFit
                         owner.posterImageView.backgroundColor = AppColor.appLightGray
                         owner.posterImageView.tintColor = AppColor.appWhite
+                    } else {
+                        owner.posterImageView.contentMode = .scaleAspectFill
                     }
                     owner.posterImageView.image = image
                 } else {

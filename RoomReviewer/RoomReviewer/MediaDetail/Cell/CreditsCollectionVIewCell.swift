@@ -32,7 +32,7 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
         $0.font = AppFont.body
         $0.textColor = AppColor.appLightGray
         $0.textAlignment = .center
-        $0.numberOfLines = 1
+        $0.numberOfLines = 2
     }
     
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
@@ -61,13 +61,13 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
         }
         
         nameLabel.snp.makeConstraints {
-            $0.top.equalTo(profileImageView.snp.bottom).offset(10)
+            $0.top.equalTo(profileImageView.snp.bottom).offset(5)
             $0.leading.trailing.equalToSuperview()
         }
         
         characterLabel.snp.makeConstraints {
-            $0.top.equalTo(nameLabel.snp.bottom).offset(2)
-            $0.leading.trailing.equalToSuperview().inset(5)
+            $0.top.equalTo(nameLabel.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         activityIndicator.snp.makeConstraints {

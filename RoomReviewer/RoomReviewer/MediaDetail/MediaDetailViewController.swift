@@ -292,6 +292,13 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
+                    if image == AppImage.emptyPosterImage {
+                        owner.backDropImageView.contentMode = .scaleAspectFit
+                        owner.backDropImageView.backgroundColor = AppColor.appLightGray
+                        owner.backDropImageView.tintColor = AppColor.appWhite
+                    } else {
+                        owner.backDropImageView.contentMode = .scaleAspectFill
+                    }
                     owner.backDropImageView.image = image
                 } else {
                     owner.backDropImageView.backgroundColor = AppColor.appDarkGray
@@ -304,6 +311,13 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, image in
                 if let image = image {
+                    if image == AppImage.emptyPosterImage {
+                        owner.posterImageView.contentMode = .scaleAspectFit
+                        owner.posterImageView.backgroundColor = AppColor.appLightGray
+                        owner.posterImageView.tintColor = AppColor.appWhite
+                    } else {
+                        owner.posterImageView.contentMode = .scaleAspectFill
+                    }
                     owner.posterImageView.image = image
                 } else {
                     owner.posterImageView.backgroundColor = AppColor.appDarkGray
@@ -671,7 +685,7 @@ extension MediaDetailViewController {
             $0.top.equalTo(overviewStackView.snp.bottom).offset(5)
             $0.horizontalEdges.equalTo(contentView).inset(5)
             $0.height.equalTo(400)
-            $0.bottom.equalTo(contentView).inset(10)
+            $0.bottom.equalTo(contentView)
         }
         
         activityIndicator.snp.makeConstraints {

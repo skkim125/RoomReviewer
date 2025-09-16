@@ -18,6 +18,6 @@ enum AppFont {
     static let semiboldSubTitle = UIFont.systemFont(ofSize: 14, weight: .semibold)
     static let callout = UIFont.systemFont(ofSize: 12)
     static let semiboldCallout = UIFont.systemFont(ofSize: 12, weight: .semibold)
-    static let body = UIFont.systemFont(ofSize: 10)
-    static let semiboldbody = UIFont.systemFont(ofSize: 10, weight: .semibold)
+    static let body = UIFont.systemFont(ofSize: 11)
+    static let semiboldbody = UIFont.systemFont(ofSize: 11, weight: .semibold)
 }

@@ -17,18 +17,9 @@ final class PosterCollectionViewCell: UICollectionViewCell, View {
     static let cellID = "PosterCollectionViewCell"
     var disposeBag = DisposeBag()
     
-    private let shadowView = UIView().then {
-        $0.layer.shadowColor = UIColor.black.cgColor
-        $0.layer.shadowOpacity = 0.25
-        $0.layer.shadowOffset = CGSize(width: 0, height: 2)
-        $0.layer.shadowRadius = 4
-        $0.layer.cornerRadius = 12
-        $0.backgroundColor = .clear
-    }
     private let posterImageView = UIImageView().then {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
-        $0.contentMode = .scaleAspectFill
         $0.layer.borderWidth = 0.3
         $0.layer.borderColor = AppColor.appWhite.withAlphaComponent(0.3).cgColor
     }
@@ -62,6 +53,8 @@ extension PosterCollectionViewCell {
                         owner.posterImageView.contentMode = .scaleAspectFit
                         owner.posterImageView.backgroundColor = AppColor.appLightGray
                         owner.posterImageView.tintColor = AppColor.appWhite
+                    } else {
+                        owner.posterImageView.contentMode = .scaleAspectFill
                     }
                     owner.posterImageView.image = image
                 } else {
@@ -90,19 +83,13 @@ extension PosterCollectionViewCell {
     }
     
     private func configureHierarchy() {
-        contentView.addSubview(shadowView)
-        shadowView.addSubview(posterImageView)
+        contentView.addSubview(posterImageView)
         contentView.addSubview(activityIndicator)
     }
     
     private func configureLayout() {
-        shadowView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(shadowView.snp.width).multipliedBy(1.5)
-        }
-
         posterImageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.edges.equalTo(contentView)
         }
         
         activityIndicator.snp.makeConstraints {
