@@ -51,6 +51,7 @@ enum MyPageSectionItem {
     case isStared([Media])
     
     case appInfo
+    case contactUs
     
     var sectionType: SectionType {
         switch self {
@@ -79,6 +80,8 @@ enum MyPageSectionItem {
             return "즐겨찾기"
         case .appInfo:
             return "앱 정보"
+        case .contactUs:
+            return "문의하기"
         }
     }
     
@@ -90,10 +93,12 @@ enum MyPageSectionItem {
             return "bookmark.fill"
         case .watchHistory:
             return "eye.fill"
-        case .appInfo:
-            return "info.circle.fill"
         case .isStared:
             return "star.fill"
+        case .appInfo:
+            return "info.circle.fill"
+        case .contactUs:
+            return "envelope.fill"
         }
     }
     
