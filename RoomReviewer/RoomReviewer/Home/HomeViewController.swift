@@ -39,8 +39,11 @@ final class HomeViewController: UIViewController, View {
         $0.action = nil
     }
     
+    var reactivateOnlineUIMode: (() -> Void)?
+    
     private lazy var offlineView = OfflineView().then {
         $0.retryAction = { [weak self] in
+            self?.reactivateOnlineUIMode?()
             self?.reactor?.action.onNext(.offlineButtonTapped)
         }
     }
@@ -153,16 +156,18 @@ final class HomeViewController: UIViewController, View {
             .bind(to: homeCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-        reactor.state.map { !$0.isOffline }
+        reactor.state.map { $0.isOffline }
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: true)
-            .drive(with: self) { owner, isHidden in
-                owner.offlineView.isHidden = isHidden
-                owner.homeCollectionView.isScrollEnabled = isHidden
+            .drive(with: self) { owner, isOffline in
+                owner.offlineView.isHidden = !isOffline
+                owner.homeCollectionView.isScrollEnabled = !isOffline
+                
                 owner.homeCollectionView.snp.remakeConstraints { make in
                     make.top.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide)
-                    if !isHidden {
-                        make.bottom.equalTo(owner.offlineView.snp.top)
+                    
+                    if isOffline {
+                        make.bottom.equalTo(owner.offlineView.snp.top).offset(-10)
                     } else {
                         make.bottom.equalTo(owner.view.safeAreaLayoutGuide)
                     }
@@ -183,7 +188,7 @@ final class HomeViewController: UIViewController, View {
                     guard let self = self else { return }
                     self.reactor?.action.onNext(.updateWatchlist)
                 }
-                vc.hidesBottomBarWhenPushed = true
+                
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -233,19 +238,19 @@ final class HomeViewController: UIViewController, View {
 
 extension HomeViewController {
     private func configureHierarchy() {
-        view.addSubview(homeCollectionView)
         view.addSubview(offlineView)
+        view.addSubview(homeCollectionView)
     }
     
     private func configureLayout() {
-        offlineView.snp.makeConstraints {
-            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(160)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+        homeCollectionView.snp.makeConstraints {
+            $0.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
-        homeCollectionView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+        offlineView.snp.makeConstraints {
+            $0.height.equalTo(120)
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
         }
     }
     

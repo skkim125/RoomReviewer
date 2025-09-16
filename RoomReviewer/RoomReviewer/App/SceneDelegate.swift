@@ -44,6 +44,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let homeReactor = HomeReactor(networkService: networkManager, mediaDBManager: mediaDatabaseManager, networkMonitor: networkMonitor)
         let homeVC = HomeViewController(imageProvider: imageProvider, imageFileManager: imageStore, mediaDBManager: mediaDatabaseManager, reviewDBManager: reviewDatabaseManager, networkManager: networkManager, networkMonitor: networkMonitor)
+        homeVC.reactivateOnlineUIMode = { [weak tabBarController] in
+            tabBarController?.reactivateOnlineUI()
+        }
         homeVC.reactor = homeReactor
         let homeNav = UINavigationController(rootViewController: homeVC)
         homeNav.delegate = tabBarController

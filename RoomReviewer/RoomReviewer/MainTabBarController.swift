@@ -59,7 +59,9 @@ final class MainTabBarController: UITabBarController {
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .subscribe(with: self) { owner, isConnected in
-                owner.updateBannerState()
+                if !isConnected {
+                    owner.updateBannerState()
+                }
             }
             .disposed(by: disposeBag)
     }
@@ -76,6 +78,10 @@ final class MainTabBarController: UITabBarController {
             make.bottom.equalTo(self.tabBar.snp.top)
             make.centerX.equalToSuperview()
         }
+    }
+    
+    func reactivateOnlineUI() {
+        updateBannerState()
     }
     
     private func updateBannerState() {

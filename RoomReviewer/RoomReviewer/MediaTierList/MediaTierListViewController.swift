@@ -127,6 +127,16 @@ final class MediaTierListViewController: UIViewController, View {
         )
         
         reactor.state.map { $0.sections }
+            .do (onNext: { [weak self] sectionModels in
+                guard let unrankedItemsCount = sectionModels.last?.items else { return }
+                DispatchQueue.main.async {
+                    if unrankedItemsCount.isEmpty {
+                        self?.tierListCollectionView.contentInset.bottom = 50
+                    } else {
+                        self?.tierListCollectionView.contentInset.bottom = 0
+                    }
+                }
+            })
             .bind(to: tierListCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
@@ -149,8 +159,17 @@ extension MediaTierListViewController: UICollectionViewDragDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, dragPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        guard let cell = collectionView.cellForItem(at: indexPath) else {
+            return nil
+        }
+        
         let parameters = UIDragPreviewParameters()
         parameters.backgroundColor = .clear
+        
+        let cornerRadius: CGFloat = 12.0
+        let visiblePath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cornerRadius)
+        
+        parameters.visiblePath = visiblePath
         
         return parameters
     }
@@ -197,37 +216,19 @@ extension MediaTierListViewController: UICollectionViewDropDelegate {
             return indexPath
         }
 
-        // 2) 빈공간에 두는 경우
         var section = -1
         
         // 섹션을 순회하여 미디어를 둔 섹션을 찾는 과정 진행
-        for i in 0..<collectionView.numberOfSections {
-            // 기준 헤더
-            guard let header = collectionView.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(item: 0, section: i)) else { continue }
-            
-            var sectionFrame = header.frame
-            
-            // nextSectionIndex: 기준헤더 + 1
-            let nextSectionIndex = i + 1
-            
-            // 만약 현재 섹션이 마지막 섹션이 아닐 경우
-            // 다음 섹션 헤더의 시작 위치를 가져와서 섹션사이즈의 높이로 설정
-            if nextSectionIndex < collectionView.numberOfSections {
-                // 현재 섹션의 전체 높이를 추출할 수 있다면
-                if let destinationHeader = collectionView.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(item: 0, section: nextSectionIndex)) {
-                    // (다음 섹션 헤더의 시작 Y좌표 - 현재 섹션 헤더의 시작 Y좌표)를 섹션의 높이로 설정
-                    sectionFrame.size.height = destinationHeader.frame.minY - header.frame.minY
-                }
-            } else {
-                // 마지막 섹션인 경우
-                // 현재 섹션 헤더의 시작 위치부터 컬렉션 뷰의 맨 아래까지를 섹션의 높이로 계산
-                sectionFrame.size.height = collectionView.bounds.height - header.frame.minY
+        for i in (0..<collectionView.numberOfSections).reversed() {
+            // 현재 순회 중인 섹션의 헤더 위치 정보를 가져옵니다.
+            guard let headerAttributes = collectionView.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(item: 0, section: i)) else {
+                continue
             }
             
-            // 섹션의 범위에 dropPoint가 포함되는 경우
-            // 섹션을 해당 인덱스로 지정
-            // break로 반복문 종료
-            if sectionFrame.contains(dropPoint) {
+            // 드롭된 지점의 Y 좌표가 현재 헤더의 시작 Y 좌표보다 크거나 같다면,
+            // 이 섹션 또는 그 이후 섹션에 드롭된 것입니다.
+            // 거꾸로 순회했으므로, 가장 먼저 이 조건을 만족하는 섹션이 바로 목표 섹션입니다.
+            if dropPoint.y >= headerAttributes.frame.minY {
                 section = i
                 break
             }
@@ -239,7 +240,6 @@ extension MediaTierListViewController: UICollectionViewDropDelegate {
             let itemCount = collectionView.numberOfItems(inSection: section)
             return IndexPath(item: itemCount, section: section)
         }
-        
         // dropPoint를 포함하는 섹션을 찾지 못했다면
         // nil 리턴
         return nil
