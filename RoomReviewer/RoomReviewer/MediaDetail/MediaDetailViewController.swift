@@ -377,6 +377,23 @@ final class MediaDetailViewController: UIViewController, View {
             .bind(to: creditsCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        reactor.state.map { $0.credits }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: [])
+            .drive(with: self) { owner, sections in
+                let height: CGFloat
+                if sections.count == 1 {
+                    height = 200
+                } else {
+                    height = 400
+                }
+                
+                owner.creditsCollectionView.snp.updateConstraints { make in
+                    make.height.equalTo(height)
+                }
+            }
+            .disposed(by: disposeBag)
+        
         reactor.state.map { $0.isOverviewExpanded }
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: false)
