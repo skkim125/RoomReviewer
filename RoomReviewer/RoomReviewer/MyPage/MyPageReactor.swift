@@ -78,7 +78,7 @@ final class MyPageReactor: Reactor {
                 let activitySectionModel: MyPageSectionModel = .myActivity(items: [.watchlist(watchlist), .watchHistory(watchHistory), .reviews(review), .isStared(isStar)])
                 
                 let sectionModels: [MyPageSectionModel] = [activitySectionModel, .management(items: [
-                    .appInfo
+                    .appInfo, .contactUs
                 ])]
                 
                 return sectionModels

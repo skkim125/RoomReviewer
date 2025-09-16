@@ -13,6 +13,7 @@ import ReactorKit
 import SnapKit
 import Then
 import FirebaseAnalytics
+import MessageUI
 
 final class MyPageViewController: UIViewController, View {
     private var myPageCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .myPageCollectionViewLayout).then {
@@ -192,7 +193,7 @@ final class MyPageViewController: UIViewController, View {
         case .appInfo:
             let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
             let appIcon = UIImage(named: "appIconImage")
-
+            
             let infoView = UIView()
             let iconImageView = UIImageView(image: appIcon)
             iconImageView.tintColor = AppColor.appWhite
@@ -219,13 +220,60 @@ final class MyPageViewController: UIViewController, View {
                 make.leading.trailing.equalToSuperview()
                 make.bottom.equalToSuperview().inset(10)
             }
-
+            
             let alert = CustomAlertViewController(
                 title: "앱 정보",
                 buttonType: .oneButton,
                 contentView: infoView
             )
             self.present(alert, animated: true)
+            
+        case .contactUs:
+            sendEmail()
         }
+    }
+    
+    private func sendEmail() {
+        let email = Bundle.main.infoDictionary?["My_Email"] as? String ?? ""
+        if MFMailComposeViewController.canSendMail() {
+            let mailVC = MFMailComposeViewController()
+            mailVC.mailComposeDelegate = self
+            
+            mailVC.setToRecipients(["\(email)"])
+            mailVC.setSubject("[방구석 평론가] 문의하기")
+            mailVC.setMessageBody(emailBodyContent(), isHTML: false)
+            
+            self.present(mailVC, animated: true)
+        } else {
+            let alert = CustomAlertViewController(
+                title: "메일 계정 없음",
+                subtitle: "이메일을 보내려면 기기의 '메일' 앱에서 계정을 설정해주세요.",
+                buttonType: .oneButton
+            )
+            self.present(alert, animated: true)
+        }
+    }
+    
+    private func emailBodyContent() -> String {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
+        let osVersion = UIDevice.current.systemVersion
+        
+        return """
+            
+            -------------------
+            - App Version: \(appVersion)
+            - OS Version: \(osVersion)
+            - Device: (사용 기종)
+            -------------------
+            
+            버그 제보나 문의하실 내용을 여기에 작성해주세요.
+            
+            """
+    }
+}
+
+extension MyPageViewController: MFMailComposeViewControllerDelegate {
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true)
     }
 }
