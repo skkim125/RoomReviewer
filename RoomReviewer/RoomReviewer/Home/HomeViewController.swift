@@ -259,7 +259,7 @@ extension HomeViewController {
     private func configureNavigationBar() {
         let appIconView = UIView()
         let label = UILabel()
-        label.font = AppFont.boldLargeTitle
+        label.font = AppFont.appIconTitle
         label.text = "방구석 평론가"
         label.textColor = AppColor.appWhite
         
@@ -283,7 +283,11 @@ extension HomeViewController {
             $0.centerY.equalTo(appIconView)
         }
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
+        if #available(iOS 26, *) {
+            navigationItem.titleView = appIconView
+        } else {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
+        }
         navigationItem.rightBarButtonItem = searchMediaButton
     }
 }
