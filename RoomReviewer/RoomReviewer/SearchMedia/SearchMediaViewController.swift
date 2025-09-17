@@ -201,7 +201,7 @@ extension SearchMediaViewController {
     private func configureNavigationBar() {
         let appIconView = UIView()
         let label = UILabel()
-        label.font = AppFont.boldLargeTitle
+        label.font = AppFont.appIconTitle
         label.text = "컨텐츠 검색"
         label.textColor = AppColor.appWhite
         
@@ -225,7 +225,11 @@ extension SearchMediaViewController {
             $0.centerY.equalTo(appIconView)
         }
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
+        if #available(iOS 26, *) {
+            navigationItem.titleView = appIconView
+        } else {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
+        }
         navigationItem.rightBarButtonItem = dismissButton
     }
     
