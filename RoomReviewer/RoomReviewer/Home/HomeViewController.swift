@@ -164,20 +164,40 @@ final class HomeViewController: UIViewController, View {
             .bind(to: homeCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.isOffline }
-            .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: true)
-            .drive(with: self) { owner, isOffline in
+        reactor.state
+            .map { (isOffline: $0.isOffline, hasData: !$0.sections.isEmpty) }
+            .distinctUntilChanged { $0 == $1 }
+            .asDriver(onErrorJustReturn: (isOffline: true, hasData: false))
+            .drive(with: self) { owner, state in
+                let (isOffline, hasData) = state
+                
                 owner.offlineView.isHidden = !isOffline
+                owner.homeCollectionView.isHidden = isOffline && !hasData
                 owner.homeCollectionView.isScrollEnabled = !isOffline
                 
-                owner.homeCollectionView.snp.remakeConstraints { make in
-                    make.top.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide)
-                    
-                    if isOffline {
-                        make.bottom.equalTo(owner.offlineView.snp.top).offset(-10)
+                if isOffline {
+                    if hasData {
+                        owner.offlineView.snp.remakeConstraints { make in
+                            make.height.equalTo(120)
+                            make.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide)
+                            make.bottom.equalTo(owner.view.safeAreaLayoutGuide).inset(20)
+                        }
+                        
+                        owner.homeCollectionView.snp.remakeConstraints { make in
+                            make.top.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide)
+                            make.bottom.equalTo(owner.offlineView.snp.top).offset(-10)
+                        }
+                        
                     } else {
-                        make.bottom.equalTo(owner.view.safeAreaLayoutGuide)
+                        owner.offlineView.snp.remakeConstraints { make in
+                            make.height.equalTo(120)
+                            make.horizontalEdges.equalTo(owner.view.safeAreaLayoutGuide).inset(20)
+                            make.centerY.equalToSuperview()
+                        }
+                    }
+                } else {
+                    owner.homeCollectionView.snp.remakeConstraints { make in
+                        make.edges.equalTo(owner.view.safeAreaLayoutGuide)
                     }
                 }
             }
