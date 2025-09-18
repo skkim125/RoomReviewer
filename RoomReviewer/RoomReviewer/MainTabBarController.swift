@@ -40,7 +40,6 @@ final class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.delegate = self
-//        loadBannerView()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -114,27 +113,45 @@ final class MainTabBarController: UITabBarController {
     
     private func requestIDFA() {
         if #available(iOS 14.5, *) {
-            ATTrackingManager.requestTrackingAuthorization { status in
+            switch ATTrackingManager.trackingAuthorizationStatus {
+            case .notDetermined:
+                ATTrackingManager.requestTrackingAuthorization { [weak self] status in
+                    guard let self = self else { return }
+                    DispatchQueue.main.async {
+                        self.loadBannerView()
+                    }
+                }
                 
+            case .authorized:
+                print("ATT: Already Authorized")
+                loadBannerView()
+                
+            case .denied, .restricted:
+                loadBannerView()
+                
+            @unknown default:
+                break
             }
+        } else {
+            loadBannerView()
         }
     }
 }
 
 extension MainTabBarController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        updateBannerState() // 탭 변경 시 상태 업데이트
+        updateBannerState()
     }
 }
 
 extension MainTabBarController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        updateBannerState() // Push/Pop 시 상태 업데이트
+        updateBannerState()
     }
 }
 
 extension MainTabBarController: BannerViewDelegate {
-    /// 광고 수신에 성공했을 때 호출됩니다.
+    // 광고 수신에 성공했을 때 호출됩니다.
     func bannerViewDidReceiveAd(_ bannerView: BannerView) {
         print("광고 수신 성공")
         isBannerAdLoaded = true
@@ -145,7 +162,7 @@ extension MainTabBarController: BannerViewDelegate {
         adjustContentInsets()
     }
 
-    /// 광고 수신에 실패했을 때 호출됩니다.
+    // 광고 수신에 실패했을 때 호출됩니다.
     func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
         print("광고 수신 실패: \(error.localizedDescription)")
         isBannerAdLoaded = false

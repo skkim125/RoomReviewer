@@ -39,6 +39,11 @@ final class HomeViewController: UIViewController, View {
         $0.action = nil
     }
     
+    private let activityIndicator = UIActivityIndicatorView(style: .large).then {
+        $0.color = .white
+        $0.hidesWhenStopped = true
+    }
+    
     var reactivateOnlineUIMode: (() -> Void)?
     
     private lazy var offlineView = OfflineView().then {
@@ -47,6 +52,7 @@ final class HomeViewController: UIViewController, View {
             self?.reactor?.action.onNext(.offlineButtonTapped)
         }
     }
+    
     
     init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager, networkManager: NetworkService, networkMonitor: NetworkMonitoring) {
         self.imageProvider = imageProvider
@@ -177,6 +183,18 @@ final class HomeViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
+        reactor.state.map { $0.isLoading }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self) { owner, isLoading in
+                if isLoading {
+                    owner.activityIndicator.startAnimating()
+                } else {
+                    owner.activityIndicator.stopAnimating()
+                }
+            }
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
             .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
@@ -242,6 +260,7 @@ extension HomeViewController {
     private func configureHierarchy() {
         view.addSubview(offlineView)
         view.addSubview(homeCollectionView)
+        view.addSubview(activityIndicator)
     }
     
     private func configureLayout() {
@@ -253,6 +272,10 @@ extension HomeViewController {
             $0.height.equalTo(120)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+        
+        activityIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
     
