@@ -762,6 +762,7 @@
 		04FFC7CB2DF16A840081AF7C /* RoomReviewer */ = {
 			isa = PBXGroup;
 			children = (
+				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04C97AAF2E20D8C4001EB1D4 /* App */,
 				044B8C392E60830500EB016D /* Extension */,
@@ -770,7 +771,6 @@
 				04FE6C8F2E5867D300CCB76C /* DB */,
 				0449525C2E08174000D75C4A /* Data */,
 				04DCA8A32DF2DBD500695361 /* Network */,
-				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
 				046B38162E78A02600354C37 /* MainTabBarController.swift */,
 				040222622E713F9E0009DC38 /* MediaTierList */,
@@ -946,7 +946,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					041366572E0136C60026514E = {
 						CreatedOnToolsVersion = 16.4;
