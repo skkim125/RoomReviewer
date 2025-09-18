@@ -20,6 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         Analytics.logEvent("app_opened", parameters: nil)
         MobileAds.shared.start(completionHandler: nil)
+        
+        sleep(2)
         return true
     }
 

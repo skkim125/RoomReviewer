@@ -57,15 +57,23 @@ final class HomeReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchData:
-            let isConnected = networkMonitor.isCurrentlyConnected
-            let dataStream = isConnected ? fetchOnlineData() : fetchOfflineData()
-            
-            return Observable.concat([
-                .just(.setLoading(true)),
-                .just(.setOffline(!isConnected)),
-                dataStream,
-                .just(.setLoading(false))
-            ])
+            return networkMonitor.isConnected
+                .take(2)
+                .flatMap { [weak self] isConnected -> Observable<Mutation> in
+                    guard let self = self else { return .empty() }
+                    
+                    let dataStream = isConnected ? self.fetchOnlineData() : self.fetchOfflineData()
+                    
+                    let delayedLoadingOff = Observable.just(Mutation.setLoading(false))
+                        .delay(.seconds(1), scheduler: MainScheduler.instance)
+                    
+                    return Observable.concat([
+                        .just(.setLoading(true)),
+                        .just(.setOffline(!isConnected)),
+                        dataStream,
+                        delayedLoadingOff
+                    ])
+                }
 
         case .searchMediaButtonTapped:
             return .just(.presentWriteReviewView)
@@ -80,11 +88,15 @@ final class HomeReactor: Reactor {
             if !networkMonitor.isCurrentlyConnected {
                 return .just(.shouldShowNetworkAlert)
             } else {
+                
+                let delayedLoadingOff = Observable.just(Mutation.setLoading(false))
+                                    .delay(.seconds(1), scheduler: MainScheduler.instance)
+                
                 return Observable.concat([
                     .just(.setLoading(true)),
                     .just(.setOffline(!networkMonitor.isCurrentlyConnected)),
                     fetchOnlineData(),
-                    .just(.setLoading(false))
+                    delayedLoadingOff
                 ])
             }
             
