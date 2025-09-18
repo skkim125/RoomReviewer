@@ -233,29 +233,67 @@ final class MyPageViewController: UIViewController, View {
             self.present(alert, animated: true)
             
         case .contactUs:
-            sendEmail()
+            showEmailActionSheet()
         }
     }
     
-    private func sendEmail() {
-        let email = Bundle.main.infoDictionary?["My_Email"] as? String ?? ""
+    private func showEmailActionSheet() {
+        let actionSheet = UIAlertController(title: "문의하기", message: "사용할 메일 앱을 선택해주세요.", preferredStyle: .actionSheet)
+        
+        let mailAction = UIAlertAction(title: "Mail 앱", style: .default) { [weak self] _ in
+            self?.sendEmailWithDefaultMailApp()
+        }
+        
+        let gmailAction = UIAlertAction(title: "Gmail", style: .default) { [weak self] _ in
+            self?.sendEmailWithGmail()
+        }
+        
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        
+        actionSheet.addAction(mailAction)
+        actionSheet.addAction(gmailAction)
+        actionSheet.addAction(cancelAction)
+        
+        self.present(actionSheet, animated: true)
+    }
+    
+    private func sendEmailWithDefaultMailApp() {
         if MFMailComposeViewController.canSendMail() {
+            let email = Bundle.main.infoDictionary?["My_Email"] as? String ?? ""
             let mailVC = MFMailComposeViewController()
             mailVC.mailComposeDelegate = self
             
-            mailVC.setToRecipients(["\(email)"])
+            mailVC.setToRecipients([email])
             mailVC.setSubject("[방구석 평론가] 문의하기")
             mailVC.setMessageBody(emailBodyContent(), isHTML: false)
             
             self.present(mailVC, animated: true)
         } else {
-            let alert = CustomAlertViewController(
-                title: "메일 계정 없음",
-                subtitle: "이메일을 보내려면 기기의 '메일' 앱에서 계정을 설정해주세요.",
-                buttonType: .oneButton
-            )
-            self.present(alert, animated: true)
+            showMailAppNotAvailableAlert(appName: "Mail")
         }
+    }
+    
+    private func sendEmailWithGmail() {
+        let email = Bundle.main.infoDictionary?["My_Email"] as? String ?? ""
+        let subject = "[방구석 평론가] 문의하기".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let body = emailBodyContent().addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        if let gmailURL = URL(string: "googlegmail:///co?to=\(email)&subject=\(subject)&body=\(body)"),
+           UIApplication.shared.canOpenURL(gmailURL) {
+            UIApplication.shared.open(gmailURL, options: [:], completionHandler: nil)
+        } else {
+            showMailAppNotAvailableAlert(appName: "Gmail")
+        }
+    }
+    
+    private func showMailAppNotAvailableAlert(appName: String) {
+        let message = appName == "Mail" ? "이메일을 보내려면 기기의 '메일' 앱에서 계정을 설정해주세요." : "Gmail 앱이 설치되어 있지 않습니다."
+        let alert = CustomAlertViewController(
+            title: "메일 계정 없음",
+            subtitle: message,
+            buttonType: .oneButton
+        )
+        self.present(alert, animated: true)
     }
     
     private func emailBodyContent() -> String {
@@ -267,7 +305,7 @@ final class MyPageViewController: UIViewController, View {
             -------------------
             - App Version: \(appVersion)
             - OS Version: \(osVersion)
-            - Device: (사용 기종)
+            - Device: (사용 기종을 적어주세요)
             -------------------
             
             버그 제보나 문의하실 내용을 여기에 작성해주세요.
