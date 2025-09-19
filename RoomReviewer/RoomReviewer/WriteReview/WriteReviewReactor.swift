@@ -189,7 +189,11 @@ final class WriteReviewReactor: Reactor {
     private func loadPosterImage(_ imagePath: String?) -> Observable<Mutation> {
         return imageFileManager.loadImage(urlString: imagePath)
             .map { image in
-                return .setPosterImage(image)
+                if let image = image {
+                    return .setPosterImage(UIImage(data: image))
+                } else {
+                    return .setPosterImage(AppImage.emptyPosterImage)
+                }
             }
     }
     

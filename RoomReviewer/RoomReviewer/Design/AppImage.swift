@@ -8,6 +8,6 @@
 import UIKit
 
 enum AppImage {
-    static let personImage = UIImage(named: "person")
-    static let emptyPosterImage = UIImage(systemName: "photo")
+    static let personImage = UIImage(named: "person")!
+    static let emptyPosterImage = UIImage(systemName: "photo")!
 }

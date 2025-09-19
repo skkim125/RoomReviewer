@@ -11,7 +11,7 @@ import CryptoKit
 
 protocol ImageFileManaging {
     func saveImage(image: Data, urlString: String)
-    func loadImage(urlString: String?) -> Observable<UIImage?>
+    func loadImage(urlString: String?) -> Observable<Data?>
     func deleteImage(urlString: String)
 }
 
@@ -53,7 +53,7 @@ final class ImageFileManager: ImageFileManaging {
         }
     }
 
-    func loadImage(urlString: String?) -> Observable<UIImage?> {
+    func loadImage(urlString: String?) -> Observable<Data?> {
         guard let urlString = urlString, !urlString.isEmpty else {
             return .just(nil)
         }
@@ -61,10 +61,11 @@ final class ImageFileManager: ImageFileManaging {
         let name = fileName(for: urlString)
         let fileURL = imageDirectory.appendingPathComponent(name)
         
-        guard let data = try? Data(contentsOf: fileURL), let image = UIImage(data: data) else {
+        guard let data = try? Data(contentsOf: fileURL) else {
             return .just(nil)
         }
-        return .just(image)
+        
+        return .just(data)
     }
 
     func deleteImage(urlString: String) {

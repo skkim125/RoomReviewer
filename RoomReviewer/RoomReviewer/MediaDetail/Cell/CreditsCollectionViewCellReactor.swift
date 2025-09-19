@@ -43,15 +43,17 @@ final class CreditsCollectionViewCellReactor: Reactor {
         switch action {
         case .loadImage:
             guard let path = currentState.profilePath else {
-                return .just(.setImage(AppImage.personImage))
+                        return .just(.setImage(AppImage.personImage))
             }
             
             let imageStream = imageLoader.fetchImage(urlString: path)
-                .asObservable()
-                .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInteractive))
-                .map { image -> Mutation in
-                    return Mutation.setImage(image ?? AppImage.personImage)
+                .map { data -> UIImage in
+                    guard let data = data, let image = UIImage(data: data) else {
+                        return AppImage.personImage
+                    }
+                    return image
                 }
+                .map { Mutation.setImage($0) }
             
             return Observable.concat([
                 .just(.setLoading(true)),
