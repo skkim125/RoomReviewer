@@ -131,5 +131,6 @@ extension TrendMediaCollectionViewCell {
         disposeBag = DisposeBag()
         reactor = nil
         posterImageView.image = nil
+        titleLabel.text = nil
     }
 }

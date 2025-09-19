@@ -46,16 +46,21 @@ final class PosterCollectionViewCellReactor: Reactor {
             
             return imageFileManager.loadImage(urlString: url)
                 .flatMap { [weak self] localImage -> Observable<Mutation> in
-                    guard let self = self else { return .empty()
-                    }
+                    guard let self = self else { return .empty() }
                     if let image = localImage {
-                        return .just(.setImage(image))
+                        return .just(.setImage(UIImage(data: image)))
                     } else {
                         let networkImageStream = self.imageProvider.fetchImage(urlString: url)
                             .do(onNext: { image in
-                                guard let image = image, let data = image.pngData() else { return }
+                                guard let data = image else { return }
                                 self.imageFileManager.saveImage(image: data, urlString: url)
                             })
+                            .map { data -> UIImage in
+                                guard let data = data, let image = UIImage(data: data) else {
+                                    return AppImage.emptyPosterImage
+                                }
+                                return image
+                            }
                             .map { Mutation.setImage($0) }
                         
                         return Observable.concat([

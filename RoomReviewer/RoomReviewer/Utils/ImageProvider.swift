@@ -9,53 +9,62 @@ import UIKit
 import RxSwift
 
 protocol ImageProviding {
-    func fetchImage(urlString: String?) -> Observable<UIImage?>
+    func fetchImage(urlString: String?) -> Observable<Data?>
 }
 
 final class ImageProvider: ImageProviding {
-    private let memoryCache = NSCache<NSString, UIImage>()
+    private let memoryCache = NSCache<NSString, NSData>()
     private let diskCacher: DiskImageCacher
+    private let fileManager: ImageFileManaging
     private let dataFetcher: DataFetching
     
-    init(diskCacher: DiskImageCacher, dataFetcher: DataFetching) {
+    init(diskCacher: DiskImageCacher, fileManager: ImageFileManaging, dataFetcher: DataFetching) {
         self.diskCacher = diskCacher
+        self.fileManager = fileManager
         self.dataFetcher = dataFetcher
         memoryCache.totalCostLimit = 150 * 1024 * 1024
     }
     
-    func fetchImage(urlString: String?) -> Observable<UIImage?> {
+    func fetchImage(urlString: String?) -> Observable<Data?> {
         guard let urlString = urlString, let url = URL(string: API.tmdbImageURL + urlString) else {
             return .just(nil)
         }
         
         let cacheKey = NSString(string: url.absoluteString)
         
-        if let cachedImage = memoryCache.object(forKey: cacheKey) {
-            return .just(cachedImage)
+        if let cachedData = memoryCache.object(forKey: cacheKey) {
+            return .just(cachedData as Data)
         }
         
-        if let localImageData = diskCacher.load(key: url.absoluteString), let localImage = UIImage(data: localImageData) {
-            memoryCache.setObject(localImage, forKey: cacheKey)
-            return .just(localImage)
-        }
-        
-        let request = URLRequest(url: url)
-        return dataFetcher.fetchData(request: request)
-            .asObservable()
-            .flatMap { [weak self] data -> Observable<UIImage?> in
+        return fileManager.loadImage(urlString: urlString)
+            .flatMap { [weak self] permanentData -> Observable<Data?> in
                 guard let self = self else { return .empty() }
                 
-                self.diskCacher.save(data: data, key: url.absoluteString)
+                if let data = permanentData {
+                    self.memoryCache.setObject(data as NSData, forKey: cacheKey)
+                    return .just(data)
+                }
                 
-                return Observable.just(data)
-                    .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInteractive))
-                    .map { data -> UIImage? in
-                        guard let image = data.downsampledImage() else { return nil }
-                        self.memoryCache.setObject(image, forKey: cacheKey)
-                        return image
+                if let diskCachedData = self.diskCacher.load(key: url.absoluteString) {
+                    self.memoryCache.setObject(diskCachedData as NSData, forKey: cacheKey)
+                    return .just(diskCachedData)
+                }
+                
+                let request = URLRequest(url: url)
+                return self.dataFetcher.fetchData(request: request)
+                    .asObservable()
+                    .map { originalData -> Data? in
+                        guard let image = originalData.downsampledImage(),
+                              let optimizedData = image.jpegData(compressionQuality: 0.8) else {
+                            return nil
+                        }
+                        
+                        self.memoryCache.setObject(optimizedData as NSData, forKey: cacheKey)
+                        self.diskCacher.save(data: optimizedData, key: url.absoluteString)
+                        
+                        return optimizedData
                     }
+                    .catchAndReturn(nil)
             }
-            .observe(on: MainScheduler.instance)
-            .catchAndReturn(nil)
     }
 }

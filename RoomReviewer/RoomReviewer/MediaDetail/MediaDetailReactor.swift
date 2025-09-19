@@ -170,28 +170,54 @@ final class MediaDetailReactor: Reactor {
             let media = currentState.media, casts = currentState.casts, creators = currentState.creators
             let isCurrentlyWatchlisted = currentState.isWatchlisted
             let actionStream: Observable<Mutation>
+            
             if isCurrentlyWatchlisted {
                 if let posterPath = media.posterPath { imageFileManager.deleteImage(urlString: posterPath) }
                 if let backdropPath = media.backdropPath { imageFileManager.deleteImage(urlString: backdropPath) }
+                
                 actionStream = mediaDBManager.deleteMedia(id: media.id).asObservable()
-                    .flatMap { _ -> Observable<Mutation> in .just(.setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)) }
-                    .catch { error in .just(.showError(DatabaseError.deleteFailed)) }
+                    .flatMap { _ -> Observable<Mutation> in
+                            .just(.setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false))
+                    }
+                    .catch { error in
+                        .just(.showError(DatabaseError.deleteFailed))
+                    }
             } else {
-                let posterSaveStream = imageProvider.fetchImage(urlString: media.posterPath).flatMap { [weak self] image -> Observable<Void> in
-                    guard let self = self, let image = image, let url = media.posterPath, let data = image.jpegData(compressionQuality: 1.0) else { return .just(()) }
-                    self.imageFileManager.saveImage(image: data, urlString: url); return .just(())
+                let posterSaveStream: Observable<Void>
+                if let posterPath = media.posterPath, !posterPath.isEmpty {
+                    posterSaveStream = imageProvider.fetchImage(urlString: posterPath)
+                        .flatMap { [weak self] data -> Observable<Void> in
+                            guard let self = self, let data = data else { return .just(()) }
+                            self.imageFileManager.saveImage(image: data, urlString: posterPath)
+                            return .just(())
+                        }
+                } else {
+                    posterSaveStream = .just(())
                 }
-                let backdropSaveStream = imageProvider.fetchImage(urlString: media.backdropPath).flatMap { [weak self] image -> Observable<Void> in
-                    guard let self = self, let image = image, let url = media.backdropPath, let data = image.jpegData(compressionQuality: 1.0) else { return .just(()) }
-                    self.imageFileManager.saveImage(image: data, urlString: url); return .just(())
+                
+                let backdropSaveStream: Observable<Void>
+                if let backdropPath = media.backdropPath, !backdropPath.isEmpty {
+                    backdropSaveStream = imageProvider.fetchImage(urlString: backdropPath)
+                        .flatMap { [weak self] data -> Observable<Void> in
+                            guard let self = self, let data = data else { return .just(()) }
+                            self.imageFileManager.saveImage(image: data, urlString: backdropPath)
+                            return .just(())
+                        }
+                } else {
+                    backdropSaveStream = .just(())
                 }
+                
                 let createMediaStream = mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: Date(), certificate: currentState.certificate, runtimeOrEpisodeInfo: currentState.runtimeOrEpisodeInfo)
                     .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }.asObservable()
                     .flatMap { result -> Observable<Mutation> in
-                        if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result { return .just(.setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed)) }
+                        if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result {
+                            return .just(.setWatchlistStatus(isWatchlisted: isWatchlist, isStared: isStared, watchedDate: watchedDate, mediaObjectID: objectID, isReviewed: isReviewed))
+                        }
                         return .empty()
                     }
-                actionStream = Observable.zip(posterSaveStream, backdropSaveStream).flatMap { _ in createMediaStream }.catch { error in .just(.showError(DatabaseError.saveFailed)) }
+                actionStream = Observable.zip(posterSaveStream, backdropSaveStream).flatMap { _ in createMediaStream }.catch { error in
+                        .just(.showError(DatabaseError.saveFailed))
+                }
             }
             return .concat([.just(.setProcessingAction(.watchlist)), actionStream, .just(.setProcessingAction(.none))])
             
@@ -207,7 +233,8 @@ final class MediaDetailReactor: Reactor {
             guard currentState.processingAction == .none else { return .empty() }
             let media = currentState.media
             let updateStream = mediaDBManager.updateWatchedDate(id: media.id, watchedDate: date).asObservable()
-                .flatMap { _ -> Observable<Mutation> in .just(.setWatchedDate(date))
+                .flatMap { _ -> Observable<Mutation> in
+                        .just(.setWatchedDate(date))
                 }
                 .catch { error in
                         .just(.showError(DatabaseError.updateFailed))
@@ -257,10 +284,16 @@ final class MediaDetailReactor: Reactor {
                 .flatMap { _ -> Observable<Mutation> in
                     return self.mediaDBManager.updateIsStared(id: media.id, isStar: starToggle)
                         .asObservable()
-                        .map { isStar -> Mutation in .updateStarButton(isStar) }
-                        .catch { _ -> Observable<Mutation> in .just(.showError(DatabaseError.saveFailed)) }
+                        .map { isStar -> Mutation in
+                            .updateStarButton(isStar)
+                        }
+                        .catch { _ -> Observable<Mutation> in
+                            .just(.showError(DatabaseError.saveFailed))
+                        }
                 }
-                .catch { _ -> Observable<Mutation> in .just(.showError(DatabaseError.saveFailed)) }
+                .catch { _ -> Observable<Mutation> in
+                    .just(.showError(DatabaseError.saveFailed))
+                }
             }
             
             return Observable.concat([
@@ -343,11 +376,18 @@ final class MediaDetailReactor: Reactor {
             return networkService.callRequest(targetType).asObservable()
                 .flatMap { (result: Result<TVDetail, Error>) -> Observable<Mutation> in
                     switch result {
-                    case .success(let detail): return .just(.getMediaDetail(detail.toDomain()))
+                    case .success(let detail):
+                        return .just(.getMediaDetail(detail.toDomain()))
                     case .failure(let error):
-                        if let networkError = error as? NetworkError, networkError == .offline { return .just(.showNetworkErrorAndDismiss) }
-                        else if let networkError = error as? NetworkError { return .just(.showError(networkError)) }
-                        else { return .just(.showError(NetworkError.commonError)) }
+                        if let networkError = error as? NetworkError, networkError == .offline {
+                            return .just(.showNetworkErrorAndDismiss)
+                        }
+                        else if let networkError = error as? NetworkError {
+                            return .just(.showError(networkError))
+                        }
+                        else {
+                            return .just(.showError(NetworkError.commonError))
+                        }
                     }
                 }
         default: return .empty()
@@ -356,11 +396,29 @@ final class MediaDetailReactor: Reactor {
     
     private func loadBackdropImage(_ imagePath: String?) -> Observable<Mutation> {
         guard let imagePath = imagePath, !imagePath.isEmpty else { return .just(.setBackdropImage(AppImage.emptyPosterImage)) }
-        return imageProvider.fetchImage(urlString: imagePath).map { .setBackdropImage($0) }.catchAndReturn(.setBackdropImage(nil))
+        
+        return imageProvider.fetchImage(urlString: imagePath)
+            .map { data -> UIImage in
+                guard let data = data, let image = UIImage(data: data) else {
+                    return AppImage.emptyPosterImage
+                }
+                return image
+            }
+            .map { .setBackdropImage($0) }
+            .catchAndReturn(.setBackdropImage(AppImage.emptyPosterImage))
     }
     
     private func loadPosterImage(_ imagePath: String?) -> Observable<Mutation> {
         guard let imagePath = imagePath, !imagePath.isEmpty else { return .just(.setPosterImage(AppImage.emptyPosterImage)) }
-        return imageProvider.fetchImage(urlString: imagePath).map { .setPosterImage($0) }.catchAndReturn(.setPosterImage(nil))
+        
+        return imageProvider.fetchImage(urlString: imagePath)
+            .map { data -> UIImage in
+                guard let data = data, let image = UIImage(data: data) else {
+                    return AppImage.emptyPosterImage
+                }
+                return image
+            }
+            .map { .setPosterImage($0) }
+            .catchAndReturn(.setPosterImage(AppImage.emptyPosterImage))
     }
 }

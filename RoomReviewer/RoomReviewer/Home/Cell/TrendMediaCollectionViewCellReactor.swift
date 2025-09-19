@@ -41,7 +41,13 @@ final class TrendMediaCollectionViewCellReactor: Reactor {
             }
             
             let imageStream = imageProvider.fetchImage(urlString: url)
-                .map { Mutation.setImage($0 ?? AppImage.emptyPosterImage) }
+                .map { data -> UIImage in
+                    guard let data = data, let image = UIImage(data: data) else {
+                        return AppImage.emptyPosterImage
+                    }
+                    return image
+                }
+                .map { Mutation.setImage($0) }
             
             return Observable.concat([
                 .just(.setLoading(true)),
