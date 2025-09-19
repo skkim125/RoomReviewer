@@ -81,11 +81,7 @@ final class MediaTierListViewController: UIViewController, View {
             $0.leading.equalTo(imageView.snp.trailing).offset(5)
             $0.centerY.equalTo(appIconView)
         }
-        if #available(iOS 26, *) {
-            navigationItem.titleView = appIconView
-        } else {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: appIconView)
-        }
+        navigationItem.titleView = appIconView
     }
     
     func bind(reactor: MediaTierListReactor) {
