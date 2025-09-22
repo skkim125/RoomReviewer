@@ -125,11 +125,9 @@ final class WriteReviewViewController: UIViewController, View {
     var updateReviewHandler: (() -> Void)?
     
     private let imageProvider: ImageProviding
-    private let imageFileManager: ImageFileManaging
     
-    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging) {
+    init(imageProvider: ImageProviding) {
         self.imageProvider = imageProvider
-        self.imageFileManager = imageFileManager
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) {

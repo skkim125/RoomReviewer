@@ -536,6 +536,38 @@
 			path = ReviewDatabaseManagerUnitTests;
 			sourceTree = "<group>";
 		};
+		049A939F2E8144BB00C1FF90 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				049A93A12E81456500C1FF90 /* MainTabBar */,
+				042EFE5E2E1403C800810E02 /* Home */,
+				042EFE602E1403DD00810E02 /* MediaDetail */,
+				04FE6C912E58879D00CCB76C /* SearchMedia */,
+				04D0D0A02E5C7E8F002A6951 /* WriteReview */,
+				040222622E713F9E0009DC38 /* MediaTierList */,
+				04100D212E6AB11C008BF76C /* MyPage */,
+				04A722DB2E549F2400797731 /* CustomView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		049A93A02E8144CB00C1FF90 /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				044B8C392E60830500EB016D /* Extension */,
+				044B8C322E60422E00EB016D /* Design */,
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
+		049A93A12E81456500C1FF90 /* MainTabBar */ = {
+			isa = PBXGroup;
+			children = (
+				046B38162E78A02600354C37 /* MainTabBarController.swift */,
+			);
+			path = MainTabBar;
+			sourceTree = "<group>";
+		};
 		04A722DB2E549F2400797731 /* CustomView */ = {
 			isa = PBXGroup;
 			children = (
@@ -765,21 +797,13 @@
 				04FFC7C42DF16A840081AF7C /* Info.plist */,
 				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04C97AAF2E20D8C4001EB1D4 /* App */,
-				044B8C392E60830500EB016D /* Extension */,
-				044B8C322E60422E00EB016D /* Design */,
+				049A93A02E8144CB00C1FF90 /* Resource */,
 				046285AD2E4E1F9E00365B77 /* Utils */,
 				04FE6C8F2E5867D300CCB76C /* DB */,
 				0449525C2E08174000D75C4A /* Data */,
 				04DCA8A32DF2DBD500695361 /* Network */,
 				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
-				046B38162E78A02600354C37 /* MainTabBarController.swift */,
-				040222622E713F9E0009DC38 /* MediaTierList */,
-				04100D212E6AB11C008BF76C /* MyPage */,
-				04A722DB2E549F2400797731 /* CustomView */,
-				042EFE5E2E1403C800810E02 /* Home */,
-				04FE6C912E58879D00CCB76C /* SearchMedia */,
-				042EFE602E1403DD00810E02 /* MediaDetail */,
-				04D0D0A02E5C7E8F002A6951 /* WriteReview */,
+				049A939F2E8144BB00C1FF90 /* View */,
 			);
 			path = RoomReviewer;
 			sourceTree = "<group>";
@@ -1485,7 +1509,7 @@
 					"@executable_path/Frameworks",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1523,7 +1547,7 @@
 					"@executable_path/Frameworks",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

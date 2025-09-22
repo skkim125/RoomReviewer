@@ -14,12 +14,10 @@ protocol ImageProviding {
 
 final class ImageProvider: ImageProviding {
     private let memoryCache = NSCache<NSString, NSData>()
-    private let diskCacher: DiskImageCacher
     private let fileManager: ImageFileManaging
     private let dataFetcher: DataFetching
     
-    init(diskCacher: DiskImageCacher, fileManager: ImageFileManaging, dataFetcher: DataFetching) {
-        self.diskCacher = diskCacher
+    init(fileManager: ImageFileManaging, dataFetcher: DataFetching) {
         self.fileManager = fileManager
         self.dataFetcher = dataFetcher
         memoryCache.totalCostLimit = 150 * 1024 * 1024
@@ -45,11 +43,6 @@ final class ImageProvider: ImageProviding {
                     return .just(data)
                 }
                 
-                if let diskCachedData = self.diskCacher.load(key: url.absoluteString) {
-                    self.memoryCache.setObject(diskCachedData as NSData, forKey: cacheKey)
-                    return .just(diskCachedData)
-                }
-                
                 let request = URLRequest(url: url)
                 return self.dataFetcher.fetchData(request: request)
                     .asObservable()
@@ -60,7 +53,6 @@ final class ImageProvider: ImageProviding {
                         }
                         
                         self.memoryCache.setObject(optimizedData as NSData, forKey: cacheKey)
-                        self.diskCacher.save(data: optimizedData, key: url.absoluteString)
                         
                         return optimizedData
                     }

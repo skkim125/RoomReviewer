@@ -91,7 +91,7 @@ final class SavedMediaViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .bind(to: savedMediaCollectionView.rx.items(cellIdentifier: PosterCollectionViewCell.cellID, cellType: PosterCollectionViewCell.self)) { [weak self] index, item, cell in
                 guard let self = self else { return }
-                let reactor = PosterCollectionViewCellReactor(media: item, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager)
+                let reactor = PosterCollectionViewCellReactor(media: item, imageProvider: self.imageProvider)
                 cell.reactor = reactor
             }
             .disposed(by: disposeBag)
@@ -99,11 +99,9 @@ final class SavedMediaViewController: UIViewController, View {
         reactor.pulse(\.$selectedMedia)
             .compactMap { $0 }
             .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { [weak self] media in
-                guard let self = self else { return }
-                
-                let detailReactor = MediaDetailReactor(media: media, networkService: self.networkManager, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager, networkMonitor: self.networkMonitor)
-                let vc = MediaDetailViewController(imageProvider: self.imageProvider, imageFileManager: self.imageFileManager, mediaDBManager: self.mediaDBManager, reviewDBManager: self.reviewDBManager)
+            .drive(with: self) { owner, media in
+                let detailReactor = MediaDetailReactor(media: media, networkService: owner.networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, networkMonitor: owner.networkMonitor)
+                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 
                 vc.updateAction = { [weak self] in
@@ -111,8 +109,8 @@ final class SavedMediaViewController: UIViewController, View {
                     self.reactor?.action.onNext(.updateSavedMedias)
                 }
                 
-                self.navigationController?.pushViewController(vc, animated: true)
-            })
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
             .disposed(by: disposeBag)
         
         reactor.state.compactMap { $0.navigationbarTitle }

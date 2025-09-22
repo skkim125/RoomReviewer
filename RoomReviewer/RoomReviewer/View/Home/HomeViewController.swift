@@ -221,7 +221,7 @@ final class HomeViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, media in
                 let detailReactor = MediaDetailReactor(media: media, networkService: owner.networkManager, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager, networkMonitor: owner.networkMonitor)
-                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = MediaDetailViewController(imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = detailReactor
                 
                 vc.updateAction = { [weak self] in
@@ -237,7 +237,7 @@ final class HomeViewController: UIViewController, View {
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let vc = SearchMediaViewController(networkMonitor: owner.networkMonitor, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = SearchMediaViewController(networkManager: owner.networkManager, networkMonitor: owner.networkMonitor, imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
                 vc.reactor = SearchMediaReactor(networkService: owner.networkManager)
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen

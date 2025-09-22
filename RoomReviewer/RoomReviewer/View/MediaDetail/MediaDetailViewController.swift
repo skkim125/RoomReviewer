@@ -157,7 +157,6 @@ final class MediaDetailViewController: UIViewController, View {
     }
     
     private let imageProvider: ImageProviding
-    private let imageFileManager: ImageFileManaging
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
@@ -174,9 +173,8 @@ final class MediaDetailViewController: UIViewController, View {
         print("MediaDetailViewController deinit")
     }
     
-    init(imageProvider: ImageProviding, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         self.imageProvider = imageProvider
-        self.imageFileManager = imageFileManager
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         super.init(nibName: nil, bundle: nil)
@@ -340,8 +338,8 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, mediaInfo in
                 guard let (media, reviewEntity) = mediaInfo else { return }
-                let reactor = WriteReviewReactor(media: media, review: reviewEntity, imageFileManager: owner.imageFileManager, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
-                let vc = WriteReviewViewController(imageProvider: owner.imageProvider, imageFileManager: owner.imageFileManager)
+                let reactor = WriteReviewReactor(media: media, review: reviewEntity, imageProvider: owner.imageProvider, mediaDBManager: owner.mediaDBManager, reviewDBManager: owner.reviewDBManager)
+                let vc = WriteReviewViewController(imageProvider: owner.imageProvider)
                 vc.reactor = reactor
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
