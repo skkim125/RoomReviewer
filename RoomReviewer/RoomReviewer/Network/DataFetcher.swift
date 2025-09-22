@@ -8,9 +8,22 @@ protocol DataFetching {
 
 final class URLSessionDataFetcher: DataFetching {
     private let networkMonitor: NetworkMonitoring
+    private let session: URLSession
     
     init(networkMonitor: NetworkMonitoring) {
         self.networkMonitor = networkMonitor
+        
+        let configuration = URLSessionConfiguration.default
+        let cache = URLCache(
+            memoryCapacity: 50 * 1024 * 1024, // 100MB
+            diskCapacity: 200 * 1024 * 1024, // 200MB 디스크
+            diskPath: "image_network_cache"
+        )
+        
+        configuration.urlCache = cache
+        configuration.requestCachePolicy = .returnCacheDataElseLoad
+        
+        session = URLSession(configuration: configuration)
     }
     
     func fetchData(request: URLRequest) -> Single<Data> {
@@ -23,7 +36,7 @@ final class URLSessionDataFetcher: DataFetching {
                 }
                 
                 return Single.create { single in
-                    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                    let task = self.session.dataTask(with: request) { data, response, error in
                         if let error = error {
                             if let urlError = error as? URLError, urlError.code == .timedOut {
                                 single(.failure(NetworkError.timeout))

@@ -106,7 +106,7 @@ final class MediaTierListViewController: UIViewController, View {
                     media = unrankedMedia
                 }
                 
-                cell.reactor = PosterCollectionViewCellReactor(media: media, imageProvider: self.imageProvider, imageFileManager: self.imageFileManager)
+                cell.reactor = PosterCollectionViewCellReactor(media: media, imageProvider: self.imageProvider)
                 return cell
             },
             configureSupplementaryView: { dataSource, collectionView, kind, indexPath in

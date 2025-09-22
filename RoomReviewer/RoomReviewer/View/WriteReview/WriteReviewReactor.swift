@@ -60,11 +60,11 @@ final class WriteReviewReactor: Reactor {
     
     var initialState: State
     
-    private let imageFileManager: ImageFileManaging
+    private let imageProvider: ImageProviding
     private let mediaDBManager: MediaDBManager
     private let reviewDBManager: ReviewDBManager
     
-    init(media: Media, review: ReviewEntity?, imageFileManager: ImageFileManaging, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
+    init(media: Media, review: ReviewEntity?, imageProvider: ImageProviding, mediaDBManager: MediaDBManager, reviewDBManager: ReviewDBManager) {
         if let existingReview = review {
             self.initialState = State(
                 media: media,
@@ -98,7 +98,7 @@ final class WriteReviewReactor: Reactor {
                 initialQuote: nil
             )
         }
-        self.imageFileManager = imageFileManager
+        self.imageProvider = imageProvider
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
     }
@@ -187,7 +187,7 @@ final class WriteReviewReactor: Reactor {
     }
     
     private func loadPosterImage(_ imagePath: String?) -> Observable<Mutation> {
-        return imageFileManager.loadImage(urlString: imagePath)
+        return imageProvider.fetchImage(urlString: imagePath)
             .map { image in
                 if let image = image {
                     return .setPosterImage(UIImage(data: image))

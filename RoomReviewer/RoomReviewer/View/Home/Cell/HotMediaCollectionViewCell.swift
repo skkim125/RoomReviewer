@@ -13,7 +13,7 @@ import SnapKit
 import Then
 
 final class HotMediaCollectionViewCell: UICollectionViewCell, View {
-    static let cellID = "HomeMediaCollectionViewCell"
+    static let cellID = "HotMediaCollectionViewCell"
     private var imageProvider: ImageProviding?
     var disposeBag = DisposeBag()
     
