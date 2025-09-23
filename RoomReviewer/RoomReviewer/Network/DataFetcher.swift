@@ -15,9 +15,9 @@ final class URLSessionDataFetcher: DataFetching {
         
         let configuration = URLSessionConfiguration.default
         let cache = URLCache(
-            memoryCapacity: 50 * 1024 * 1024, // 100MB
-            diskCapacity: 200 * 1024 * 1024, // 200MB 디스크
-            diskPath: "image_network_cache"
+            memoryCapacity: 50 * 1024 * 1024, // 100MB 메모리 캐시
+            diskCapacity: 200 * 1024 * 1024, // 200MB 디스크 캐시
+            diskPath: "network_cache"
         )
         
         configuration.urlCache = cache

@@ -20,7 +20,7 @@ final class ImageProvider: ImageProviding {
     init(fileManager: ImageFileManaging, dataFetcher: DataFetching) {
         self.fileManager = fileManager
         self.dataFetcher = dataFetcher
-        memoryCache.totalCostLimit = 150 * 1024 * 1024
+        memoryCache.totalCostLimit = 150 * 1024 * 1024 // 150MB 메모리 캐시
     }
     
     func fetchImage(urlString: String?) -> Observable<Data?> {
