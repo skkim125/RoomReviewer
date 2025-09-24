@@ -11,17 +11,22 @@ import ReactorKit
 @testable import RoomReviewer
 
 final class NetworkTransformMediaDetailTests: XCTestCase {
-    
+    var networkMonitor: NetworkMonitoring!
     var networkManager: NetworkService!
+    var dataFetcher: DataFetching!
     var disposeBag: DisposeBag!
     
     override func setUpWithError() throws {
-        networkManager = NetworkManager()
+        networkMonitor = NetworkMonitor()
+        dataFetcher = URLSessionDataFetcher(networkMonitor: networkMonitor)
+        networkManager = NetworkManager(dataFetcher: dataFetcher)
         disposeBag = DisposeBag()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
     
     override func tearDownWithError() throws {
+        networkMonitor = nil
+        dataFetcher = nil
         networkManager = nil
         disposeBag = nil
     }
