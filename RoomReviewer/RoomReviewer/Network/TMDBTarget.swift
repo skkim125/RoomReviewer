@@ -112,13 +112,13 @@ extension TMDBTargetType: TargetType {
             ]
         case .getMovieDetail:
             return [
-                URLQueryItem(name: "append_to_response", value: "credits,release_dates,watch/providers"),
+                URLQueryItem(name: "append_to_response", value: "credits,release_dates,watch/providers,videos"),
                 URLQueryItem(name: "language", value: "ko-KR"),
                 URLQueryItem(name: "region", value: "KR"),
             ]
         case .getTVDetail:
             return [
-                URLQueryItem(name: "append_to_response", value: "aggregate_credits,content_ratings,recommendations,watch/providers"),
+                URLQueryItem(name: "append_to_response", value: "aggregate_credits,content_ratings,recommendations,watch/providers,videos"),
                 URLQueryItem(name: "language", value: "ko-KR"),
                 URLQueryItem(name: "region", value: "KR"),
             ]

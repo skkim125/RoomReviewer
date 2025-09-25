@@ -19,9 +19,10 @@ struct MovieDetail: Decodable {
     let runtime: Int?
     let credits: MovieCreditsResponse
     let watchProviders: WatchProviders
+    let videos: DetailVideoResponse
 
     enum CodingKeys: String, CodingKey {
-        case id, title, overview, genres, runtime, credits
+        case id, title, overview, genres, runtime, credits, videos
         case posterPath = "poster_path"
         case backdropPath = "backdrop_path"
         case releaseDate = "release_dates"
@@ -104,6 +105,10 @@ extension MovieDetail {
             Cast(id: $0.id, name: $0.name, profilePath: $0.profilePath, character: $0.character)
         }
         
+        let videos = videos.results.map {
+            Video(name: $0.name, key: $0.key, site: $0.site, type: $0.type, id: $0.id, publishedDate: $0.publishedAt)
+        }
+        
         return MediaDetail(
             id: id,
             title: title,
@@ -116,6 +121,7 @@ extension MovieDetail {
             runtimeOrEpisodeInfo: runtimeInfo,
             cast: cast,
             creator: directors,
+            video: videos
         )
     }
 }

@@ -539,6 +539,7 @@
 		049A939F2E8144BB00C1FF90 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
 				049A93A12E81456500C1FF90 /* MainTabBar */,
 				042EFE5E2E1403C800810E02 /* Home */,
 				042EFE602E1403DD00810E02 /* MediaDetail */,
@@ -798,11 +799,10 @@
 				04FFC7C32DF16A840081AF7C /* Assets.xcassets */,
 				04C97AAF2E20D8C4001EB1D4 /* App */,
 				049A93A02E8144CB00C1FF90 /* Resource */,
+				04DCA8A32DF2DBD500695361 /* Network */,
 				046285AD2E4E1F9E00365B77 /* Utils */,
 				04FE6C8F2E5867D300CCB76C /* DB */,
 				0449525C2E08174000D75C4A /* Data */,
-				04DCA8A32DF2DBD500695361 /* Network */,
-				04FFC7C62DF16A840081AF7C /* LaunchScreen.storyboard */,
 				049A939F2E8144BB00C1FF90 /* View */,
 			);
 			path = RoomReviewer;
