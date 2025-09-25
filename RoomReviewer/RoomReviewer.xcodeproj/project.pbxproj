@@ -35,7 +35,7 @@
 		042968982E619DC700E6DFF6 /* TrendMediaResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042968972E619DC700E6DFF6 /* TrendMediaResponse.swift */; };
 		042EFE642E14040500810E02 /* SearchMediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042EFE632E14040500810E02 /* SearchMediaViewController.swift */; };
 		042F7EB52E658471003272EC /* CreditsSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EB42E658471003272EC /* CreditsSectionHeader.swift */; };
-		042F7EB92E6584AA003272EC /* CreditsSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EB82E6584AA003272EC /* CreditsSectionModel.swift */; };
+		042F7EB92E6584AA003272EC /* MediaDetailSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EB82E6584AA003272EC /* MediaDetailSectionModel.swift */; };
 		042F7EBB2E65CA40003272EC /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F7EBA2E65CA40003272EC /* String+.swift */; };
 		043BB0432DFC4D8800E5438D /* TV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0422DFC4D8800E5438D /* TV.swift */; };
 		043BB0452DFC4DA700E5438D /* TMDBTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043BB0442DFC4DA700E5438D /* TMDBTarget.swift */; };
@@ -187,7 +187,7 @@
 		042968972E619DC700E6DFF6 /* TrendMediaResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMediaResponse.swift; sourceTree = "<group>"; };
 		042EFE632E14040500810E02 /* SearchMediaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMediaViewController.swift; sourceTree = "<group>"; };
 		042F7EB42E658471003272EC /* CreditsSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsSectionHeader.swift; sourceTree = "<group>"; };
-		042F7EB82E6584AA003272EC /* CreditsSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsSectionModel.swift; sourceTree = "<group>"; };
+		042F7EB82E6584AA003272EC /* MediaDetailSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDetailSectionModel.swift; sourceTree = "<group>"; };
 		042F7EBA2E65CA40003272EC /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		043BB0422DFC4D8800E5438D /* TV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TV.swift; sourceTree = "<group>"; };
 		043BB0442DFC4DA700E5438D /* TMDBTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBTarget.swift; sourceTree = "<group>"; };
@@ -474,7 +474,7 @@
 		042F7EB72E6584A2003272EC /* SectionModel */ = {
 			isa = PBXGroup;
 			children = (
-				042F7EB82E6584AA003272EC /* CreditsSectionModel.swift */,
+				042F7EB82E6584AA003272EC /* MediaDetailSectionModel.swift */,
 			);
 			path = SectionModel;
 			sourceTree = "<group>";
@@ -1165,7 +1165,7 @@
 				046EFB562E56E5E200E2736B /* MediaEntity+CoreDataProperties.swift in Sources */,
 				04C97AB42E2286C3001EB1D4 /* PosterCollectionViewCell.swift in Sources */,
 				04FE6C952E599C3A00CCB76C /* MovieDetail.swift in Sources */,
-				042F7EB92E6584AA003272EC /* CreditsSectionModel.swift in Sources */,
+				042F7EB92E6584AA003272EC /* MediaDetailSectionModel.swift in Sources */,
 				0489D8F42E729EA9003FE402 /* DataFetcher.swift in Sources */,
 				048096642E5DC9CB002033A0 /* MockDatastack.swift in Sources */,
 				042F7EBB2E65CA40003272EC /* String+.swift in Sources */,
@@ -1509,7 +1509,7 @@
 					"@executable_path/Frameworks",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1547,7 +1547,7 @@
 					"@executable_path/Frameworks",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

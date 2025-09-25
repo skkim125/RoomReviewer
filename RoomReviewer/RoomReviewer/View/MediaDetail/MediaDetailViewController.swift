@@ -352,14 +352,16 @@ final class MediaDetailViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
 
-        let dataSource = RxCollectionViewSectionedReloadDataSource<CreditsSectionModel>(
+        let dataSource = RxCollectionViewSectionedReloadDataSource<MediaDetailSectionModel>(
             configureCell: { [weak self] dataSource, collectionView, indexPath, item in
                 guard let self = self, let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CreditsCollectionViewCell.cellID, for: indexPath) as? CreditsCollectionViewCell else { return UICollectionViewCell() }
                 switch dataSource[indexPath] {
-                case .casts(let cast):
+                case .cast(let cast):
                     cell.reactor = CreditsCollectionViewCellReactor(name: cast.name, role: cast.character, profilePath: cast.profilePath, imageLoader: self.imageProvider)
-                case .creators(let creator):
+                case .creator(let creator):
                     cell.reactor = CreditsCollectionViewCellReactor(name: creator.name, role: creator.department, profilePath: creator.profilePath, imageLoader: self.imageProvider)
+                case .video(item: _):
+                    break
                 }
                 return cell
             },
@@ -370,24 +372,22 @@ final class MediaDetailViewController: UIViewController, View {
             }
         )
         
-        reactor.state.map { $0.credits }
+        let dataStream = reactor.state.map { $0.mediaDetailSectionModels }
             .distinctUntilChanged()
+            .share()
+        
+        dataStream
             .bind(to: creditsCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.credits }
-            .distinctUntilChanged()
+        dataStream
             .asDriver(onErrorJustReturn: [])
             .drive(with: self) { owner, sections in
-                let height: CGFloat
-                if sections.count == 1 {
-                    height = 200
-                } else {
-                    height = 400
-                }
+                print("sectionsCount: \(sections.count), 섹션 정보: \(sections.map { $0.header })")
+                let height: CGFloat = CGFloat(sections.count * 200)
                 
-                owner.creditsCollectionView.snp.updateConstraints { make in
-                    make.height.equalTo(height)
+                owner.creditsCollectionView.snp.updateConstraints {
+                    $0.height.equalTo(height)
                 }
             }
             .disposed(by: disposeBag)

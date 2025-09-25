@@ -38,7 +38,7 @@ struct Crew: Equatable {
     let profilePath: String?
 }
 
-struct Video {
+struct Video: Equatable {
     let name: String?
     let key: String?
     let site: String?

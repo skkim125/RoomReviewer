@@ -46,11 +46,11 @@ final class MediaDetailReactor: Reactor {
         var posterImageData: UIImage?
         var casts: [Cast] = []
         var creators: [Crew] = []
-        var credits: [CreditsSectionModel] = []
+        var videos: [Video] = []
+        var mediaDetailSectionModels: [MediaDetailSectionModel] = []
         var releaseYear: String?
         var certificate: String?
         var runtimeOrEpisodeInfo: String?
-        var videos: [Video] = []
         var isOverviewButtonVisible: Bool = false
         var isOverviewExpanded: Bool = false
         var isWatchlisted: Bool = false
@@ -315,15 +315,30 @@ final class MediaDetailReactor: Reactor {
             newState.areImagesLoaded = isLoaded
         case .getMediaDetail(let mediaInfo):
             let detail = mediaInfo
-            newState.overview = detail.overview; newState.genres = detail.genres.joined(separator: " / ")
-            newState.casts = detail.cast; newState.creators = detail.creator
-            var sectionModels: [CreditsSectionModel] = []
-            let creators = detail.creator.sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ CreditsSectionItem.creators(item: $0) })
-            if !creators.isEmpty { sectionModels.append(CreditsSectionModel.creators(item: creators)) }
-            let casts = detail.cast.map({ CreditsSectionItem.casts(item: $0) })
-            if !casts.isEmpty { sectionModels.append(CreditsSectionModel.casts(item: casts)) }
-            newState.credits = sectionModels
-            newState.releaseYear = detail.releaseYear; newState.certificate = detail.certificate
+            newState.overview = detail.overview
+            newState.genres = detail.genres.joined(separator: " / ")
+            newState.casts = detail.cast
+            newState.creators = detail.creator
+            var sectionModels: [MediaDetailSectionModel] = []
+            let creators = detail.creator.sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ MediaDetailSectionItem.creator(item: $0) })
+            if !creators.isEmpty {
+                sectionModels.append(MediaDetailSectionModel.creators(items: creators))
+            }
+            let casts = detail.cast.map({ MediaDetailSectionItem.cast(item: $0) })
+            if !casts.isEmpty {
+                sectionModels.append(MediaDetailSectionModel.casts(items: casts))
+            }
+            
+            if let videos = detail.video {
+                let convertVideoSectionItems = videos.map { MediaDetailSectionItem.video(item: $0) }
+                if !convertVideoSectionItems.isEmpty {
+                    sectionModels.append(MediaDetailSectionModel.videos(items: convertVideoSectionItems))
+                }
+            }
+            
+            newState.mediaDetailSectionModels = sectionModels
+            newState.releaseYear = detail.releaseYear
+            newState.certificate = detail.certificate
             newState.runtimeOrEpisodeInfo = detail.runtimeOrEpisodeInfo
             
         case .setBackdropImage(let image):
@@ -331,8 +346,11 @@ final class MediaDetailReactor: Reactor {
         case .setPosterImage(let image):
             newState.posterImageData = image
         case .setWatchlistStatus(let isWatchlisted, let isStared, let date, let objectID, let isReviewed):
-            newState.isWatchlisted = isWatchlisted; newState.watchedDate = date
-            newState.mediaObjectID = objectID; newState.isStared = isStared; newState.isReviewed = isReviewed
+            newState.isWatchlisted = isWatchlisted
+            newState.watchedDate = date
+            newState.mediaObjectID = objectID
+            newState.isStared = isStared
+            newState.isReviewed = isReviewed
         case .setWatchedDate(let date):
             newState.watchedDate = date
         case .pushWriteReviewView(let media, let reviewEntity):
