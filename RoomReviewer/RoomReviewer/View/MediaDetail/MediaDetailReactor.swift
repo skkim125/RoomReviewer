@@ -50,6 +50,7 @@ final class MediaDetailReactor: Reactor {
         var releaseYear: String?
         var certificate: String?
         var runtimeOrEpisodeInfo: String?
+        var videos: [Video] = []
         var isOverviewButtonVisible: Bool = false
         var isOverviewExpanded: Bool = false
         var isWatchlisted: Bool = false
@@ -324,6 +325,7 @@ final class MediaDetailReactor: Reactor {
             newState.credits = sectionModels
             newState.releaseYear = detail.releaseYear; newState.certificate = detail.certificate
             newState.runtimeOrEpisodeInfo = detail.runtimeOrEpisodeInfo
+            
         case .setBackdropImage(let image):
             newState.backDropImageData = image
         case .setPosterImage(let image):
