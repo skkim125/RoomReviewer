@@ -20,9 +20,10 @@ struct MediaDetail {
     let cast: [Cast]
     let creator: [Crew]
 //    let watchProviders: [Provider]
+    let video: [Video]?
 }
 
-struct Cast: Decodable, Equatable {
+struct Cast: Equatable {
     let id: Int
     let name: String
     let profilePath: String?
@@ -30,9 +31,18 @@ struct Cast: Decodable, Equatable {
     var index: Int?
 }
 
-struct Crew: Decodable, Equatable {
+struct Crew: Equatable {
     let id: Int
     let name: String
     let department: String?
     let profilePath: String?
+}
+
+struct Video {
+    let name: String?
+    let key: String?
+    let site: String?
+    let type: String?
+    let id: String?
+    let publishedDate: String?
 }

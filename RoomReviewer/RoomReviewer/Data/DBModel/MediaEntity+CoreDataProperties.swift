@@ -97,7 +97,8 @@ extension MediaEntity : Identifiable {
             releaseYear: releaseYear,
             runtimeOrEpisodeInfo: self.runtimeOrEpisodeInfo ?? "정보 없음",
             cast: cast,
-            creator: creator
+            creator: creator,
+            video: []
         )
     }
 }

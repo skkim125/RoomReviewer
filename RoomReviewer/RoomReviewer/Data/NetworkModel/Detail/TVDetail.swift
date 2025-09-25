@@ -20,9 +20,10 @@ struct TVDetail: Decodable {
     let certificate: ContentRatingResult
     let createdBy: [Creator]
     let aggregateCredits: TVCreditsResponse
+    let videos: DetailVideoResponse
 
     enum CodingKeys: String, CodingKey {
-        case id, name, overview, genres
+        case id, name, overview, genres, videos
         case posterPath = "poster_path"
         case backdropPath = "backdrop_path"
         case firstAirDate = "first_air_date"
@@ -79,6 +80,10 @@ extension TVDetail {
             Cast(id: $0.id, name: $0.name, profilePath: $0.profilePath, character: $0.roles?[0].character ?? "")
         }
         
+        let videos = videos.results.map {
+            Video(name: $0.name, key: $0.key, site: $0.site, type: $0.type, id: $0.id, publishedDate: $0.publishedAt)
+        }
+        
         return MediaDetail(
             id: id,
             title: name,
@@ -90,7 +95,34 @@ extension TVDetail {
             releaseYear: releaseYear,
             runtimeOrEpisodeInfo: episodeInfo,
             cast: cast,
-            creator: aggregateCrews.isEmpty ? creditedByCrews : aggregateCrews
+            creator: aggregateCrews.isEmpty ? creditedByCrews : aggregateCrews,
+            video: videos
         )
+    }
+}
+
+struct DetailVideoResponse: Decodable {
+    let results: [VideoResponse]
+    
+    enum CodingKeys: String, CodingKey {
+        case results
+    }
+}
+
+struct VideoResponse: Decodable {
+    let name: String?
+    let key: String?
+    let site: String?
+    let type: String?
+    let id: String?
+    let publishedAt: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case name = "name"
+        case key = "key"
+        case site = "site"
+        case type = "type"
+        case id = "id"
+        case publishedAt = "published_at"
     }
 }
