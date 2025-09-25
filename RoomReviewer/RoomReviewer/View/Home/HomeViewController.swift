@@ -81,7 +81,7 @@ final class HomeViewController: UIViewController, View {
 
         Analytics.logEvent("HomeView_appeared", parameters: nil)
 
-        reactor?.action.onNext(.updateWatchlist)
+        reactor?.action.onNext(.viewWillAppear)
     }
     
     private func configureView() {
@@ -226,7 +226,7 @@ final class HomeViewController: UIViewController, View {
                 
                 vc.updateAction = { [weak self] in
                     guard let self = self else { return }
-                    self.reactor?.action.onNext(.updateWatchlist)
+                    self.reactor?.action.onNext(.viewWillAppear)
                 }
                 
                 owner.navigationController?.pushViewController(vc, animated: true)

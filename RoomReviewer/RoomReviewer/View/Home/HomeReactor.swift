@@ -28,6 +28,7 @@ final class HomeReactor: Reactor {
         var sections: [HomeSectionModel] = []
         var isLoading: Bool = true
         var isOffline: Bool = false
+        var isInitialDataLoaded: Bool = false
         @Pulse var presentWriteReviewView: Void?
         @Pulse var selectedMedia: Media?
         @Pulse var shouldShowNetworkAlert: Void?
@@ -38,7 +39,7 @@ final class HomeReactor: Reactor {
         case fetchData
         case searchMediaButtonTapped
         case mediaSelected(Media)
-        case updateWatchlist
+        case viewWillAppear
         case offlineButtonTapped
         case alertConfirmed
     }
@@ -48,6 +49,7 @@ final class HomeReactor: Reactor {
         case setLoading(Bool)
         case setOffline(Bool)
         case presentWriteReviewView
+        case setInitialDataLoaded(Bool)
         case presentMediaDetail(Media)
         case updateWatchlist([HomeSectionItem])
         case shouldShowNetworkAlert
@@ -71,6 +73,7 @@ final class HomeReactor: Reactor {
                         .just(.setLoading(true)),
                         .just(.setOffline(!isConnected)),
                         dataStream,
+                        .just(.setInitialDataLoaded(true)),
                         delayedLoadingOff
                     ])
                 }
@@ -81,7 +84,10 @@ final class HomeReactor: Reactor {
         case .mediaSelected(let media):
             return .just(.presentMediaDetail(media))
             
-        case .updateWatchlist:
+        case .viewWillAppear:
+            guard currentState.isInitialDataLoaded else {
+                return .empty()
+            }
             return updateWatchlist()
 
         case .offlineButtonTapped:
@@ -156,6 +162,8 @@ final class HomeReactor: Reactor {
             newState.shouldShowNetworkAlert = ()
         case .shouldShowOfflineAlert:
             newState.shouldShowOfflineAlert = ()
+        case .setInitialDataLoaded(let isLoaded):
+            newState.isInitialDataLoaded = isLoaded
         }
         
         return newState
