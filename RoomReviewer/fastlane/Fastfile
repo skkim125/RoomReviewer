@@ -16,16 +16,73 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Push a new release build to the App Store"
-  lane :release do
+
+  # 버그 수정 (Patch Update)
+  desc "Patch 업데이트"
+  lane :patch do
+    # Patch + 1
+    increment_version_number(
+      bump_type: "patch",
+      xcodeproj: "RoomReviewer.xcodeproj"
+    )
+    
     increment_build_number(xcodeproj: "RoomReviewer.xcodeproj")
     build_app(scheme: "RoomReviewer")
-    upload_to_app_store( # App Store에 업로드
-      force: true, # HTML 보고서 검증을 건너뛰고, 강제로 업로드를 진행
-      skip_metadata: true, # 앱 메타데이터(앱 설명, 키워드 등)를 업로드하지 않도록 설정
-      skip_screenshots: true, # 앱 스크린샷을 업로드하지 않도록 설정
-     )
+    
+    release_notes_text = File.read("release_notes.txt")
+
+    upload_to_app_store(
+      force: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      release_notes: { "ko-KR" => release_notes_text }
+    )
   end
+
+  # 기능 추가 (Minor Update)
+  desc "Minor 업데이트."
+  lane :minor do
+    # Minor + 1 & patch = 0
+    increment_version_number(
+      bump_type: "minor",
+      xcodeproj: "RoomReviewer.xcodeproj"
+    )
+
+    increment_build_number(xcodeproj: "RoomReviewer.xcodeproj")
+    build_app(scheme: "RoomReviewer")
+
+    release_notes_text = File.read("release_notes.txt")
+
+    upload_to_app_store(
+      force: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      release_notes: { "ko-KR" => release_notes_text }
+    )
+  end
+
+  # 대규모 업데이트 (Major Update)
+  desc "Major 업데이트"
+  lane :major do
+    # Major + 1 & minor, patch = 0
+    increment_version_number(
+      bump_type: "major",
+      xcodeproj: "RoomReviewer.xcodeproj"
+    )
+
+    increment_build_number(xcodeproj: "RoomReviewer.xcodeproj")
+    build_app(scheme: "RoomReviewer")
+
+    release_notes_text = File.read("release_notes.txt")
+
+    upload_to_app_store(
+      force: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      release_notes: { "ko-KR" => release_notes_text }
+    )
+  end
+
 end
 
 
