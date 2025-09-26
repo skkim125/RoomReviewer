@@ -60,6 +60,7 @@ final class MediaDetailReactor: Reactor {
         var isReviewed: Bool = false
         var isStared: Bool = false
         var processingAction: ProcessingAction = .none
+        var videoSelected: Video?
 
         enum ProcessingAction: Equatable {
             case none
@@ -79,6 +80,7 @@ final class MediaDetailReactor: Reactor {
         @Pulse var showSetWatchedDateAlert: Void?
         @Pulse var pushWriteReviewView: (Media, ReviewEntity?)?
         @Pulse var showNetworkErrorAndDismiss: Void?
+        @Pulse var showMoveYoutubeAlert: Video?
         @Pulse var error: Error?
     }
 
@@ -92,6 +94,7 @@ final class MediaDetailReactor: Reactor {
         case moreOverviewButtonTapped
         case starButtonTapped
         case setOverviewButtonVisible(Bool)
+        case videoSelected(Video?)
     }
 
     enum Mutation {
@@ -109,6 +112,7 @@ final class MediaDetailReactor: Reactor {
         case updateStarButton(Bool)
         case setProcessingAction(State.ProcessingAction)
         case showNetworkErrorAndDismiss
+        case showMoveYoutubeAlert(Video)
         case showError(Error)
     }
 
@@ -305,6 +309,10 @@ final class MediaDetailReactor: Reactor {
                 createAndUpdateStream,
                 Observable.just(.setProcessingAction(.none))
             ])
+            
+        case .videoSelected(let video):
+            guard let video = video else { return .empty() }
+            return .just(.showMoveYoutubeAlert(video))
         }
     }
     
@@ -372,6 +380,8 @@ final class MediaDetailReactor: Reactor {
             newState.showNetworkErrorAndDismiss = ()
         case .showError(let error):
             newState.error = error
+        case .showMoveYoutubeAlert(let video):
+            newState.showMoveYoutubeAlert = video
         }
         
         return newState

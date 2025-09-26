@@ -404,11 +404,13 @@ final class MediaDetailViewController: UIViewController, View {
                 
                 sections.forEach { section in
                     switch section {
-                    case .creators, .casts:
-                        totalHeight += 190
+                    case .creators:
+                        totalHeight += 160
+                    case .casts:
+                        totalHeight += 200
                     case .videos:
                         let width = UIScreen.main.bounds.width * 0.9
-                        totalHeight += (width * 9 / 16) + 50 + AppFont.semiboldSubTitle.lineHeight
+                        totalHeight += (width * 9 / 16) + 30 + AppFont.semiboldSubTitle.lineHeight
                     }
                 }
                 
@@ -446,6 +448,14 @@ final class MediaDetailViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: NetworkError.commonError)
             .drive(with: self) { owner, error in
                 owner.showErrorAlert(error: error)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$showMoveYoutubeAlert)
+            .map { $0 }
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, video in
+                owner.showMoveYoutubeAlert(video)
             }
             .disposed(by: disposeBag)
     }
@@ -501,6 +511,19 @@ final class MediaDetailViewController: UIViewController, View {
                 Analytics.logEvent("detail_star_tapped", parameters: ["media_id": state.media.id, "media_type": state.media.mediaType.rawValue, "media_title": state.media.title, "is_stared_after_tap": !state.isStared])
             })
             .map { MediaDetailReactor.Action.starButtonTapped }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        creditsCollectionView.rx.modelSelected(MediaDetailSectionModel.Item.self)
+            .compactMap { item -> Video? in
+                switch item {
+                case .cast, .creator:
+                    return nil
+                case .video(item: let video):
+                    return video
+                }
+            }
+            .map { Reactor.Action.videoSelected($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -726,7 +749,7 @@ extension MediaDetailViewController {
             $0.top.equalTo(overviewStackView.snp.bottom).offset(5)
             $0.horizontalEdges.equalTo(contentView).inset(5)
             $0.height.equalTo(400)
-            $0.bottom.equalTo(contentView)
+            $0.bottom.equalTo(contentView).inset(10)
         }
         
         activityIndicator.snp.makeConstraints {
@@ -807,6 +830,20 @@ extension MediaDetailViewController {
         present(alert, animated: true)
     }
     
+    private func showMoveYoutubeAlert(_ video: Video?) {
+        guard let video = video else { return }
+        
+        let alert = CustomAlertViewController(
+            title: "시청을 위해 Youtube로 이동하겠습니까?",
+            subtitle: "Youtube로 이동합니다.",
+            buttonType: .twoButton
+        ) { [weak self] in
+            self?.openYouTubeVideo(id: video.key ?? "")
+        }
+        
+        present(alert, animated: true)
+    }
+    
     private func showErrorAlert(error: Error) {
         let alert = CustomAlertViewController(
             title: "오류 발생",
@@ -814,5 +851,17 @@ extension MediaDetailViewController {
             buttonType: .oneButton
         )
         present(alert, animated: true)
+    }
+    
+    private func openYouTubeVideo(id: String) {
+        let appURL = URL(string: "youtube://www.youtube.com/watch?v=\(id)")!
+        let webURL = URL(string: "https://www.youtube.com/watch?v=\(id)")!
+        let application = UIApplication.shared
+        
+        if application.canOpenURL(appURL) {
+            application.open(appURL)
+        } else {
+            application.open(webURL)
+        }
     }
 }
