@@ -4,6 +4,17 @@
 .DS_Store
 GoogleService-Info.plist
 
+# Fastlane
+fastlane/report.xml
+fastlane/logs
+fastlane/test_output
+fastlane/.env
+
+# Build artifacts
+*.ipa
+*.dSYM
+*.xcarchive
+
 ## User settings
 xcuserdata/
 *.xcconfig

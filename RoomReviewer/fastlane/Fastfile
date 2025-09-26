@@ -1,0 +1,31 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new release build to the App Store"
+  lane :release do
+    increment_build_number(xcodeproj: "RoomReviewer.xcodeproj")
+    build_app(scheme: "RoomReviewer")
+    upload_to_app_store( # App Store에 업로드
+      force: true, # HTML 보고서 검증을 건너뛰고, 강제로 업로드를 진행
+      skip_metadata: true, # 앱 메타데이터(앱 설명, 키워드 등)를 업로드하지 않도록 설정
+      skip_screenshots: true, # 앱 스크린샷을 업로드하지 않도록 설정
+     )
+  end
+end
+
+
