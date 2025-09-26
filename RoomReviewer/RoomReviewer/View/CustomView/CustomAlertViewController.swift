@@ -109,6 +109,7 @@ final class CustomAlertViewController: UIViewController {
         
         titleLabel.font = AppFont.semiboldTitle
         titleLabel.textAlignment = .center
+        titleLabel.numberOfLines = 0
         titleLabel.textColor = AppColor.appWhite
         
         subtitleLabel.font = AppFont.subTitle

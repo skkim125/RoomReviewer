@@ -15,17 +15,29 @@ final class VideoCollectionViewCell: UICollectionViewCell, View {
     var disposeBag = DisposeBag()
     
     private let videoImageView = UIImageView().then {
+        $0.alpha = 0.8
         $0.layer.cornerRadius = 8
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = AppColor.appLightGray
         $0.tintColor = AppColor.appWhite
+        $0.layer.borderWidth = 0.3
+        $0.layer.borderColor = AppColor.appWhite.withAlphaComponent(0.3).cgColor
     }
     
     private let videoNameLabel = UILabel().then {
         $0.font = AppFont.semiboldSubTitle
         $0.textColor = AppColor.appWhite
         $0.textAlignment = .center
+    }
+    
+    private let videoPlayButton = UIImageView().then {
+        let paletteConfig = UIImage.SymbolConfiguration(paletteColors: [AppColor.appGray, AppColor.appWhite])
+            .applying(UIImage.SymbolConfiguration(pointSize: 50))
+        
+        let image = UIImage(systemName: "play.circle.fill")?.withConfiguration(paletteConfig)
+        $0.image = image
+        $0.contentMode = .scaleAspectFit
     }
     
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
@@ -44,6 +56,7 @@ final class VideoCollectionViewCell: UICollectionViewCell, View {
         contentView.addSubview(videoImageView)
         contentView.addSubview(videoNameLabel)
         contentView.addSubview(activityIndicator)
+        contentView.addSubview(videoPlayButton)
     }
     
     private func configureLayout() {
@@ -61,13 +74,26 @@ final class VideoCollectionViewCell: UICollectionViewCell, View {
         activityIndicator.snp.makeConstraints {
             $0.center.equalTo(videoImageView)
         }
+        
+        videoPlayButton.snp.makeConstraints {
+            $0.center.equalTo(videoImageView)
+            $0.size.equalTo(50)
+        }
     }
     
     func bind(reactor: VideoCollectionViewCellReactor) {
-        reactor.state.map { $0.isLoading }
+        let isLoadingStream = reactor.state.map { $0.isLoading }
             .distinctUntilChanged()
+            .share()
+        
+        isLoadingStream
             .observe(on: MainScheduler.instance)
             .bind(to: activityIndicator.rx.isAnimating)
+            .disposed(by: disposeBag)
+        
+        isLoadingStream
+            .observe(on: MainScheduler.instance)
+            .bind(to: videoPlayButton.rx.isHidden)
             .disposed(by: disposeBag)
             
         reactor.state.map { $0.videoThumnailImage }

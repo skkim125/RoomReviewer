@@ -71,7 +71,7 @@ extension UICollectionViewLayout {
             
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(40)
+                heightDimension: .absolute(35)
             )
             let header = NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: headerSize,
@@ -89,7 +89,7 @@ extension UICollectionViewLayout {
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .absolute(100),
-                    heightDimension: .absolute(140)
+                    heightDimension: .absolute(sectionIndex == 0 ? 130 : 140)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.interItemSpacing = .fixed(10)
@@ -109,10 +109,10 @@ extension UICollectionViewLayout {
                 )
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
-                let width = UIScreen.main.bounds.width * 0.875
+                let width = UIScreen.main.bounds.width * 0.87
                 let height = width * 9 / 16 + AppFont.semiboldSubTitle.lineHeight
                 let groupSize = NSCollectionLayoutSize(
-                    widthDimension: .absolute(width),
+                    widthDimension: .fractionalWidth(0.87),
                     heightDimension: .absolute(height)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
@@ -121,7 +121,7 @@ extension UICollectionViewLayout {
                 let section = NSCollectionLayoutSection(group: group)
                 section.orthogonalScrollingBehavior = .groupPagingCentered
                 section.interGroupSpacing = 15
-                section.contentInsets = .init(top: 5, leading: 15, bottom: 10, trailing: 15)
+                section.contentInsets = .init(top: 0, leading: 15, bottom: 10, trailing: 15)
                 section.boundarySupplementaryItems = [header]
                 
                 return section
