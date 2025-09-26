@@ -32,6 +32,7 @@ final class MediaDetailReactor: Reactor {
         self.mediaDBManager = mediaDBManager
         self.reviewDBManager = reviewDBManager
         self.networkMonitor = networkMonitor
+        print("mediaName: \(media.title), id: \(media.id)")
     }
 
     struct State {
@@ -186,7 +187,8 @@ final class MediaDetailReactor: Reactor {
             } else {
                 let posterSaveStream: Observable<Void>
                 if let posterPath = media.posterPath, !posterPath.isEmpty {
-                    posterSaveStream = imageProvider.fetchImage(urlString: posterPath)
+                    let posterURL = API.tmdbImageURL + posterPath
+                    posterSaveStream = imageProvider.fetchImage(urlString: posterURL)
                         .flatMap { [weak self] data -> Observable<Void> in
                             guard let self = self, let data = data else { return .just(()) }
                             self.imageFileManager.saveImage(image: data, urlString: posterPath)
@@ -198,7 +200,8 @@ final class MediaDetailReactor: Reactor {
                 
                 let backdropSaveStream: Observable<Void>
                 if let backdropPath = media.backdropPath, !backdropPath.isEmpty {
-                    backdropSaveStream = imageProvider.fetchImage(urlString: backdropPath)
+                    let backdropURL = API.tmdbImageURL + backdropPath
+                    backdropSaveStream = imageProvider.fetchImage(urlString: backdropURL)
                         .flatMap { [weak self] data -> Observable<Void> in
                             guard let self = self, let data = data else { return .just(()) }
                             self.imageFileManager.saveImage(image: data, urlString: backdropPath)
@@ -417,7 +420,8 @@ final class MediaDetailReactor: Reactor {
     private func loadBackdropImage(_ imagePath: String?) -> Observable<Mutation> {
         guard let imagePath = imagePath, !imagePath.isEmpty else { return .just(.setBackdropImage(AppImage.emptyPosterImage)) }
         
-        return imageProvider.fetchImage(urlString: imagePath)
+        let backdropURL = API.tmdbImageURL + imagePath
+        return imageProvider.fetchImage(urlString: backdropURL)
             .map { data -> UIImage in
                 guard let data = data, let image = UIImage(data: data) else {
                     return AppImage.emptyPosterImage
@@ -431,7 +435,8 @@ final class MediaDetailReactor: Reactor {
     private func loadPosterImage(_ imagePath: String?) -> Observable<Mutation> {
         guard let imagePath = imagePath, !imagePath.isEmpty else { return .just(.setPosterImage(AppImage.emptyPosterImage)) }
         
-        return imageProvider.fetchImage(urlString: imagePath)
+        let posterURL = API.tmdbImageURL + imagePath
+        return imageProvider.fetchImage(urlString: posterURL)
             .map { data -> UIImage in
                 guard let data = data, let image = UIImage(data: data) else {
                     return AppImage.emptyPosterImage

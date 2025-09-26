@@ -42,7 +42,8 @@ final class PosterCollectionViewCellReactor: Reactor {
                 return .just(.setImage(AppImage.emptyPosterImage))
             }
             
-            let imageStream = imageProvider.fetchImage(urlString: url)
+            let imageURL = API.tmdbImageURL + url
+            let imageStream = imageProvider.fetchImage(urlString: imageURL)
                 .map { data -> UIImage in
                     guard let data = data, let image = UIImage(data: data) else {
                         return AppImage.emptyPosterImage

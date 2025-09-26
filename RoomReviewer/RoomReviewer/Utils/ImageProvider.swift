@@ -24,7 +24,7 @@ final class ImageProvider: ImageProviding {
     }
     
     func fetchImage(urlString: String?) -> Observable<Data?> {
-        guard let urlString = urlString, let url = URL(string: API.tmdbImageURL + urlString) else {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
             return .just(nil)
         }
         

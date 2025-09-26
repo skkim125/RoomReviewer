@@ -20,6 +20,10 @@ enum API {
         forInfoDictionaryKey: "API_IMAGE_URL"
     ) as? String ?? ""
     
+    static let youtubeThumnailURL = Bundle.main.object(
+        forInfoDictionaryKey: "Youtube_Thumnail_Link"
+    ) as? String ?? ""
+    
     static let authorization = "Authorization"
     static let contentType = "accept"
     static let jsonContentType = "application/json"

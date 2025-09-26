@@ -43,10 +43,11 @@ final class CreditsCollectionViewCellReactor: Reactor {
         switch action {
         case .loadImage:
             guard let path = currentState.profilePath else {
-                        return .just(.setImage(AppImage.personImage))
+                return .just(.setImage(AppImage.personImage))
             }
             
-            let imageStream = imageLoader.fetchImage(urlString: path)
+            let imageURL = API.tmdbImageURL + path
+            let imageStream = imageLoader.fetchImage(urlString: imageURL)
                 .map { data -> UIImage in
                     guard let data = data, let image = UIImage(data: data) else {
                         return AppImage.personImage

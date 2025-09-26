@@ -147,9 +147,10 @@ final class MediaDetailViewController: UIViewController, View {
         $0.action = nil
     }
     
-    private lazy var creditsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .creditsCollectionViewLayout).then {
+    private lazy var creditsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .mediaDetailCollectionViewLayout).then {
         $0.showsHorizontalScrollIndicator = false
         $0.register(CreditsCollectionViewCell.self, forCellWithReuseIdentifier: CreditsCollectionViewCell.cellID)
+        $0.register(VideoCollectionViewCell.self, forCellWithReuseIdentifier: VideoCollectionViewCell.cellID)
         $0.register(CreditsSectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CreditsSectionHeader.reusableID)
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
@@ -354,16 +355,31 @@ final class MediaDetailViewController: UIViewController, View {
 
         let dataSource = RxCollectionViewSectionedReloadDataSource<MediaDetailSectionModel>(
             configureCell: { [weak self] dataSource, collectionView, indexPath, item in
-                guard let self = self, let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CreditsCollectionViewCell.cellID, for: indexPath) as? CreditsCollectionViewCell else { return UICollectionViewCell() }
-                switch dataSource[indexPath] {
+                guard let self = self else { return UICollectionViewCell() }
+                
+                switch item {
                 case .cast(let cast):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CreditsCollectionViewCell.cellID, for: indexPath) as? CreditsCollectionViewCell else {
+                        return UICollectionViewCell()
+                    }
                     cell.reactor = CreditsCollectionViewCellReactor(name: cast.name, role: cast.character, profilePath: cast.profilePath, imageLoader: self.imageProvider)
+                    return cell
+                    
                 case .creator(let creator):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CreditsCollectionViewCell.cellID, for: indexPath) as? CreditsCollectionViewCell else {
+                        return UICollectionViewCell()
+                    }
                     cell.reactor = CreditsCollectionViewCellReactor(name: creator.name, role: creator.department, profilePath: creator.profilePath, imageLoader: self.imageProvider)
-                case .video(item: _):
-                    break
+                    return cell
+                    
+                case .video(let video):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCollectionViewCell.cellID, for: indexPath) as? VideoCollectionViewCell else {
+                        return UICollectionViewCell()
+                    }
+                    
+                    cell.reactor = VideoCollectionViewCellReactor(videoName: video.name, videoKey: video.key, imageLoader: self.imageProvider)
+                    return cell
                 }
-                return cell
             },
             configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
                 guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CreditsSectionHeader.reusableID, for: indexPath) as? CreditsSectionHeader else { return UICollectionReusableView() }
@@ -383,11 +399,21 @@ final class MediaDetailViewController: UIViewController, View {
         dataStream
             .asDriver(onErrorJustReturn: [])
             .drive(with: self) { owner, sections in
-                print("sectionsCount: \(sections.count), 섹션 정보: \(sections.map { $0.header })")
-                let height: CGFloat = CGFloat(sections.count * 200)
+                
+                var totalHeight: CGFloat = 0.0
+                
+                sections.forEach { section in
+                    switch section {
+                    case .creators, .casts:
+                        totalHeight += 190
+                    case .videos:
+                        let width = UIScreen.main.bounds.width * 0.9
+                        totalHeight += (width * 9 / 16) + 50 + AppFont.semiboldSubTitle.lineHeight
+                    }
+                }
                 
                 owner.creditsCollectionView.snp.updateConstraints {
-                    $0.height.equalTo(height)
+                    $0.height.equalTo(totalHeight)
                 }
             }
             .disposed(by: disposeBag)
