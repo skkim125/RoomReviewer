@@ -180,20 +180,14 @@ enum MockTargetType: TargetType {
 extension TMDBTargetType {
     private func setDate() -> (String, String) {
         let nowDate = Date()
-        let nowDateString = convertDateString(nowDate)
+        let nowDateString = DateFormatter.convertDateString(nowDate)
         
         let twoMonthAgo = Calendar.current.date(byAdding: .month, value: -2, to: nowDate)
         let components = Calendar.current.dateComponents([.year, .month], from: twoMonthAgo ?? Date())
         let firstDayOfTwoMonth = Calendar.current.date(from: components)
-        let oneMonthAgoDateString = convertDateString(firstDayOfTwoMonth)
+        let oneMonthAgoDateString = DateFormatter.convertDateString(firstDayOfTwoMonth)
         
         return (nowDateString, oneMonthAgoDateString)
-    }
-    
-    private func convertDateString(_ date: Date?) -> String {
-        guard let date = date else { return "" }
-        
-        return DateFormatter.dateFormatter.string(from: date)
     }
 }
 
@@ -204,5 +198,16 @@ extension DateFormatter {
         dateFormatter.locale = Locale(identifier: "ko_KR")
         dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return dateFormatter
+    }
+    
+    static func convertDate(_ dateString: String?) -> Date? {
+        guard let dateString = dateString else { return nil }
+        return DateFormatter.dateFormatter.date(from: dateString)
+    }
+    
+    static func convertDateString(_ date: Date?) -> String {
+        guard let date = date else { return "" }
+        
+        return DateFormatter.dateFormatter.string(from: date)
     }
 }

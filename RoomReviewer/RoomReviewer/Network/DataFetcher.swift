@@ -67,6 +67,7 @@ final class URLSessionDataFetcher: DataFetching {
                             single(.failure(NetworkError.serviceUnavailable))
                             return
                         default:
+                            print(response.statusCode)
                             single(.failure(NetworkError.invalidResponse))
                             return
                         }

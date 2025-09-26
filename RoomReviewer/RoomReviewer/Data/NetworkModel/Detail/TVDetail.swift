@@ -82,7 +82,7 @@ extension TVDetail {
         
         let videos = videos.results.map {
             Video(name: $0.name, key: $0.key, site: $0.site, type: $0.type, id: $0.id, publishedDate: $0.publishedAt)
-        }
+        }.filter { $0.site == "YouTube" }
         
         return MediaDetail(
             id: id,

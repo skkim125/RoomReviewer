@@ -66,26 +66,8 @@ extension UICollectionViewLayout {
         }
     }
     
-    static var creditsCollectionViewLayout: UICollectionViewLayout {
+    static var mediaDetailCollectionViewLayout: UICollectionViewLayout {
         return UICollectionViewCompositionalLayout { sectionIndex, layoutEnvironment in
-            
-            let itemSize = NSCollectionLayoutSize(
-                widthDimension: .absolute(100),
-                heightDimension: .fractionalHeight(1)
-            )
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .absolute(100),
-                heightDimension: .absolute(140)
-            )
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-            group.interItemSpacing = .fixed(10)
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuous
-            section.interGroupSpacing = 15
-            section.contentInsets = .init(top: 5, leading: 15, bottom: 10, trailing: 15)
             
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
@@ -97,9 +79,61 @@ extension UICollectionViewLayout {
                 alignment: .top
             )
             
-            section.boundarySupplementaryItems = [header]
-            
-            return section
+            switch sectionIndex {
+            case 0, 1:
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .absolute(100),
+                    heightDimension: .fractionalHeight(1.0)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .absolute(100),
+                    heightDimension: .absolute(140)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                group.interItemSpacing = .fixed(10)
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .continuous
+                section.interGroupSpacing = 15
+                section.contentInsets = .init(top: 0, leading: 15, bottom: 10, trailing: 15)
+                section.boundarySupplementaryItems = [header]
+                
+                return section
+                
+            case 2:
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .fractionalHeight(1.0)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let width = UIScreen.main.bounds.width * 0.875
+                let height = width * 9 / 16 + AppFont.semiboldSubTitle.lineHeight
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .absolute(width),
+                    heightDimension: .absolute(height)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                group.interItemSpacing = .fixed(10)
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .groupPagingCentered
+                section.interGroupSpacing = 15
+                section.contentInsets = .init(top: 5, leading: 15, bottom: 10, trailing: 15)
+                section.boundarySupplementaryItems = [header]
+                
+                return section
+                
+            default:
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(100), heightDimension: .absolute(180))
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                let section = NSCollectionLayoutSection(group: group)
+                return section
+            }
         }
     }
     

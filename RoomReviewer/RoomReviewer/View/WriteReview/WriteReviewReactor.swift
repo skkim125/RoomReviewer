@@ -187,7 +187,12 @@ final class WriteReviewReactor: Reactor {
     }
     
     private func loadPosterImage(_ imagePath: String?) -> Observable<Mutation> {
-        return imageProvider.fetchImage(urlString: imagePath)
+        guard let imagePath else {
+            return .just(.setPosterImage(AppImage.emptyPosterImage))
+        }
+        
+        let imageURL = API.tmdbImageURL + imagePath
+        return imageProvider.fetchImage(urlString: imageURL)
             .map { image in
                 if let image = image {
                     return .setPosterImage(UIImage(data: image))

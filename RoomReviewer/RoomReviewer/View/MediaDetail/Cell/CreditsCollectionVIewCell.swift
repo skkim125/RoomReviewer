@@ -77,13 +77,11 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
     
     func bind(reactor: CreditsCollectionViewCellReactor) {
         reactor.state.map { $0.name }
-            .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: nameLabel.rx.text)
             .disposed(by: disposeBag)
             
         reactor.state.map { $0.character }
-            .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: characterLabel.rx.text)
             .disposed(by: disposeBag)
@@ -111,6 +109,9 @@ final class CreditsCollectionViewCell: UICollectionViewCell, View {
     override func prepareForReuse() {
         super.prepareForReuse()
         disposeBag = DisposeBag()
+        self.profileImageView.image = nil
+        self.characterLabel.text = nil
+        self.nameLabel.text = nil
         self.reactor = nil
     }
 }

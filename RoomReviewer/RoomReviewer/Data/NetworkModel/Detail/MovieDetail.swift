@@ -107,7 +107,7 @@ extension MovieDetail {
         
         let videos = videos.results.map {
             Video(name: $0.name, key: $0.key, site: $0.site, type: $0.type, id: $0.id, publishedDate: $0.publishedAt)
-        }
+        }.sorted(by: { DateFormatter.convertDate($0.publishedDate) ?? Date() > DateFormatter.convertDate($1.publishedDate) ?? Date() })
         
         return MediaDetail(
             id: id,

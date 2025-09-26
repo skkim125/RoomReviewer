@@ -16,6 +16,8 @@
 	<string>$(GAD_Application_Identifier)</string>
 	<key>GAD_BannerADs_Identifier</key>
 	<string>$(GAD_BannerADs_Identifier)</string>
+	<key>Youtube_Thumnail_Link</key>
+	<string>$(Youtube_Thumnail_Link)</string>
 	<key>My_Email</key>
 	<string>$(My_Email)</string>
 	<key>SKAdNetworkItems</key>

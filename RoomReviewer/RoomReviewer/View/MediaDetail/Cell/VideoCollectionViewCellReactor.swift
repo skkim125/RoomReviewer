@@ -1,49 +1,51 @@
 //
-//  HotTVCollectionViewCellReactor.swift
+//  VideoCollectionViewCellReactor.swift
 //  RoomReviewer
 //
-//  Created by 김상규 on 6/16/25.
+//  Created by 김상규 on 9/25/25.
 //
 
 import UIKit
-import RxSwift
 import ReactorKit
+import RxSwift
 
-final class HotMediaCollectionViewCellReactor: Reactor {
+final class VideoCollectionViewCellReactor: Reactor {
     enum Action {
         case loadImage
     }
-
+    
     enum Mutation {
         case setLoading(Bool)
         case setImage(UIImage?)
     }
-
+    
     struct State {
-        var mediaName: String?
-        var mediaPosterURL: String?
-        var imageData: UIImage?
+        let videoName: String?
+        let videoKey: String?
+        var videoThumnailImage: UIImage?
         var isLoading: Bool = false
     }
-
+    
     var initialState: State
-    private let imageProvider: ImageProviding
-    private let imageFileManager: ImageFileManaging
-
-    init(media: Media, imageProvider: ImageProviding, imageFileManager: ImageFileManaging) {
-        self.initialState = State(mediaName: media.title, mediaPosterURL: media.posterPath)
-        self.imageProvider = imageProvider
-        self.imageFileManager = imageFileManager
+    private let imageLoader: ImageProviding
+    
+    init(videoName: String?, videoKey: String?, imageLoader: ImageProviding) {
+        self.initialState = State(
+            videoName: videoName,
+            videoKey: videoKey
+        )
+        self.imageLoader = imageLoader
     }
-
+    
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .loadImage:
-            guard let url = currentState.mediaPosterURL else {
-                return .just(.setImage(AppImage.emptyPosterImage))
+            guard let videoKey = currentState.videoKey else {
+                return .just(.setImage(AppImage.personImage))
             }
-            let imageURL = API.tmdbImageURL + url
-            let imageStream = imageProvider.fetchImage(urlString: imageURL)
+            let thumnailLink = API.youtubeThumnailURL + videoKey + "/hqdefault.jpg"
+            print("thumnailLink", thumnailLink)
+            let imageStream = imageLoader.fetchImage(urlString: thumnailLink)
                 .map { data -> UIImage in
                     guard let data = data, let image = UIImage(data: data) else {
                         return AppImage.emptyPosterImage
@@ -55,18 +57,18 @@ final class HotMediaCollectionViewCellReactor: Reactor {
             return Observable.concat([
                 .just(.setLoading(true)),
                 imageStream,
-                .just(.setLoading(false)),
-                ])
+                .just(.setLoading(false))
+            ])
         }
     }
-
+    
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setImage(let image):
-            newState.imageData = image
         case .setLoading(let isLoading):
             newState.isLoading = isLoading
+        case .setImage(let image):
+            newState.videoThumnailImage = image
         }
         return newState
     }
