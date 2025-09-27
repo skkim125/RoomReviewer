@@ -458,6 +458,15 @@ final class MediaDetailViewController: UIViewController, View {
                 owner.showMoveYoutubeAlert(video)
             }
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$showUpdateCompleteAlert)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self) { owner, _ in
+                owner.showUpdateCompleteAlert()
+            }
+            .disposed(by: disposeBag)
+        
     }
     
     private func bindAction(reactor: MediaDetailReactor) {
@@ -848,6 +857,15 @@ extension MediaDetailViewController {
         let alert = CustomAlertViewController(
             title: "오류 발생",
             subtitle: error.localizedDescription,
+            buttonType: .oneButton
+        )
+        present(alert, animated: true)
+    }
+    
+    private func showUpdateCompleteAlert() {
+        let alert = CustomAlertViewController(
+            title: "업데이트 완료",
+            subtitle: "최신 정보로 업데이트되었습니다.",
             buttonType: .oneButton
         )
         present(alert, animated: true)

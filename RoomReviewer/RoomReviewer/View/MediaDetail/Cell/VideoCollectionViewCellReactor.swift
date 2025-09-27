@@ -44,7 +44,7 @@ final class VideoCollectionViewCellReactor: Reactor {
                 return .just(.setImage(AppImage.personImage))
             }
             let thumnailLink = API.youtubeThumnailURL + videoKey + "/hqdefault.jpg"
-            print("thumnailLink", thumnailLink)
+
             let imageStream = imageLoader.fetchImage(urlString: thumnailLink)
                 .map { data -> UIImage in
                     guard let data = data, let image = UIImage(data: data) else {
