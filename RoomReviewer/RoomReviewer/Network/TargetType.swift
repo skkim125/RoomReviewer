@@ -28,7 +28,7 @@ extension TargetType {
         guard let url = components?.url else { throw NetworkError.invalidURL }
         var request = URLRequest(url: url)
         
-        request.timeoutInterval = 5
+        request.timeoutInterval = 15
         request.allHTTPHeaderFields = header
         request.httpMethod = method.rawValue
         if let body = body {

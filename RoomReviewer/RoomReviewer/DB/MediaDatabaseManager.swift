@@ -16,6 +16,7 @@ protocol MediaDBManager {
     func deleteMedia(id: Int) -> Single<Void>
     func fetchMedia(id: Int) -> Single<(Bool, NSManagedObjectID?, Bool, Date?, Bool)?>
     func fetchMediaEntity(id: Int) -> Single<MediaEntity?>
+    func updateMediaDetail(id: Int, mediaDetail: MediaDetail) -> Single<Bool> 
     func updateWatchedDate(id: Int, watchedDate: Date?) -> Single<NSManagedObjectID>
     func updateIsStared(id: Int, isStar: Bool) -> Single<Bool>
     func updateIsWatchlist(id: Int, isWatchlist: Bool) -> Single<Bool>
@@ -328,6 +329,100 @@ final class MediaDatabaseManager: MediaDBManager {
                     }
                 } catch {
                     print("티어 업데이트 실패: \(error.localizedDescription)")
+                    observer(.failure(DatabaseError.updateFailed))
+                }
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
+    func updateMediaDetail(id: Int, mediaDetail: MediaDetail) -> Single<Bool> {
+        return Single.create { [weak self] observer in
+            guard let self = self else {
+                observer(.failure(DatabaseError.commonError))
+                return Disposables.create()
+            }
+            
+            let backgroundContext = self.stack.newBackgroundContext()
+            backgroundContext.perform {
+                let request: NSFetchRequest<MediaEntity> = MediaEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %d", id)
+                
+                do {
+                    if let mediaToUpdate = try backgroundContext.fetch(request).first {
+                        
+                        var hasChanges = false
+                        
+                        if mediaToUpdate.overview != mediaDetail.overview {
+                            hasChanges = true
+                        }
+                        if mediaToUpdate.certificate != mediaDetail.certificate {
+                            hasChanges = true
+                        }
+                        if mediaToUpdate.runtimeOrEpisodeInfo != mediaDetail.runtimeOrEpisodeInfo {
+                            hasChanges = true
+                        }
+                        
+                        let oldCastIDs = (mediaToUpdate.casts as? Set<CastEntity>)?.map { $0.id }.sorted() ?? []
+                        let newCastIDs = mediaDetail.cast.map { Int64($0.id) }.sorted()
+                        if oldCastIDs != newCastIDs {
+                            hasChanges = true
+                        }
+                        
+                        let oldCrewIDs = (mediaToUpdate.crews as? Set<CrewEntity>)?.map { $0.id }.sorted() ?? []
+                        let newCrewIDs = mediaDetail.creator.map { Int64($0.id) }.sorted()
+                        if oldCrewIDs != newCrewIDs {
+                            hasChanges = true
+                        }
+                        
+                        guard hasChanges else {
+                            print("\(mediaToUpdate.title) 상세 정보 변경점 없음")
+                            observer(.success(false))
+                            return
+                        }
+                        
+                        mediaToUpdate.overview = mediaDetail.overview
+                        mediaToUpdate.certificate = mediaDetail.certificate
+                        mediaToUpdate.runtimeOrEpisodeInfo = mediaDetail.runtimeOrEpisodeInfo
+                        
+                        if let oldCasts = mediaToUpdate.casts {
+                            mediaToUpdate.removeFromCasts(oldCasts)
+                        }
+                        
+                        if let oldCrews = mediaToUpdate.crews {
+                            mediaToUpdate.removeFromCrews(oldCrews)
+                        }
+                        
+                        for (index, cast) in mediaDetail.cast.enumerated() {
+                            let castEntity = CastEntity(context: backgroundContext)
+                            castEntity.id = Int64(cast.id)
+                            castEntity.name = cast.name
+                            castEntity.character = cast.character
+                            castEntity.profileURL = cast.profilePath
+                            castEntity.index = Int64(index)
+                            mediaToUpdate.addToCasts(castEntity)
+                        }
+                        
+                        for (index, crew) in mediaDetail.creator.enumerated() {
+                            let crewEntity = CrewEntity(context: backgroundContext)
+                            crewEntity.id = Int64(crew.id)
+                            crewEntity.name = crew.name
+                            crewEntity.department = crew.department
+                            crewEntity.profileURL = crew.profilePath
+                            crewEntity.index = Int64(index)
+                            mediaToUpdate.addToCrews(crewEntity)
+                        }
+                        
+                        try backgroundContext.save()
+                        print("\(mediaToUpdate.title) 상세 정보 업데이트 완료")
+                        observer(.success(true))
+                        
+                    } else {
+                        observer(.success(false))
+                    }
+                } catch {
+                    print("미디어 상세 정보 업데이트 실패: \(error.localizedDescription)")
                     observer(.failure(DatabaseError.updateFailed))
                 }
             }

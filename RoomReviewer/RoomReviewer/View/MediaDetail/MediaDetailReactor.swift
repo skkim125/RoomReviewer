@@ -81,6 +81,7 @@ final class MediaDetailReactor: Reactor {
         @Pulse var pushWriteReviewView: (Media, ReviewEntity?)?
         @Pulse var showNetworkErrorAndDismiss: Void?
         @Pulse var showMoveYoutubeAlert: Video?
+        @Pulse var showUpdateCompleteAlert: Void?
         @Pulse var error: Error?
     }
 
@@ -113,6 +114,7 @@ final class MediaDetailReactor: Reactor {
         case setProcessingAction(State.ProcessingAction)
         case showNetworkErrorAndDismiss
         case showMoveYoutubeAlert(Video)
+        case showUpdateCompleteAlert
         case showError(Error)
     }
 
@@ -134,30 +136,55 @@ final class MediaDetailReactor: Reactor {
             let detailFetchStream = mediaDBManager.fetchMediaEntity(id: media.id).asObservable()
                 .flatMap { [weak self] entity -> Observable<Mutation> in
                     guard let self = self else { return .empty() }
+                    
+                    let localDataStream: Observable<Mutation>
                     if let entity = entity {
-                        return .just(.getMediaDetail(entity.toMediaDetail()))
+                        localDataStream = .just(.getMediaDetail(entity.toMediaDetail()))
                     } else {
-                        if !self.networkMonitor.isCurrentlyConnected { return .just(.showNetworkErrorAndDismiss) }
-                        return self.fetchMediaCredits()
+                        localDataStream = .empty()
                     }
+                    
+                    let networkDataStream: Observable<Mutation>
+                    
+                    if self.networkMonitor.isCurrentlyConnected {
+                        networkDataStream = self.fetchMediaCredits()
+                            .flatMap { mutation -> Observable<Mutation> in
+                                if case .getMediaDetail(let detail) = mutation {
+                                    return self.mediaDBManager.updateMediaDetail(id: media.id, mediaDetail: detail)
+                                        .asObservable()
+                                        .flatMap { wasUpdated -> Observable<Mutation> in
+                                            if wasUpdated {
+                                                return .concat(.just(mutation), .just(.showUpdateCompleteAlert))
+                                            } else {
+                                                return .just(mutation)
+                                            }
+                                        }
+                                        .catchAndReturn(mutation)
+                                }
+                                return .just(mutation)
+                            }
+                    } else {
+                        networkDataStream = .empty()
+                    }
+                    
+                    if entity == nil && !self.networkMonitor.isCurrentlyConnected {
+                        return .just(.showNetworkErrorAndDismiss)
+                    }
+                    
+                    return Observable.concat(localDataStream, networkDataStream)
                 }
             
             let essentialDataStream = Observable.merge(dbStatusStream, detailFetchStream)
                 .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
                 .observe(on: mutationScheduler)
                 .concat(Observable.just(.setEssentialDataLoaded(true)))
-
-            let imageStream = Observable.merge(
-                self.loadBackdropImage(currentState.media.backdropPath),
-                self.loadPosterImage(currentState.media.posterPath)
-            )
-            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
-            .observe(on: mutationScheduler)
-
-            let imageLoadingStream = imageStream
+            
+            let imageStream = Observable.merge(loadBackdropImage(currentState.media.backdropPath), loadPosterImage(currentState.media.posterPath))
+                .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+                .observe(on: mutationScheduler)
                 .concat(Observable.just(.setImagesLoaded(true)))
             
-            return Observable.merge(essentialDataStream, imageLoadingStream)
+            return Observable.merge(essentialDataStream, imageStream)
                 .observe(on: MainScheduler.instance)
         
         case .viewWillAppear:
@@ -331,11 +358,11 @@ final class MediaDetailReactor: Reactor {
             newState.casts = detail.cast
             newState.creators = detail.creator
             var sectionModels: [MediaDetailSectionModel] = []
-            let creators = detail.creator.sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ MediaDetailSectionItem.creator(item: $0) })
+            let creators = detail.creator.prefix(10).sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ MediaDetailSectionItem.creator(item: $0) })
             if !creators.isEmpty {
                 sectionModels.append(MediaDetailSectionModel.creators(items: creators))
             }
-            let casts = detail.cast.map({ MediaDetailSectionItem.cast(item: $0) })
+            let casts = detail.cast.prefix(10).map({ MediaDetailSectionItem.cast(item: $0) })
             if !casts.isEmpty {
                 sectionModels.append(MediaDetailSectionModel.casts(items: casts))
             }
@@ -380,6 +407,8 @@ final class MediaDetailReactor: Reactor {
             newState.showNetworkErrorAndDismiss = ()
         case .showError(let error):
             newState.error = error
+        case .showUpdateCompleteAlert:
+            newState.showUpdateCompleteAlert = ()
         case .showMoveYoutubeAlert(let video):
             newState.showMoveYoutubeAlert = video
         }
@@ -423,7 +452,8 @@ final class MediaDetailReactor: Reactor {
                         }
                     }
                 }
-        default: return .empty()
+        default:
+            return .empty()
         }
     }
     
