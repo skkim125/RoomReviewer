@@ -97,6 +97,7 @@
 		04B379492E51EB0000C2F3EA /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 04B379482E51EB0000C2F3EA /* RxCocoa */; };
 		04B3794D2E51EB0000C2F3EA /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 04B3794C2E51EB0000C2F3EA /* RxSwift */; };
 		04B9CBC02DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B9CBBF2DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift */; };
+		04C6A3E12E87E8BA00848C99 /* ImageEndPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C6A3E02E87E8BA00848C99 /* ImageEndPoint.swift */; };
 		04C97AB12E224717001EB1D4 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB02E224717001EB1D4 /* Media.swift */; };
 		04C97AB42E2286C3001EB1D4 /* PosterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB32E2286C3001EB1D4 /* PosterCollectionViewCell.swift */; };
 		04C97ABA2E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C97AB92E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift */; };
@@ -234,6 +235,7 @@
 		04B379092E51D74E00C2F3EA /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		04B3792F2E51EA3E00C2F3EA /* MediaDatabaseManagerUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MediaDatabaseManagerUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		04B9CBBF2DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotMediaCollectionViewCell.swift; sourceTree = "<group>"; };
+		04C6A3E02E87E8BA00848C99 /* ImageEndPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEndPoint.swift; sourceTree = "<group>"; };
 		04C97AB02E224717001EB1D4 /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		04C97AB32E2286C3001EB1D4 /* PosterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterCollectionViewCell.swift; sourceTree = "<group>"; };
 		04C97AB92E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterCollectionViewCellReactor.swift; sourceTree = "<group>"; };
@@ -525,6 +527,7 @@
 			isa = PBXGroup;
 			children = (
 				0489D8FB2E741481003FE402 /* ImageFileManager.swift */,
+				04C6A3E02E87E8BA00848C99 /* ImageEndPoint.swift */,
 				0489D8FF2E743394003FE402 /* DiskImageCacheManager.swift */,
 				0410D7922E4F2CBD009D38EE /* ImageProvider.swift */,
 				0489D8F12E729B46003FE402 /* NetworkMonitor.swift */,
@@ -1218,6 +1221,7 @@
 				04B9CBC02DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift in Sources */,
 				04FE6C9C2E599E3000CCB76C /* MediaDetail.swift in Sources */,
 				04FFC7D12DF16A840081AF7C /* SceneDelegate.swift in Sources */,
+				04C6A3E12E87E8BA00848C99 /* ImageEndPoint.swift in Sources */,
 				042968932E61727300E6DFF6 /* TrendMediaCollectionViewCell.swift in Sources */,
 				04A722DF2E54A1A200797731 /* CommonButton.swift in Sources */,
 				046E7A2E2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift in Sources */,

@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 protocol ImageProviding {
-    func fetchImage(urlString: String?) -> Observable<Data?>
+    func fetchImage(endpoint: ImageEndpoint) -> Observable<Data?>
 }
 
 final class ImageProvider: ImageProviding {
@@ -23,24 +23,24 @@ final class ImageProvider: ImageProviding {
         memoryCache.totalCostLimit = 150 * 1024 * 1024 // 150MB 메모리 캐시
     }
     
-    func fetchImage(urlString: String?) -> Observable<Data?> {
-        guard let urlString = urlString, let url = URL(string: urlString) else {
-            return .just(nil)
-        }
-        
-        let cacheKey = NSString(string: url.absoluteString)
+    func fetchImage(endpoint: ImageEndpoint) -> Observable<Data?> {
+        let cacheKey = NSString(string: endpoint.cacheKey)
         
         if let cachedData = memoryCache.object(forKey: cacheKey) {
             return .just(cachedData as Data)
         }
         
-        return fileManager.loadImage(urlString: urlString)
+        return fileManager.loadImage(urlString: endpoint.cacheKey)
             .flatMap { [weak self] permanentData -> Observable<Data?> in
                 guard let self = self else { return .empty() }
                 
                 if let data = permanentData {
                     self.memoryCache.setObject(data as NSData, forKey: cacheKey)
                     return .just(data)
+                }
+                
+                guard let url = endpoint.fullURL else {
+                    return .just(nil)
                 }
                 
                 let request = URLRequest(url: url)
@@ -53,6 +53,7 @@ final class ImageProvider: ImageProviding {
                         }
                         
                         self.memoryCache.setObject(optimizedData as NSData, forKey: cacheKey)
+                        self.fileManager.saveImage(image: optimizedData, urlString: endpoint.cacheKey)
                         
                         return optimizedData
                     }

@@ -42,8 +42,8 @@ final class HotMediaCollectionViewCellReactor: Reactor {
             guard let url = currentState.mediaPosterURL else {
                 return .just(.setImage(AppImage.emptyPosterImage))
             }
-            let imageURL = API.tmdbImageURL + url
-            let imageStream = imageProvider.fetchImage(urlString: imageURL)
+            let tmdbImageEndpoint = ImageEndpoint(type: .tmdbImage(path: url))
+            let imageStream = imageProvider.fetchImage(endpoint: tmdbImageEndpoint)
                 .map { data -> UIImage in
                     guard let data = data, let image = UIImage(data: data) else {
                         return AppImage.emptyPosterImage
