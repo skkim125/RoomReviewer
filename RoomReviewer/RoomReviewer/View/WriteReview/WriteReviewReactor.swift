@@ -191,15 +191,15 @@ final class WriteReviewReactor: Reactor {
             return .just(.setPosterImage(AppImage.emptyPosterImage))
         }
         
-        let imageURL = API.tmdbImageURL + imagePath
-        return imageProvider.fetchImage(urlString: imageURL)
-            .map { image in
-                if let image = image {
-                    return .setPosterImage(UIImage(data: image))
-                } else {
-                    return .setPosterImage(AppImage.emptyPosterImage)
+        let tmdbImageEndpoint = ImageEndpoint(type: .tmdbImage(path: imagePath))
+        return imageProvider.fetchImage(endpoint: tmdbImageEndpoint)
+            .map { data -> UIImage in
+                guard let data = data, let image = UIImage(data: data) else {
+                    return AppImage.emptyPosterImage
                 }
+                return image
             }
+            .map { Mutation.setPosterImage($0) }
     }
     
     private func saveReview(state: State) -> Observable<Mutation> {

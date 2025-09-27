@@ -46,8 +46,8 @@ final class CreditsCollectionViewCellReactor: Reactor {
                 return .just(.setImage(AppImage.personImage))
             }
             
-            let imageURL = API.tmdbImageURL + path
-            let imageStream = imageLoader.fetchImage(urlString: imageURL)
+            let tmdbImageEndpoint = ImageEndpoint(type: .tmdbImage(path: path))
+            let imageStream = imageLoader.fetchImage(endpoint: tmdbImageEndpoint)
                 .map { data -> UIImage in
                     guard let data = data, let image = UIImage(data: data) else {
                         return AppImage.personImage
