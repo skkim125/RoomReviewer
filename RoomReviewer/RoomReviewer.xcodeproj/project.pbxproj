@@ -48,6 +48,9 @@
 		043BB0522DFD5EE000E5438D /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB0512DFD5EE000E5438D /* RxCocoa */; };
 		043BB0542DFD5EE000E5438D /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 043BB0532DFD5EE000E5438D /* RxSwift */; };
 		04417ABF2E770D34002DC640 /* DatabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04417ABE2E770D34002DC640 /* DatabaseError.swift */; };
+		0446B8B92E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8B82E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel */; };
+		0446B8BC2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8BB2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift */; };
+		0446B8BD2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8BA2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift */; };
 		044952592E08169D00D75C4A /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 044952582E08169D00D75C4A /* Differentiator */; };
 		0449525B2E08169D00D75C4A /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 0449525A2E08169D00D75C4A /* RxDataSources */; };
 		044952642E081A4A00D75C4A /* HomeSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044952632E081A4A00D75C4A /* HomeSectionModel.swift */; };
@@ -200,6 +203,10 @@
 		043BB0482DFC4EA800E5438D /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		043BB04C2DFC4F2A00E5438D /* HomeReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactor.swift; sourceTree = "<group>"; };
 		04417ABE2E770D34002DC640 /* DatabaseError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseError.swift; sourceTree = "<group>"; };
+		0446B8B52E8A5DBD004043FE /* RoomReviewerEntity v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "RoomReviewerEntity v2.xcdatamodel"; sourceTree = "<group>"; };
+		0446B8B82E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = RoomReviewerMappingModel_v1.xcmappingmodel; sourceTree = "<group>"; };
+		0446B8BA2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		0446B8BB2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		044952632E081A4A00D75C4A /* HomeSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSectionModel.swift; sourceTree = "<group>"; };
 		044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeReactorLoadDataUnitTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
@@ -713,6 +720,9 @@
 			isa = PBXGroup;
 			children = (
 				046EFB462E56E0A200E2736B /* RoomReviewerEntity.xcdatamodeld */,
+				0446B8B82E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel */,
+				0446B8BA2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift */,
+				0446B8BB2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift */,
 				046E7A2C2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift */,
 				046E7A2D2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift */,
 				046EFB532E56E5E200E2736B /* MediaEntity+CoreDataClass.swift */,
@@ -1168,6 +1178,7 @@
 				04100D2B2E6ABD38008BF76C /* MyPageSectionModel.swift in Sources */,
 				04100D1E2E698381008BF76C /* CrewEntity+CoreDataProperties.swift in Sources */,
 				0489D8FC2E741481003FE402 /* ImageFileManager.swift in Sources */,
+				0446B8B92E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel in Sources */,
 				04100D1F2E698381008BF76C /* CastEntity+CoreDataProperties.swift in Sources */,
 				04100D202E698381008BF76C /* CrewEntity+CoreDataClass.swift in Sources */,
 				04D0D0A32E5C7EB0002A6951 /* WriteReviewViewController.swift in Sources */,
@@ -1203,6 +1214,8 @@
 				04FFC7D02DF16A840081AF7C /* AppDelegate.swift in Sources */,
 				043BB04D2DFC4F2A00E5438D /* HomeReactor.swift in Sources */,
 				04FE6C812E585F6C00CCB76C /* MovieCreditsResponse.swift in Sources */,
+				0446B8BC2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift in Sources */,
+				0446B8BD2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift in Sources */,
 				044B8C3B2E60831300EB016D /* UICollectionViewLayout+.swift in Sources */,
 				040AD09A2E1F7F6900C6EBC9 /* HomeSectionHeaderView.swift in Sources */,
 				044952642E081A4A00D75C4A /* HomeSectionModel.swift in Sources */,
@@ -1993,9 +2006,10 @@
 		046EFB462E56E0A200E2736B /* RoomReviewerEntity.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				0446B8B52E8A5DBD004043FE /* RoomReviewerEntity v2.xcdatamodel */,
 				046EFB472E56E0A200E2736B /* RoomReviewerEntity.xcdatamodel */,
 			);
-			currentVersion = 046EFB472E56E0A200E2736B /* RoomReviewerEntity.xcdatamodel */;
+			currentVersion = 0446B8B52E8A5DBD004043FE /* RoomReviewerEntity v2.xcdatamodel */;
 			path = RoomReviewerEntity.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
