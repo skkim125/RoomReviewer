@@ -81,7 +81,7 @@ extension TVDetail {
         }
         
         let videos = videos.results.map {
-            Video(name: $0.name, key: $0.key, site: $0.site, type: $0.type, id: $0.id, publishedDate: $0.publishedAt)
+            Video(name: $0.name, key: $0.key, site: $0.site, id: $0.id, publishedDate: $0.publishedAt)
         }.filter { $0.site == "YouTube" }
         
         return MediaDetail(
@@ -110,18 +110,16 @@ struct DetailVideoResponse: Decodable {
 }
 
 struct VideoResponse: Decodable {
-    let name: String?
-    let key: String?
-    let site: String?
-    let type: String?
-    let id: String?
+    let name: String
+    let key: String
+    let site: String
+    let id: String
     let publishedAt: String?
     
     enum CodingKeys: String, CodingKey {
         case name = "name"
         case key = "key"
         case site = "site"
-        case type = "type"
         case id = "id"
         case publishedAt = "published_at"
     }

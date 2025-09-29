@@ -200,7 +200,7 @@ final class MediaDetailReactor: Reactor {
         
         case .watchlistButtonTapped:
             guard currentState.processingAction == .none else { return .empty() }
-            let media = currentState.media, casts = currentState.casts, creators = currentState.creators
+            let media = currentState.media, casts = currentState.casts, creators = currentState.creators, videos = currentState.videos
             let isCurrentlyWatchlisted = currentState.isWatchlisted
             let actionStream: Observable<Mutation>
             
@@ -212,6 +212,11 @@ final class MediaDetailReactor: Reactor {
                 if let backdropPath = media.backdropPath {
                     let backdropURL = API.tmdbImageURL + backdropPath
                     imageFileManager.deleteImage(urlString: backdropURL)
+                }
+                
+                let videoPaths = videos.map { API.youtubeThumnailURL + $0.key }
+                for videoPath in videoPaths {
+                    imageFileManager.deleteImage(urlString: videoPath)
                 }
                 
                 actionStream = mediaDBManager.deleteMedia(id: media.id).asObservable()
@@ -238,7 +243,21 @@ final class MediaDetailReactor: Reactor {
                     backdropSaveStream = .just(())
                 }
                 
-                let createMediaStream = mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, addedDate: Date(), certificate: currentState.certificate, runtimeOrEpisodeInfo: currentState.runtimeOrEpisodeInfo)
+                let videoThumnailSaveStream: Observable<Void>
+                if !videos.isEmpty {
+                    let endpoints = videos.compactMap { video -> ImageEndpoint? in
+                        guard !video.key.isEmpty else { return nil }
+                        return ImageEndpoint(type: .youtubeThumbnail(key: video.key))
+                    }
+                    
+                    let fetchStreams = endpoints.map { imageProvider.fetchImage(endpoint: $0) }
+                    videoThumnailSaveStream = Observable.zip(fetchStreams).map { _ in () }
+                    
+                } else {
+                    videoThumnailSaveStream = .just(())
+                }
+                
+                let createMediaStream = mediaDBManager.createMedia(id: media.id, title: media.title, overview: media.overview, type: media.mediaType.rawValue, posterURL: media.posterPath, backdropURL: media.backdropPath, genres: media.genreIDS, releaseDate: media.releaseDate, watchedDate: nil, creators: creators, casts: casts, videos: videos, addedDate: Date(), certificate: currentState.certificate, runtimeOrEpisodeInfo: currentState.runtimeOrEpisodeInfo)
                     .flatMap { _ in self.mediaDBManager.fetchMedia(id: media.id) }.asObservable()
                     .flatMap { result -> Observable<Mutation> in
                         if let (isWatchlist, objectID, isStared, watchedDate, isReviewed) = result {
@@ -246,7 +265,7 @@ final class MediaDetailReactor: Reactor {
                         }
                         return .empty()
                     }
-                actionStream = Observable.zip(posterSaveStream, backdropSaveStream).flatMap { _ in createMediaStream }.catch { error in
+                actionStream = Observable.zip(posterSaveStream, backdropSaveStream, videoThumnailSaveStream).flatMap { _ in createMediaStream }.catch { error in
                         .just(.showError(DatabaseError.saveFailed))
                 }
             }
@@ -284,6 +303,7 @@ final class MediaDetailReactor: Reactor {
             let media = currentState.media
             let creators = currentState.creators
             let casts = currentState.casts
+            let videos = currentState.videos
             let starToggle = !currentState.isStared
             
             let updateStream = mediaDBManager.updateIsStared(id: media.id, isStar: starToggle)
@@ -307,6 +327,7 @@ final class MediaDetailReactor: Reactor {
                     watchedDate: nil,
                     creators: creators,
                     casts: casts,
+                    videos: videos,
                     addedDate: nil,
                     certificate: self.currentState.certificate,
                     runtimeOrEpisodeInfo: self.currentState.runtimeOrEpisodeInfo
@@ -367,6 +388,7 @@ final class MediaDetailReactor: Reactor {
                 let convertVideoSectionItems = videos.map { MediaDetailSectionItem.video(item: $0) }
                 if !convertVideoSectionItems.isEmpty {
                     sectionModels.append(MediaDetailSectionModel.videos(items: convertVideoSectionItems))
+                    newState.videos = videos
                 }
             }
             

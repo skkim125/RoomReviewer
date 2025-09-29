@@ -847,7 +847,7 @@ extension MediaDetailViewController {
             subtitle: "Youtube로 이동합니다.",
             buttonType: .twoButton
         ) { [weak self] in
-            self?.openYouTubeVideo(id: video.key ?? "")
+            self?.openYouTubeVideo(id: video.key)
         }
         
         present(alert, animated: true)

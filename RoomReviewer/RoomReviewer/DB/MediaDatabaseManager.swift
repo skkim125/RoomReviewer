@@ -10,7 +10,7 @@ import CoreData
 import RxSwift
 
 protocol MediaDBManager {
-    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?, certificate: String?, runtimeOrEpisodeInfo: String?) -> Single<NSManagedObjectID>
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], videos: [Video]?, addedDate: Date?, certificate: String?, runtimeOrEpisodeInfo: String?) -> Single<NSManagedObjectID>
     
     func fetchAllMedia() -> Single<[MediaEntity]>
     func deleteMedia(id: Int) -> Single<Void>
@@ -31,7 +31,7 @@ final class MediaDatabaseManager: MediaDBManager {
     }
 
     // 보고 싶은 or 리뷰 작성을 위한 Media 생성 & 저장
-    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], addedDate: Date?, certificate: String?, runtimeOrEpisodeInfo: String?) -> Single<NSManagedObjectID> {
+    func createMedia(id: Int, title: String, overview: String?, type: String, posterURL: String?, backdropURL: String?, genres: [Int], releaseDate: String?, watchedDate: Date?, creators: [Crew], casts: [Cast], videos: [Video]?, addedDate: Date?, certificate: String?, runtimeOrEpisodeInfo: String?) -> Single<NSManagedObjectID> {
         
         return Single.create { [weak self] observer in
             guard let self = self else {
@@ -79,6 +79,22 @@ final class MediaDatabaseManager: MediaDBManager {
                     crewEntity.index = Int64(index) // 인덱스 저장
                     
                     mediaEntity.addToCrews(crewEntity)
+                }
+                
+                if let video = videos {
+                    for (index, video) in video.enumerated() {
+                        let videoEntity = VideoEntity(context: backgroundContext)
+                        
+                        videoEntity.id = video.id
+                        videoEntity.videoName = video.name
+                        videoEntity.date = video.publishedDate
+                        videoEntity.key = video.key
+                        videoEntity.index = Int64(index) // 인덱스 저장
+                        
+                        mediaEntity.addToVideos(videoEntity)
+                    }
+                } else {
+                    mediaEntity.videos = NSSet()
                 }
                 
                 do {
@@ -376,6 +392,12 @@ final class MediaDatabaseManager: MediaDBManager {
                             hasChanges = true
                         }
                         
+                        let oldVideoIDs = (mediaToUpdate.videos as? Set<VideoEntity>)?.map { $0.id }.sorted() ?? []
+                        let newVideoIDs = mediaDetail.video?.map { $0.id }.sorted()
+                        if oldVideoIDs != newVideoIDs {
+                            hasChanges = true
+                        }
+                        
                         guard hasChanges else {
                             print("\(mediaToUpdate.title) 상세 정보 변경점 없음")
                             observer(.success(false))
@@ -412,6 +434,22 @@ final class MediaDatabaseManager: MediaDBManager {
                             crewEntity.profileURL = crew.profilePath
                             crewEntity.index = Int64(index)
                             mediaToUpdate.addToCrews(crewEntity)
+                        }
+                        
+                        if let video = mediaDetail.video {
+                            for (index, video) in video.enumerated() {
+                                let videoEntity = VideoEntity(context: backgroundContext)
+                                
+                                videoEntity.id = video.id
+                                videoEntity.videoName = video.name
+                                videoEntity.date = video.publishedDate
+                                videoEntity.key = video.key
+                                videoEntity.index = Int64(index) // 인덱스 저장
+                                
+                                mediaToUpdate.addToVideos(videoEntity)
+                            }
+                        } else {
+                            mediaToUpdate.videos = []
                         }
                         
                         try backgroundContext.save()
