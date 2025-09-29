@@ -27,12 +27,13 @@ extension MediaEntity {
     @NSManaged public var title: String
     @NSManaged public var type: String
     @NSManaged public var watchedDate: Date?
-    @NSManaged public var review: ReviewEntity?
-    @NSManaged public var crews: NSSet?
-    @NSManaged public var casts: NSSet?
     @NSManaged public var tier: String?
     @NSManaged public var certificate: String?
     @NSManaged public var runtimeOrEpisodeInfo: String?
+    @NSManaged public var review: ReviewEntity?
+    @NSManaged public var crews: NSSet?
+    @NSManaged public var casts: NSSet?
+    @NSManaged public var videos: NSSet?
 }
 
 // MARK: Generated accessors for crews
@@ -75,6 +76,25 @@ extension MediaEntity {
     @NSManaged public func removeFromCasts(_ values: NSSet)
 }
 
+extension MediaEntity {
+    public var videoArray: [VideoEntity] {
+        guard let set = self.videos as? Set<VideoEntity> else { return [] }
+        return set.sorted { $0.index < $1.index }
+    }
+    
+    @objc(addVideosObject:)
+    @NSManaged public func addToVideos(_ value: VideoEntity)
+
+    @objc(removeVideosObject:)
+    @NSManaged public func removeFromVideos(_ value: VideoEntity)
+    
+    @objc(addVideos:)
+    @NSManaged public func addToVideos(_ values: NSSet)
+
+    @objc(removeVideos:)
+    @NSManaged public func removeFromVideos(_ values: NSSet)
+}
+
 extension MediaEntity : Identifiable {
     func toDomain() -> Media {
         return Media(id: Int(self.id), mediaType: MediaType(rawValue: self.type) ?? .person, title: self.title, overview: self.overview, posterPath: self.posterURL, backdropPath: self.backdropURL, genreIDS: self.genres, releaseDate: self.releaseDate, watchedDate: self.watchedDate)
@@ -83,6 +103,7 @@ extension MediaEntity : Identifiable {
     func toMediaDetail() -> MediaDetail {
         let cast = self.castArray.map { $0.toDomain() }
         let creator = self.crewArray.map { $0.toDomain() }
+        let video = self.videoArray.map { $0.toDomain() }
         let releaseYear = String(self.releaseDate?.prefix(4) ?? "")
         let genres = API.convertGenreString(self.genres)
 
@@ -98,7 +119,7 @@ extension MediaEntity : Identifiable {
             runtimeOrEpisodeInfo: self.runtimeOrEpisodeInfo ?? "정보 없음",
             cast: cast,
             creator: creator,
-            video: []
+            video: video
         )
     }
 }

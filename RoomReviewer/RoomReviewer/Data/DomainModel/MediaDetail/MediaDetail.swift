@@ -39,10 +39,9 @@ struct Crew: Equatable {
 }
 
 struct Video: Equatable {
-    let name: String?
-    let key: String?
+    let name: String
+    let key: String
     let site: String?
-    let type: String?
-    let id: String?
+    let id: String
     let publishedDate: String?
 }
