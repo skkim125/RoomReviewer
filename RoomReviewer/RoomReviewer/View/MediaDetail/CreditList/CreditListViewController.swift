@@ -93,7 +93,7 @@ final class CreditListViewController: UIViewController, View {
     }
     
     private func configureNavigationBar() {
-        navigationItem.title = "출연 배우"
+        navigationItem.title = "모든 출연진"
         self.navigationItem.hidesBackButton = true
         self.navigationItem.leftBarButtonItem = backButton
     }

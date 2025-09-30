@@ -13,7 +13,7 @@ final class SeeMoreCollectionViewCell: UICollectionViewCell {
     static let cellID = "SeeMoreCollectionViewCell"
     
     private let titleLabel = UILabel().then {
-        $0.text = "출연 배우 모두 보기"
+        $0.text = "출연진 모두 보기"
         $0.font = AppFont.semiboldSubTitle
         $0.textColor = AppColor.appWhite
     }
