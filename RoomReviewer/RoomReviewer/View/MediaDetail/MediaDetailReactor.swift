@@ -10,6 +10,16 @@ import RxSwift
 import ReactorKit
 import CoreData
 
+protocol Credit {
+    var id: Int { get }
+    var name: String { get }
+    var profilePath: String? { get }
+    var role: String? { get }
+}
+extension Cast: Credit { var role: String? { character } }
+extension Crew: Credit { var role: String? { department } }
+
+
 final class MediaDetailReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
@@ -82,6 +92,7 @@ final class MediaDetailReactor: Reactor {
         @Pulse var showNetworkErrorAndDismiss: Void?
         @Pulse var showMoveYoutubeAlert: Video?
         @Pulse var showUpdateCompleteAlert: Void?
+        @Pulse var pushCreditsListView: (title: String, credits: [Credit])?
         @Pulse var error: Error?
     }
 
@@ -96,6 +107,7 @@ final class MediaDetailReactor: Reactor {
         case starButtonTapped
         case setOverviewButtonVisible(Bool)
         case videoSelected(Video?)
+        case seeMoreCreditsButtonTapped
     }
 
     enum Mutation {
@@ -115,6 +127,7 @@ final class MediaDetailReactor: Reactor {
         case showNetworkErrorAndDismiss
         case showMoveYoutubeAlert(Video)
         case showUpdateCompleteAlert
+        case pushCreditsListView(title: String, credits: [Credit])
         case showError(Error)
     }
 
@@ -357,6 +370,10 @@ final class MediaDetailReactor: Reactor {
         case .videoSelected(let video):
             guard let video = video else { return .empty() }
             return .just(.showMoveYoutubeAlert(video))
+            
+        case .seeMoreCreditsButtonTapped:
+            let allCredits: [Credit] = currentState.creators.map { $0 as Credit } + currentState.casts.map { $0 as Credit }
+            return .just(.pushCreditsListView(title: "출연 및 제작", credits: allCredits))
         }
     }
     
@@ -370,18 +387,35 @@ final class MediaDetailReactor: Reactor {
             newState.areImagesLoaded = isLoaded
         case .getMediaDetail(let mediaInfo):
             let detail = mediaInfo
+            
             newState.overview = detail.overview
             newState.genres = detail.genres.joined(separator: " / ")
             newState.casts = detail.cast
             newState.creators = detail.creator
+            
             var sectionModels: [MediaDetailSectionModel] = []
+            
             let creators = detail.creator.prefix(10).sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ MediaDetailSectionItem.creator(item: $0) })
             if !creators.isEmpty {
                 sectionModels.append(MediaDetailSectionModel.creators(items: creators))
             }
-            let casts = detail.cast.prefix(10).map({ MediaDetailSectionItem.cast(item: $0) })
-            if !casts.isEmpty {
-                sectionModels.append(MediaDetailSectionModel.casts(items: casts))
+            
+            var castItems: [MediaDetailSectionItem] = []
+            let allCasts = detail.cast
+            
+            if allCasts.count > 10 {
+                let top10Casts = allCasts.prefix(10)
+                castItems.append(contentsOf: top10Casts.map { .cast(item: $0) })
+            } else {
+                castItems.append(contentsOf: allCasts.map { .cast(item: $0) })
+            }
+            
+            if !castItems.isEmpty {
+                sectionModels.append(MediaDetailSectionModel.casts(items: castItems))
+            }
+            
+            if detail.cast.count > 10 {
+                sectionModels.append(MediaDetailSectionModel.seeMore(items: [.seeMore]))
             }
             
             if let videos = detail.video {
@@ -429,6 +463,8 @@ final class MediaDetailReactor: Reactor {
             newState.showUpdateCompleteAlert = ()
         case .showMoveYoutubeAlert(let video):
             newState.showMoveYoutubeAlert = video
+        case .pushCreditsListView(let title, let credits):
+            newState.pushCreditsListView = (title, credits)
         }
         
         return newState

@@ -151,6 +151,7 @@ final class MediaDetailViewController: UIViewController, View {
         $0.showsHorizontalScrollIndicator = false
         $0.register(CreditsCollectionViewCell.self, forCellWithReuseIdentifier: CreditsCollectionViewCell.cellID)
         $0.register(VideoCollectionViewCell.self, forCellWithReuseIdentifier: VideoCollectionViewCell.cellID)
+        $0.register(SeeMoreCollectionViewCell.self, forCellWithReuseIdentifier: SeeMoreCollectionViewCell.cellID)
         $0.register(CreditsSectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CreditsSectionHeader.reusableID)
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
@@ -372,6 +373,12 @@ final class MediaDetailViewController: UIViewController, View {
                     cell.reactor = CreditsCollectionViewCellReactor(name: creator.name, role: creator.department, profilePath: creator.profilePath, imageLoader: self.imageProvider)
                     return cell
                     
+                case .seeMore:
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SeeMoreCollectionViewCell.cellID, for: indexPath) as? SeeMoreCollectionViewCell else {
+                        return UICollectionViewCell()
+                    }
+                    return cell
+                    
                 case .video(let video):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCollectionViewCell.cellID, for: indexPath) as? VideoCollectionViewCell else {
                         return UICollectionViewCell()
@@ -411,6 +418,8 @@ final class MediaDetailViewController: UIViewController, View {
                     case .videos:
                         let width = UIScreen.main.bounds.width * 0.9
                         totalHeight += (width * 9 / 16) + 30 + AppFont.semiboldSubTitle.lineHeight
+                    case .seeMore:
+                        totalHeight += 30
                     }
                 }
                 
@@ -467,6 +476,12 @@ final class MediaDetailViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$pushCreditsListView)
+            .compactMap { $0 }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(with: self) { owner, creditsInfo in
+            }
+            .disposed(by: disposeBag)
     }
     
     private func bindAction(reactor: MediaDetailReactor) {
@@ -524,15 +539,16 @@ final class MediaDetailViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         creditsCollectionView.rx.modelSelected(MediaDetailSectionModel.Item.self)
-            .compactMap { item -> Video? in
+            .compactMap { item -> Reactor.Action? in
                 switch item {
                 case .cast, .creator:
                     return nil
                 case .video(item: let video):
-                    return video
+                    return Reactor.Action.videoSelected(video)
+                case .seeMore:
+                    return Reactor.Action.seeMoreCreditsButtonTapped
                 }
             }
-            .map { Reactor.Action.videoSelected($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

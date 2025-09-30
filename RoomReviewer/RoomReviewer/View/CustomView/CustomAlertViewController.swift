@@ -80,7 +80,7 @@ final class CustomAlertViewController: UIViewController {
     private func configureLayout() {
         containerView.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(30)
+            make.horizontalEdges.equalToSuperview().inset(20)
             make.top.greaterThanOrEqualToSuperview().offset(20)
             make.bottom.lessThanOrEqualToSuperview().inset(20)
         }
@@ -145,5 +145,6 @@ final class CustomAlertViewController: UIViewController {
                 owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
+        
     }
 }

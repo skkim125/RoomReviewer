@@ -12,12 +12,14 @@ enum MediaDetailSectionModel: Equatable {
     case creators(items: [MediaDetailSectionItem])
     case casts(items: [MediaDetailSectionItem])
     case videos(items: [MediaDetailSectionItem])
+    case seeMore(items: [MediaDetailSectionItem])
 }
 
 enum MediaDetailSectionItem: Equatable {
     case creator(item: Crew)
     case cast(item: Cast)
     case video(item: Video)
+    case seeMore
 }
 
 extension MediaDetailSectionModel: SectionModelType {
@@ -25,7 +27,7 @@ extension MediaDetailSectionModel: SectionModelType {
     
     var items: [MediaDetailSectionItem] {
         switch self {
-        case .creators(let items), .casts(let items), .videos(let items):
+        case .creators(let items), .casts(let items), .videos(let items), .seeMore(let items):
             return items
         }
     }
@@ -38,6 +40,8 @@ extension MediaDetailSectionModel: SectionModelType {
             self = .casts(items: items)
         case .videos:
             self = .videos(items: items)
+        case .seeMore:
+            self = .seeMore(items: items)
         }
     }
 }
@@ -51,6 +55,8 @@ extension MediaDetailSectionModel {
             return "주요 출연진"
         case .videos:
             return "관련 영상"
+        default:
+            return nil
         }
     }
 }

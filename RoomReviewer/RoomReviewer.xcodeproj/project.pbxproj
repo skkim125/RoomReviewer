@@ -51,6 +51,7 @@
 		0446B8B92E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8B82E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel */; };
 		0446B8BC2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8BB2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift */; };
 		0446B8BD2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8BA2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift */; };
+		0446B8C92E8AAACA004043FE /* SeeMoreCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8C82E8AAACA004043FE /* SeeMoreCollectionViewCell.swift */; };
 		044952592E08169D00D75C4A /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 044952582E08169D00D75C4A /* Differentiator */; };
 		0449525B2E08169D00D75C4A /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 0449525A2E08169D00D75C4A /* RxDataSources */; };
 		044952642E081A4A00D75C4A /* HomeSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044952632E081A4A00D75C4A /* HomeSectionModel.swift */; };
@@ -207,6 +208,7 @@
 		0446B8B82E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = RoomReviewerMappingModel_v1.xcmappingmodel; sourceTree = "<group>"; };
 		0446B8BA2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		0446B8BB2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		0446B8C82E8AAACA004043FE /* SeeMoreCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeeMoreCollectionViewCell.swift; sourceTree = "<group>"; };
 		044952632E081A4A00D75C4A /* HomeSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSectionModel.swift; sourceTree = "<group>"; };
 		044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeReactorLoadDataUnitTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
@@ -753,6 +755,7 @@
 				046E7A362E574D2B00FAF58A /* CreditsCollectionViewCellReactor.swift */,
 				0418C3152E856BE80040A8DE /* VideoCollectionViewCell.swift */,
 				0418C3172E856BF10040A8DE /* VideoCollectionViewCellReactor.swift */,
+				0446B8C82E8AAACA004043FE /* SeeMoreCollectionViewCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -1247,6 +1250,7 @@
 				04DCA8A02DF2DB7100695361 /* NetworkError.swift in Sources */,
 				046B38172E78A02600354C37 /* MainTabBarController.swift in Sources */,
 				048096522E5DC437002033A0 /* ReviewDatabaseManager.swift in Sources */,
+				0446B8C92E8AAACA004043FE /* SeeMoreCollectionViewCell.swift in Sources */,
 				04D0D0A52E5C7EB9002A6951 /* WriteReviewReactor.swift in Sources */,
 				04B3790A2E51D74E00C2F3EA /* CoreDataStack.swift in Sources */,
 				046E7A352E574D1000FAF58A /* CreditsCollectionVIewCell.swift in Sources */,
@@ -1534,7 +1538,7 @@
 					"@executable_path/Frameworks",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1572,7 +1576,7 @@
 					"@executable_path/Frameworks",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.harvey.RoomReviewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
