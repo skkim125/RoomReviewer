@@ -5,7 +5,7 @@
 GoogleService-Info.plist
 
 # Fastlane
-fastlane/report.xml
+**/fastlane/report.xml
 fastlane/logs
 fastlane/test_output
 fastlane/.env
