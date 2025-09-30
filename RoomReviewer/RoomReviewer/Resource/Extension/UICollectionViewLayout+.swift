@@ -108,7 +108,7 @@ extension UICollectionViewLayout {
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
                 section.interGroupSpacing = 15
-                section.contentInsets = .init(top: 0, leading: 15, bottom: 10, trailing: 15)
+                section.contentInsets = .init(top: 5, leading: 15, bottom: 10, trailing: 15)
                 
                 return section
                 
@@ -218,6 +218,27 @@ extension UICollectionViewLayout {
             )
             
             section.boundarySupplementaryItems = [header]
+            
+            return section
+        }
+    }
+    
+    static var creditListCollectionViewLayout: UICollectionViewLayout {
+        return UICollectionViewCompositionalLayout { _, _ in
+            let itemSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(100)
+            )
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = .init(top: 5, leading: 15, bottom: 5, trailing: 15)
+            
+            let groupSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(100)
+            )
+            let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+            
+            let section = NSCollectionLayoutSection(group: group)
             
             return section
         }

@@ -414,12 +414,12 @@ final class MediaDetailViewController: UIViewController, View {
                     case .creators:
                         totalHeight += 160
                     case .casts:
-                        totalHeight += 200
+                        totalHeight += 210
                     case .videos:
                         let width = UIScreen.main.bounds.width * 0.9
-                        totalHeight += (width * 9 / 16) + 30 + AppFont.semiboldSubTitle.lineHeight
+                        totalHeight += (width * 9 / 16) + 35 + AppFont.semiboldSubTitle.lineHeight
                     case .seeMore:
-                        totalHeight += 30
+                        totalHeight += 40
                     }
                 }
                 
@@ -479,7 +479,11 @@ final class MediaDetailViewController: UIViewController, View {
         reactor.pulse(\.$pushCreditsListView)
             .compactMap { $0 }
             .asDriver(onErrorDriveWith: .empty())
-            .drive(with: self) { owner, creditsInfo in
+            .drive(with: self) { owner, credits in
+                let vc = CreditListViewController(imageProvider: owner.imageProvider)
+                vc.reactor = CreditListReactor(credits: credits)
+                
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
     }
@@ -773,7 +777,7 @@ extension MediaDetailViewController {
         creditsCollectionView.snp.makeConstraints {
             $0.top.equalTo(overviewStackView.snp.bottom).offset(5)
             $0.horizontalEdges.equalTo(contentView).inset(5)
-            $0.height.equalTo(400)
+            $0.height.equalTo(0)
             $0.bottom.equalTo(contentView).inset(10)
         }
         

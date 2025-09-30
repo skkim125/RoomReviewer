@@ -10,16 +10,6 @@ import RxSwift
 import ReactorKit
 import CoreData
 
-protocol Credit {
-    var id: Int { get }
-    var name: String { get }
-    var profilePath: String? { get }
-    var role: String? { get }
-}
-extension Cast: Credit { var role: String? { character } }
-extension Crew: Credit { var role: String? { department } }
-
-
 final class MediaDetailReactor: Reactor {
     var initialState: State
     private let networkService: NetworkService
@@ -92,7 +82,7 @@ final class MediaDetailReactor: Reactor {
         @Pulse var showNetworkErrorAndDismiss: Void?
         @Pulse var showMoveYoutubeAlert: Video?
         @Pulse var showUpdateCompleteAlert: Void?
-        @Pulse var pushCreditsListView: (title: String, credits: [Credit])?
+        @Pulse var pushCreditsListView: [Cast]?
         @Pulse var error: Error?
     }
 
@@ -127,7 +117,7 @@ final class MediaDetailReactor: Reactor {
         case showNetworkErrorAndDismiss
         case showMoveYoutubeAlert(Video)
         case showUpdateCompleteAlert
-        case pushCreditsListView(title: String, credits: [Credit])
+        case pushCreditsListView(credits: [Cast])
         case showError(Error)
     }
 
@@ -372,8 +362,8 @@ final class MediaDetailReactor: Reactor {
             return .just(.showMoveYoutubeAlert(video))
             
         case .seeMoreCreditsButtonTapped:
-            let allCredits: [Credit] = currentState.creators.map { $0 as Credit } + currentState.casts.map { $0 as Credit }
-            return .just(.pushCreditsListView(title: "출연 및 제작", credits: allCredits))
+            let casts = currentState.casts
+            return .just(.pushCreditsListView(credits: casts))
         }
     }
     
@@ -463,8 +453,8 @@ final class MediaDetailReactor: Reactor {
             newState.showUpdateCompleteAlert = ()
         case .showMoveYoutubeAlert(let video):
             newState.showMoveYoutubeAlert = video
-        case .pushCreditsListView(let title, let credits):
-            newState.pushCreditsListView = (title, credits)
+        case .pushCreditsListView(let credits):
+            newState.pushCreditsListView = credits
         }
         
         return newState

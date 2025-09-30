@@ -52,6 +52,11 @@
 		0446B8BC2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8BB2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift */; };
 		0446B8BD2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8BA2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift */; };
 		0446B8C92E8AAACA004043FE /* SeeMoreCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8C82E8AAACA004043FE /* SeeMoreCollectionViewCell.swift */; };
+		0446B8DC2E8BA83C004043FE /* CreditListCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8D72E8BA83C004043FE /* CreditListCollectionViewCell.swift */; };
+		0446B8EA2E8BAC2F004043FE /* CreditListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8E92E8BAC2F004043FE /* CreditListViewController.swift */; };
+		0446B8EC2E8BAC40004043FE /* CreditListReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8EB2E8BAC40004043FE /* CreditListReactor.swift */; };
+		0446B8EE2E8BACC2004043FE /* CreditListCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8ED2E8BACC2004043FE /* CreditListCollectionViewCellReactor.swift */; };
+		0446B8F02E8BAD07004043FE /* CreditListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0446B8EF2E8BAD07004043FE /* CreditListSectionModel.swift */; };
 		044952592E08169D00D75C4A /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 044952582E08169D00D75C4A /* Differentiator */; };
 		0449525B2E08169D00D75C4A /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 0449525A2E08169D00D75C4A /* RxDataSources */; };
 		044952642E081A4A00D75C4A /* HomeSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044952632E081A4A00D75C4A /* HomeSectionModel.swift */; };
@@ -209,6 +214,11 @@
 		0446B8BA2E8A5E7A004043FE /* VideoEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		0446B8BB2E8A5E7A004043FE /* VideoEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		0446B8C82E8AAACA004043FE /* SeeMoreCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeeMoreCollectionViewCell.swift; sourceTree = "<group>"; };
+		0446B8D72E8BA83C004043FE /* CreditListCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditListCollectionViewCell.swift; sourceTree = "<group>"; };
+		0446B8E92E8BAC2F004043FE /* CreditListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditListViewController.swift; sourceTree = "<group>"; };
+		0446B8EB2E8BAC40004043FE /* CreditListReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditListReactor.swift; sourceTree = "<group>"; };
+		0446B8ED2E8BACC2004043FE /* CreditListCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditListCollectionViewCellReactor.swift; sourceTree = "<group>"; };
+		0446B8EF2E8BAD07004043FE /* CreditListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditListSectionModel.swift; sourceTree = "<group>"; };
 		044952632E081A4A00D75C4A /* HomeSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSectionModel.swift; sourceTree = "<group>"; };
 		044952692E08257000D75C4A /* HomeReactorLoadDataUnitTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeReactorLoadDataUnitTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044952722E08257600D75C4A /* HomeReactorLoadDataUnitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeReactorLoadDataUnitTest.swift; sourceTree = "<group>"; };
@@ -474,6 +484,7 @@
 				04C97ABD2E23784C001EB1D4 /* MediaDetailViewController.swift */,
 				04C97ADB2E23B595001EB1D4 /* MediaDetailReactor.swift */,
 				04FE6C922E5887C200CCB76C /* Cell */,
+				0446B8D62E8BA81F004043FE /* CreditList */,
 			);
 			path = MediaDetail;
 			sourceTree = "<group>";
@@ -492,6 +503,34 @@
 				042F7EB82E6584AA003272EC /* MediaDetailSectionModel.swift */,
 			);
 			path = SectionModel;
+			sourceTree = "<group>";
+		};
+		0446B8D62E8BA81F004043FE /* CreditList */ = {
+			isa = PBXGroup;
+			children = (
+				0446B8E22E8BA8A0004043FE /* SecionModel */,
+				0446B8E92E8BAC2F004043FE /* CreditListViewController.swift */,
+				0446B8EB2E8BAC40004043FE /* CreditListReactor.swift */,
+				0446B8E12E8BA84C004043FE /* Cell */,
+			);
+			path = CreditList;
+			sourceTree = "<group>";
+		};
+		0446B8E12E8BA84C004043FE /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				0446B8D72E8BA83C004043FE /* CreditListCollectionViewCell.swift */,
+				0446B8ED2E8BACC2004043FE /* CreditListCollectionViewCellReactor.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		0446B8E22E8BA8A0004043FE /* SecionModel */ = {
+			isa = PBXGroup;
+			children = (
+				0446B8EF2E8BAD07004043FE /* CreditListSectionModel.swift */,
+			);
+			path = SecionModel;
 			sourceTree = "<group>";
 		};
 		0449525C2E08174000D75C4A /* Data */ = {
@@ -1180,12 +1219,15 @@
 				04100D1D2E698381008BF76C /* CastEntity+CoreDataClass.swift in Sources */,
 				04100D2B2E6ABD38008BF76C /* MyPageSectionModel.swift in Sources */,
 				04100D1E2E698381008BF76C /* CrewEntity+CoreDataProperties.swift in Sources */,
+				0446B8DC2E8BA83C004043FE /* CreditListCollectionViewCell.swift in Sources */,
 				0489D8FC2E741481003FE402 /* ImageFileManager.swift in Sources */,
 				0446B8B92E8A5E40004043FE /* RoomReviewerMappingModel_v1.xcmappingmodel in Sources */,
 				04100D1F2E698381008BF76C /* CastEntity+CoreDataProperties.swift in Sources */,
 				04100D202E698381008BF76C /* CrewEntity+CoreDataClass.swift in Sources */,
 				04D0D0A32E5C7EB0002A6951 /* WriteReviewViewController.swift in Sources */,
+				0446B8EC2E8BAC40004043FE /* CreditListReactor.swift in Sources */,
 				046E7A372E574D2B00FAF58A /* CreditsCollectionViewCellReactor.swift in Sources */,
+				0446B8EA2E8BAC2F004043FE /* CreditListViewController.swift in Sources */,
 				0418C3182E856BF10040A8DE /* VideoCollectionViewCellReactor.swift in Sources */,
 				046EFB562E56E5E200E2736B /* MediaEntity+CoreDataProperties.swift in Sources */,
 				04C97AB42E2286C3001EB1D4 /* PosterCollectionViewCell.swift in Sources */,
@@ -1199,6 +1241,7 @@
 				04DCA8A52DF2DBFC00695361 /* TargetType.swift in Sources */,
 				04C97ABE2E23784C001EB1D4 /* MediaDetailViewController.swift in Sources */,
 				04100D382E6AF6BB008BF76C /* SavedMediaReactor.swift in Sources */,
+				0446B8F02E8BAD07004043FE /* CreditListSectionModel.swift in Sources */,
 				0489D8F22E729B46003FE402 /* NetworkMonitor.swift in Sources */,
 				04FE6C972E599C4100CCB76C /* TVDetail.swift in Sources */,
 				0480964E2E5DC118002033A0 /* MediaDatabaseManager.swift in Sources */,
@@ -1242,6 +1285,7 @@
 				04A722DF2E54A1A200797731 /* CommonButton.swift in Sources */,
 				046E7A2E2E56E6AE00FAF58A /* ReviewEntity+CoreDataClass.swift in Sources */,
 				046E7A2F2E56E6AE00FAF58A /* ReviewEntity+CoreDataProperties.swift in Sources */,
+				0446B8EE2E8BACC2004043FE /* CreditListCollectionViewCellReactor.swift in Sources */,
 				040222642E713FBD0009DC38 /* MediaTierListViewController.swift in Sources */,
 				04100D2E2E6AC2C2008BF76C /* MyPageHeaderView.swift in Sources */,
 				04C97ABA2E236D29001EB1D4 /* PosterCollectionViewCellReactor.swift in Sources */,
