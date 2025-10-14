@@ -95,7 +95,6 @@
 		0489D8F62E72B92B003FE402 /* OfflineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8F52E72B92B003FE402 /* OfflineView.swift */; };
 		0489D8FC2E741481003FE402 /* ImageFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8FB2E741481003FE402 /* ImageFileManager.swift */; };
 		0489D8FE2E741597003FE402 /* Data+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8FD2E741597003FE402 /* Data+.swift */; };
-		0489D9002E743394003FE402 /* DiskImageCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0489D8FF2E743394003FE402 /* DiskImageCacheManager.swift */; };
 		048E5E1D2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048E5E1C2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift */; };
 		048E5E1F2E62D92D00189765 /* AppImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048E5E1E2E62D92D00189765 /* AppImage.swift */; };
 		04A722DD2E549F3600797731 /* CustomAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A722DC2E549F3600797731 /* CustomAlertViewController.swift */; };
@@ -246,7 +245,6 @@
 		0489D8F52E72B92B003FE402 /* OfflineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineView.swift; sourceTree = "<group>"; };
 		0489D8FB2E741481003FE402 /* ImageFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFileManager.swift; sourceTree = "<group>"; };
 		0489D8FD2E741597003FE402 /* Data+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+.swift"; sourceTree = "<group>"; };
-		0489D8FF2E743394003FE402 /* DiskImageCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskImageCacheManager.swift; sourceTree = "<group>"; };
 		048E5E1C2E62D23C00189765 /* TrendMediaCollectionViewCellReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMediaCollectionViewCellReactor.swift; sourceTree = "<group>"; };
 		048E5E1E2E62D92D00189765 /* AppImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImage.swift; sourceTree = "<group>"; };
 		04A722DC2E549F3600797731 /* CustomAlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlertViewController.swift; sourceTree = "<group>"; };
@@ -576,7 +574,6 @@
 			children = (
 				0489D8FB2E741481003FE402 /* ImageFileManager.swift */,
 				04C6A3E02E87E8BA00848C99 /* ImageEndPoint.swift */,
-				0489D8FF2E743394003FE402 /* DiskImageCacheManager.swift */,
 				0410D7922E4F2CBD009D38EE /* ImageProvider.swift */,
 				0489D8F12E729B46003FE402 /* NetworkMonitor.swift */,
 			);
@@ -1275,7 +1272,6 @@
 				0489D8FE2E741597003FE402 /* Data+.swift in Sources */,
 				04C97ADC2E23B595001EB1D4 /* MediaDetailReactor.swift in Sources */,
 				044B8C342E60423900EB016D /* AppFont.swift in Sources */,
-				0489D9002E743394003FE402 /* DiskImageCacheManager.swift in Sources */,
 				042F7EB52E658471003272EC /* CreditsSectionHeader.swift in Sources */,
 				04B9CBC02DFEAA8A00E84E78 /* HotMediaCollectionViewCell.swift in Sources */,
 				04FE6C9C2E599E3000CCB76C /* MediaDetail.swift in Sources */,

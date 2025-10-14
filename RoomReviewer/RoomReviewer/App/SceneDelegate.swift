@@ -36,7 +36,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let dataFetcher = URLSessionDataFetcher(networkMonitor: networkMonitor)
         let networkManager = NetworkManager(dataFetcher: dataFetcher)
         let imageStore: ImageFileManaging = ImageFileManager()
-        let imageProvider = ImageProvider(fileManager: imageStore, dataFetcher: dataFetcher)
+        let imageProvider = ImageProvider(dataFetcher: dataFetcher)
         let dataStack = CoreDataStack(modelName: "RoomReviewerEntity")
         let mediaDatabaseManager = MediaDatabaseManager(stack: dataStack)
         let reviewDatabaseManager = ReviewDatabaseManager(stack: dataStack)

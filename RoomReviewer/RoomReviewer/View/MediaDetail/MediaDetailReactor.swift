@@ -134,7 +134,9 @@ final class MediaDetailReactor: Reactor {
                     } else {
                         return .setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false)
                     }
-                }.catch { error in return .just(.showError(error)) }
+                }.catch { error in
+                    return .just(.showError(error))
+                }
             
             let detailFetchStream = mediaDBManager.fetchMediaEntity(id: media.id).asObservable()
                 .flatMap { [weak self] entity -> Observable<Mutation> in
@@ -227,13 +229,19 @@ final class MediaDetailReactor: Reactor {
                             .just(.setWatchlistStatus(isWatchlisted: false, isStared: false, watchedDate: nil, mediaObjectID: nil, isReviewed: false))
                     }
                     .catch { error in
-                        .just(.showError(DatabaseError.deleteFailed))
+                            .just(.showError(DatabaseError.deleteFailed))
                     }
             } else {
                 let posterSaveStream: Observable<Void>
                 if let posterPath = media.posterPath, !posterPath.isEmpty {
                     let endpoint = ImageEndpoint(type: .tmdbImage(path: posterPath))
-                    posterSaveStream = imageProvider.fetchImage(endpoint: endpoint).map { _ in () }
+                    posterSaveStream = imageProvider.fetchImage(endpoint: endpoint)
+                        .flatMap { [weak self] imageData -> Observable<Void> in
+                            guard let self = self, let data = imageData else { return .just(()) }
+                            let posterURL = API.tmdbImageURL + posterPath
+                            self.imageFileManager.saveImage(image: data, urlString: posterURL)
+                            return .just(())
+                        }
                 } else {
                     posterSaveStream = .just(())
                 }
@@ -241,21 +249,31 @@ final class MediaDetailReactor: Reactor {
                 let backdropSaveStream: Observable<Void>
                 if let backdropPath = media.backdropPath, !backdropPath.isEmpty {
                     let endpoint = ImageEndpoint(type: .tmdbImage(path: backdropPath))
-                    backdropSaveStream = imageProvider.fetchImage(endpoint: endpoint).map { _ in () }
+                    backdropSaveStream = imageProvider.fetchImage(endpoint: endpoint)
+                        .flatMap { [weak self] imageData -> Observable<Void> in
+                            guard let self = self, let data = imageData else { return .just(()) }
+                            let backdropURL = API.tmdbImageURL + backdropPath
+                            self.imageFileManager.saveImage(image: data, urlString: backdropURL)
+                            return .just(())
+                        }
                 } else {
                     backdropSaveStream = .just(())
                 }
                 
                 let videoThumnailSaveStream: Observable<Void>
                 if !videos.isEmpty {
-                    let endpoints = videos.compactMap { video -> ImageEndpoint? in
+                    let saveStreams = videos.compactMap { video -> Observable<Void>? in
                         guard !video.key.isEmpty else { return nil }
-                        return ImageEndpoint(type: .youtubeThumbnail(key: video.key))
+                        let endpoint = ImageEndpoint(type: .youtubeThumbnail(key: video.key))
+                        return imageProvider.fetchImage(endpoint: endpoint)
+                            .flatMap { [weak self] imageData -> Observable<Void> in
+                                guard let self = self, let data = imageData else { return .just(()) }
+                                let thumnailURL = API.youtubeThumnailURL + video.key
+                                self.imageFileManager.saveImage(image: data, urlString: thumnailURL)
+                                return .just(())
+                            }
                     }
-                    
-                    let fetchStreams = endpoints.map { imageProvider.fetchImage(endpoint: $0) }
-                    videoThumnailSaveStream = Observable.zip(fetchStreams).map { _ in () }
-                    
+                    videoThumnailSaveStream = Observable.zip(saveStreams).map { _ in () }
                 } else {
                     videoThumnailSaveStream = .just(())
                 }
@@ -505,7 +523,14 @@ final class MediaDetailReactor: Reactor {
         guard let imagePath = imagePath, !imagePath.isEmpty else { return .just(.setBackdropImage(AppImage.emptyPosterImage)) }
         
         let backdropEndpoint = ImageEndpoint(type: .tmdbImage(path: imagePath))
+        
         return imageProvider.fetchImage(endpoint: backdropEndpoint)
+            .catch { [weak self] _ -> Observable<Data?> in
+                guard let self = self else { return .just(nil) }
+                
+                let backdropURL = API.tmdbImageURL + imagePath
+                return self.imageFileManager.loadImage(urlString: backdropURL)
+            }
             .map { data -> UIImage in
                 guard let data = data, let image = UIImage(data: data) else {
                     return AppImage.emptyPosterImage
@@ -520,7 +545,14 @@ final class MediaDetailReactor: Reactor {
         guard let imagePath = imagePath, !imagePath.isEmpty else { return .just(.setPosterImage(AppImage.emptyPosterImage)) }
         
         let posterEndpoint = ImageEndpoint(type: .tmdbImage(path: imagePath))
+        
         return imageProvider.fetchImage(endpoint: posterEndpoint)
+            .catch { [weak self] _ -> Observable<Data?> in
+                guard let self = self else { return .just(nil) }
+                
+                let posterURL = API.tmdbImageURL + imagePath
+                return self.imageFileManager.loadImage(urlString: posterURL)
+            }
             .map { data -> UIImage in
                 guard let data = data, let image = UIImage(data: data) else {
                     return AppImage.emptyPosterImage
