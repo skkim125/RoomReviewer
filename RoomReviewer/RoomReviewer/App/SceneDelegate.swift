@@ -86,31 +86,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         return tabBarController
     }
-    
-//    private func startNetworkMonitoring(networkMonitor: NetworkMonitoring) {
-//        networkMonitor.start()
-//        networkMonitor.isConnected
-//            .observe(on: MainScheduler.instance)
-//            .distinctUntilChanged()
-//            .subscribe(with: self) { owner, isConnected in
-//                if !isConnected {
-//                    owner.showNetworkErrorAlert()
-//                }
-//            }
-//            .disposed(by: disposeBag)
-//    }
-    
-//    private func showNetworkErrorAlert() {
-//        let alert = CustomAlertViewController(
-//            title: "네트워크 오류",
-//            subtitle: "네트워크 연결을 확인해주세요.",
-//            buttonType: .oneButton
-//        )
-//        
-//        if window?.rootViewController?.presentedViewController == nil {
-//            window?.rootViewController?.present(alert, animated: true)
-//        }
-//    }
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
