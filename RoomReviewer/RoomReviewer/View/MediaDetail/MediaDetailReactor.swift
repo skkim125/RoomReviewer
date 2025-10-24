@@ -404,9 +404,7 @@ final class MediaDetailReactor: Reactor {
             var sectionModels: [MediaDetailSectionModel] = []
             
             let creators = detail.creator.prefix(10).sorted(by: { $0.department ?? "" < $1.department ?? "" }).compactMap({ MediaDetailSectionItem.creator(item: $0) })
-            if !creators.isEmpty {
-                sectionModels.append(MediaDetailSectionModel.creators(items: creators))
-            }
+            sectionModels.append(MediaDetailSectionModel.creators(items: creators))
             
             var castItems: [MediaDetailSectionItem] = []
             let allCasts = detail.cast
@@ -417,21 +415,20 @@ final class MediaDetailReactor: Reactor {
             } else {
                 castItems.append(contentsOf: allCasts.map { .cast(item: $0) })
             }
+            sectionModels.append(MediaDetailSectionModel.casts(items: castItems))
             
-            if !castItems.isEmpty {
-                sectionModels.append(MediaDetailSectionModel.casts(items: castItems))
-            }
             
             if detail.cast.count > 10 {
                 sectionModels.append(MediaDetailSectionModel.seeMore(items: [.seeMore]))
+            } else {
+                sectionModels.append(MediaDetailSectionModel.seeMore(items: []))
             }
             
-            if let videos = detail.video {
+            if let videos = detail.video, !videos.isEmpty {
                 let convertVideoSectionItems = videos.map { MediaDetailSectionItem.video(item: $0) }
-                if !convertVideoSectionItems.isEmpty {
-                    sectionModels.append(MediaDetailSectionModel.videos(items: convertVideoSectionItems))
-                    newState.videos = videos
-                }
+                sectionModels.append(MediaDetailSectionModel.videos(items: convertVideoSectionItems))
+            } else {
+                sectionModels.append(MediaDetailSectionModel.videos(items: []))
             }
             
             newState.mediaDetailSectionModels = sectionModels

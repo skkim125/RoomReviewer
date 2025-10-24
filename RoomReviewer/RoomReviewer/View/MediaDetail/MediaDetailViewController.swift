@@ -411,15 +411,20 @@ final class MediaDetailViewController: UIViewController, View {
                 
                 sections.forEach { section in
                     switch section {
-                    case .creators:
-                        totalHeight += 160
-                    case .casts:
-                        totalHeight += 210
-                    case .videos:
-                        let width = UIScreen.main.bounds.width * 0.9
-                        totalHeight += (width * 9 / 16) + 35 + AppFont.semiboldSubTitle.lineHeight
-                    case .seeMore:
-                        totalHeight += 40
+                    case .creators(let items):
+                        if !items.isEmpty { totalHeight += 160 }
+                        
+                    case .casts(let items):
+                        if !items.isEmpty { totalHeight += 210 }
+                        
+                    case .seeMore(let items):
+                        if !items.isEmpty { totalHeight += 40 }
+                        
+                    case .videos(let items):
+                        if !items.isEmpty {
+                            let width = UIScreen.main.bounds.width * 0.9
+                            totalHeight += (width * 9 / 16) + 35 + AppFont.semiboldSubTitle.lineHeight
+                        }
                     }
                 }
                 
