@@ -10,6 +10,8 @@
 	<string>$(API_URL)</string>
 	<key>GADApplicationIdentifier</key>
 	<string>$(GAD_Application_Identifier)</string>
+	<key>GAD_TestAds_Identifier</key>
+	<string>$(GAD_TestAds_Identifier)</string>
 	<key>GAD_BannerADs_Identifier</key>
 	<string>$(GAD_BannerADs_Identifier)</string>
 	<key>LSApplicationQueriesSchemes</key>
