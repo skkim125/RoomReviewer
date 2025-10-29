@@ -17,9 +17,18 @@ final class MainTabBarController: UITabBarController {
     
     private lazy var bannerView = BannerView().then {
         $0.adSize = AdSizeBanner
+        
+        #if DEBUG
+        $0.adUnitID = Bundle.main.object(
+            forInfoDictionaryKey: "GAD_TestAds_Identifier"
+        ) as? String ?? ""
+        print("AdMob: DEBUG Mode - Using Test Ad Unit ID")
+        #else
         $0.adUnitID = Bundle.main.object(
             forInfoDictionaryKey: "GAD_BannerADs_Identifier"
         ) as? String ?? ""
+        print("AdMob: RELEASE Mode - Using Real Ad Unit ID")
+        #endif
         $0.rootViewController = self
         $0.isHidden = true
     }
