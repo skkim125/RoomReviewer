@@ -1,0 +1,86 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+# fastlane/Fastfile
+
+default_platform :ios
+
+platform :ios do
+  
+  # -----------------------------------------------------
+  #  패치 버전 배포 (예: 1.0.0 -> 1.0.1)
+  # (버그 수정)
+  # -----------------------------------------------------
+desc "Increment patch version, build, and deploy to App Store."
+  lane :release_patch do
+    
+    increment_version_number(
+      bump_type: "patch",
+      xcodeproj: "RoomReviewer.xcodeproj"
+    )
+    
+    build_and_upload
+  end
+
+  # -----------------------------------------------------
+  #  마이너 버전 배포 (예: 1.0.1 -> 1.1.0)
+  # (신기능 추가)
+  # -----------------------------------------------------
+  desc "Increment minor version, build, and deploy to App Store."
+  lane :release_minor do
+    
+    increment_version_number(
+      bump_type: "minor",
+      xcodeproj: "RoomReviewer.xcodeproj"
+    )
+    
+    build_and_upload
+  end
+    
+  private_lane :build_and_upload do |options|
+
+    fastlane_dir = File.dirname(__FILE__)
+    # 같은 폴더에 있는 release_notes.txt 파일을 읽습니다.
+    changelog_from_file = File.read(File.join(fastlane_dir, "release_notes.txt"))
+
+    increment_build_number(
+      xcodeproj: "RoomReviewer.xcodeproj"
+    )
+
+    gym(
+      scheme: "RoomReviewer",
+      clean: true,
+      export_method: "app-store",
+      output_directory: "./build"
+    )
+
+    upload_to_app_store(
+      release_notes: {
+      "ko" => changelog_from_file
+      },
+      submit_for_review: true,
+      automatic_release: true
+    )
+   
+    git_commit(
+      path: ["RoomReviewer.xcodeproj/project.pbxproj"],
+      message: "Bump version to #{get_version_number(xcodeproj: "RoomReviewer.xcodeproj",
+      target: "RoomReviewer"
+     )}"
+    )
+    
+    push_to_git_remote
+  end
+end
