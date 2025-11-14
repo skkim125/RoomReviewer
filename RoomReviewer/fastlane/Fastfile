@@ -16,14 +16,13 @@
 # fastlane/Fastfile
 
 default_platform :ios
-
 platform :ios do
   
   # -----------------------------------------------------
-  #  패치 버전 배포 (예: 1.0.0 -> 1.0.1)
+  #  패치 버전 배포 (예: 1.0.0 -> 1.0.1)
   # (버그 수정)
   # -----------------------------------------------------
-desc "Increment patch version, build, and deploy to App Store."
+  desc "Increment patch version, build, and deploy to App Store."
   lane :release_patch do
     
     increment_version_number(
@@ -33,9 +32,9 @@ desc "Increment patch version, build, and deploy to App Store."
     
     build_and_upload
   end
-
+  
   # -----------------------------------------------------
-  #  마이너 버전 배포 (예: 1.0.1 -> 1.1.0)
+  #  마이너 버전 배포 (예: 1.0.1 -> 1.1.0)
   # (신기능 추가)
   # -----------------------------------------------------
   desc "Increment minor version, build, and deploy to App Store."
@@ -50,25 +49,27 @@ desc "Increment patch version, build, and deploy to App Store."
   end
     
   private_lane :build_and_upload do |options|
-
     fastlane_dir = File.dirname(__FILE__)
-    # 같은 폴더에 있는 release_notes.txt 파일을 읽습니다.
     changelog_from_file = File.read(File.join(fastlane_dir, "release_notes.txt"))
-
+    
     increment_build_number(
       xcodeproj: "RoomReviewer.xcodeproj"
     )
-
+    
     gym(
       scheme: "RoomReviewer",
+      project: "RoomReviewer.xcodeproj",
       clean: true,
       export_method: "app-store",
       output_directory: "./build"
     )
-
+    
+    # API Key 대신 username 사용
     upload_to_app_store(
+      username: "skkim125@icloud.com",
+      app_identifier: "com.harvey.RoomReviewer",
       release_notes: {
-      "ko" => changelog_from_file
+        "ko" => changelog_from_file
       },
       submit_for_review: true,
       automatic_release: true
@@ -76,9 +77,10 @@ desc "Increment patch version, build, and deploy to App Store."
    
     git_commit(
       path: ["RoomReviewer.xcodeproj/project.pbxproj"],
-      message: "Bump version to #{get_version_number(xcodeproj: "RoomReviewer.xcodeproj",
-      target: "RoomReviewer"
-     )}"
+      message: "Bump version to #{get_version_number(
+        xcodeproj: "RoomReviewer.xcodeproj",
+        target: "RoomReviewer"
+      )}"
     )
     
     push_to_git_remote

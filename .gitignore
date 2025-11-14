@@ -5,10 +5,16 @@
 GoogleService-Info.plist
 
 # Fastlane
-**/fastlane/report.xml
-fastlane/logs
-fastlane/test_output
-fastlane/.env
+RoomReviewer/fastlane/report.xml
+RoomReviewer/fastlane/logs
+RoomReviewer/fastlane/test_output
+RoomReviewer/fastlane/AuthKey_*.p8
+
+# Environment variables
+.env
+RoomReviewer/.env
+RoomReviewer/fastlane/.env
+
 
 # Build artifacts
 *.ipa

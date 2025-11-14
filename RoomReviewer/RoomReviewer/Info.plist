@@ -11,9 +11,13 @@
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.5</string>
+	<string>1.0.6</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME) </string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
 	<key>GADApplicationIdentifier</key>
 	<string>$(GAD_Application_Identifier)</string>
 	<key>GAD_BannerADs_Identifier</key>
